@@ -1,0 +1,15 @@
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\bin\x86\Debug\OpenCLTemplate.dll
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\bin\x86\Debug\OpenCLTemplate.pdb
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\bin\x86\Debug\OpenCLTemplate.xml
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\bin\x86\Debug\pt\OpenCLTemplate.resources.dll
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\bin\x86\Debug\OpenCL.NET.dll
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\bin\x86\Debug\OpenCL.NET.xml
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\obj\x86\Debug\ResolveAssemblyReference.cache
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\obj\x86\Debug\OpenCLTemplate.frmCLInfo.resources
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\obj\x86\Debug\OpenCLTemplate.frmCLEdit.resources
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\obj\x86\Debug\OpenCLTemplate.Properties.Resources.resources
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\obj\x86\Debug\OpenCLTemplate.frmCLInfo.pt.resources
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\obj\x86\Debug\OpenCLTemplate.csproj.GenerateResource.Cache
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\obj\x86\Debug\pt\OpenCLTemplate.resources.dll
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\obj\x86\Debug\OpenCLTemplate.dll
+D:\Programacao\OpenCL\OpenCLTemplate\OpenCLTemplate 1.132\OpenCLTemplate\obj\x86\Debug\OpenCLTemplate.pdb
