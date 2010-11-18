@@ -115,6 +115,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLCalc.cs" />
+    <Compile Include="FourierTransform\CLFFT.cs" />
     <Compile Include="IsoSurface\Isosurface.cs" />
     <Compile Include="ODEs\ODEs.cs" />
     <Compile Include="SparseLinalg\SparseLinalg.cs" />
