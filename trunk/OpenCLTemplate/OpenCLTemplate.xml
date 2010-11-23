@@ -4,14 +4,194 @@
         <name>OpenCLTemplate</name>
     </assembly>
     <members>
+        <member name="T:OpenCLTemplate.OpenCLRTBController">
+            <summary>Class to help editing OpenCL code</summary>
+        </member>
+        <member name="M:OpenCLTemplate.OpenCLRTBController.#ctor(System.Windows.Forms.RichTextBox)">
+            <summary>Constructor. Takes care of a Rich Text Box KeyUp event to paint things</summary>
+            <param name="rTBOpenCL">RichTextBox to control</param>
+        </member>
+        <member name="F:OpenCLTemplate.OpenCLRTBController.HelpIndentation">
+            <summary>Help indentation?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.OpenCLRTBController.NormalTextColor">
+            <summary>Regular text color</summary>
+        </member>
+        <member name="F:OpenCLTemplate.OpenCLRTBController.NormalTextFont">
+            <summary>Regular text font</summary>
+        </member>
+        <member name="F:OpenCLTemplate.OpenCLRTBController.CommentColor">
+            <summary>Comments color</summary>
+        </member>
+        <member name="F:OpenCLTemplate.OpenCLRTBController.CommentTextFont">
+            <summary>Comments font</summary>
+        </member>
+        <member name="F:OpenCLTemplate.OpenCLRTBController.OpenCLStrings">
+            <summary>List of string structures to mark</summary>
+        </member>
+        <member name="M:OpenCLTemplate.OpenCLRTBController.rTB_KeyUp(System.Object,System.Windows.Forms.KeyEventArgs)">
+            <summary>KeyUp event handler</summary>
+        </member>
+        <member name="M:OpenCLTemplate.OpenCLRTBController.Update">
+            <summary>Forces OpenCL RichTextBox to be updated</summary>
+        </member>
+        <member name="M:OpenCLTemplate.OpenCLRTBController.StartedUpdating(System.Windows.Forms.RichTextBox)">
+            <summary>Stops updating text box while coloring text</summary>
+            <param name="rTB">Rich text box to lock</param>
+        </member>
+        <member name="M:OpenCLTemplate.OpenCLRTBController.StoppedUpdating(System.Windows.Forms.RichTextBox)">
+            <summary>Restarts updating text box</summary>
+            <param name="rTB">Rich text box to unlock</param>
+        </member>
+        <member name="T:OpenCLTemplate.OpenCLRTBController.StringsToMark">
+            <summary>Defines a structure of strings to mark</summary>
+        </member>
+        <member name="F:OpenCLTemplate.OpenCLRTBController.StringsToMark.Description">
+            <summary>Description of string type</summary>
+        </member>
+        <member name="F:OpenCLTemplate.OpenCLRTBController.StringsToMark.StringsColor">
+            <summary>Color to use for this string type</summary>
+        </member>
+        <member name="F:OpenCLTemplate.OpenCLRTBController.StringsToMark.StringsFont">
+            <summary>Font to be used in this list of strings</summary>
+        </member>
+        <member name="F:OpenCLTemplate.OpenCLRTBController.StringsToMark.Strings">
+            <summary>List of strings of this type</summary>
+        </member>
+        <member name="T:OpenCLTemplate.MachineLearning.TrainingSet">
+            <summary>
+            This class encapsulates all training data.
+            </summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.TrainingSet.trainingArray">
+            <summary>
+            List of training units
+            </summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.TrainingSet.kernels">
+            <summary>Auxiliar variable used during training, kernels values</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.TrainingSet.IsKernelCalculated">
+            <summary>Is kernel K[i][p], p=0..n, calculated?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.TrainingSet.errors">
+            <summary>
+            Auxiliar variable used during training
+            </summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.TrainingSet.addTrainingUnit(OpenCLTemplate.MachineLearning.TrainingUnit)">
+            <summary>Adds a new training unit to the set</summary>
+            <param name="newTrainingUnit">New training unit to add</param>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.TrainingSet.rnd">
+            <summary>
+            Random number generator
+            </summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.TrainingSet.removeRandomTrainingUnit">
+            <summary>Removes a random training unit from the set</summary>
+        </member>
+        <member name="P:OpenCLTemplate.MachineLearning.TrainingSet.getN">
+            <summary>
+            Gets the number of elements in the training set (equivalent to trainingArray.Count)
+            </summary>
+        </member>
+        <member name="T:OpenCLTemplate.FourierTransform.CLFFTfloat">
+            <summary>Computes Fast Fourier Transform of floats</summary>
+        </member>
+        <member name="F:OpenCLTemplate.FourierTransform.CLFFTfloat.kernelfft_radix16">
+            <summary>Radix FFT kernel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.FourierTransform.CLFFTfloat.kernelfft_radix4">
+            <summary>Radix FFT kernel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.FourierTransform.CLFFTfloat.kernelConjugate">
+            <summary>Radix FFT kernel</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.FFT16(OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Computes the Discrete Fourier Transform of a float2 vector x whose length is a power of 16. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.FFT16(System.Single[])">
+            <summary>Computes the Discrete Fourier Transform of a float2 vector x whose length is a power of 16. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.iFFT16(System.Single[])">
+            <summary>Computes the inverse Discrete Fourier Transform of a float2 vector x whose length is a power of 16. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.iFFT16(OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Computes the inverse Discrete Fourier Transform of a float2 vector x whose length is a power of 16. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.FFT4(OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Computes the Discrete Fourier Transform of a float2 vector x whose length is a power of 4. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.FFT4(System.Single[])">
+            <summary>Computes the Discrete Fourier Transform of a float2 vector x whose length is a power of 4. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.iFFT4(System.Single[])">
+            <summary>Computes the inverse Discrete Fourier Transform of a float2 vector x whose length is a power of 4. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.iFFT4(OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Computes the inverse Discrete Fourier Transform of a float2 vector x whose length is a power of 4. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
+        </member>
+        <member name="T:OpenCLTemplate.FourierTransform.CLFFTfloat.CLFFTSrc">
+            <summary>Fast Fourier Transform source code</summary>
+        </member>
+        <member name="T:OpenCLTemplate.FourierTransform.CLFFTdouble">
+            <summary>Computes Fast Fourier Transform of doubles</summary>
+        </member>
+        <member name="F:OpenCLTemplate.FourierTransform.CLFFTdouble.kernelfft_radix16">
+            <summary>Radix FFT kernel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.FourierTransform.CLFFTdouble.kernelfft_radix4">
+            <summary>Radix FFT kernel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.FourierTransform.CLFFTdouble.kernelConjugate">
+            <summary>Radix FFT kernel</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.FFT16(OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Computes the Discrete Fourier Transform of a double2 vector x whose length is a power of 16. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.FFT16(System.Double[])">
+            <summary>Computes the Discrete Fourier Transform of a double2 vector x whose length is a power of 16. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.iFFT16(System.Double[])">
+            <summary>Computes the inverse Discrete Fourier Transform of a double2 vector x whose length is a power of 16. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.iFFT16(OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Computes the inverse Discrete Fourier Transform of a double2 vector x whose length is a power of 16. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.FFT4(OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Computes the Discrete Fourier Transform of a double2 vector x whose length is a power of 4. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.FFT4(System.Double[])">
+            <summary>Computes the Discrete Fourier Transform of a double2 vector x whose length is a power of 4. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.iFFT4(System.Double[])">
+            <summary>Computes the inverse Discrete Fourier Transform of a double2 vector x whose length is a power of 4. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
+        </member>
+        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.iFFT4(OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Computes the inverse Discrete Fourier Transform of a double2 vector x whose length is a power of 4. 
+            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
+        </member>
+        <member name="T:OpenCLTemplate.FourierTransform.CLFFTdouble.CLFFTSrc">
+            <summary>Fast Fourier Transform source code</summary>
+        </member>
         <member name="T:OpenCLTemplate.frmCLEdit">
             <summary>OpenCL Helper Editor</summary>
-        </member>
-        <member name="M:OpenCLTemplate.frmCLEdit.#ctor">
-            <summary>Constructor.</summary>
-        </member>
-        <member name="M:OpenCLTemplate.frmCLEdit.btnCompileTest_Click(System.Object,System.EventArgs)">
-            <summary>Button to test code</summary>
         </member>
         <member name="F:OpenCLTemplate.frmCLEdit.components">
             <summary>
@@ -30,133 +210,11 @@
             the contents of this method with the code editor.
             </summary>
         </member>
-        <member name="T:OpenCLTemplate.DifferentialEquations.floatODE46">
-            <summary>Float differential equation integrator</summary>
-        </member>
-        <member name="F:OpenCLTemplate.DifferentialEquations.floatODE46.KernelFinalizeCalc">
-            <summary>Writes final Y values and estimated absolute errors</summary>
-        </member>
-        <member name="F:OpenCLTemplate.DifferentialEquations.floatODE46.KernelUpdateX">
-            <summary>Updates X to current time</summary>
-        </member>
-        <member name="F:OpenCLTemplate.DifferentialEquations.floatODE46.x">
-            <summary>Independent variable current value in OpenCL memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.DifferentialEquations.floatODE46.y">
-            <summary>Dynamic system current state in OpenCL memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.DifferentialEquations.floatODE46.Derivs">
-            <summary>Derivative calculator</summary>
-        </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.#ctor(System.Single,System.Single,System.Single[],OpenCLTemplate.DifferentialEquations.floatODE46.DerivCalcDeleg)">
+        <member name="M:OpenCLTemplate.frmCLEdit.#ctor">
             <summary>Constructor.</summary>
-            <param name="InitialState">Initial state of system</param>
-            <param name="StepSize">Desired step per integration pass</param>
-            <param name="InitialIndepVarValue">Initial independent variable value</param>
-            <param name="DerivativeCalculator">Function to calculate derivatives vector</param>
         </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.Integrate(System.Single)">
-            <summary>Integrates equation set to a final value using current stepsize. Ideally, final value 
-            and currentX should multiples of stepsize.</summary>
-            <param name="FinalValue">Final value to reach.</param>
-        </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.ResetState(System.Single,System.Single[])">
-            <summary>Sets current state</summary>
-            <param name="indepVar">New independent variable value</param>
-            <param name="State">New state values</param>
-        </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.Step(System.Single)">
-            <summary>Takes an integration step. Saves and returns stepsize back to what it was.</summary>
-            <param name="StepSize">Step size to use</param>
-        </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.Step">
-            <summary>Takes an integration step</summary>
-        </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.SetStep(System.Single)">
-            <summary>Sets step size.</summary>
-            <param name="StepSize">Step size to use</param>
-        </member>
-        <member name="P:OpenCLTemplate.DifferentialEquations.floatODE46.State">
-            <summary>Gets current values of space-state variables (from Device).</summary>
-        </member>
-        <member name="P:OpenCLTemplate.DifferentialEquations.floatODE46.AbsError">
-            <summary>Gets current absolute error sum</summary>
-        </member>
-        <member name="P:OpenCLTemplate.DifferentialEquations.floatODE46.IndepVar">
-            <summary>Gets current independent variable value (from Device).</summary>
-        </member>
-        <member name="T:OpenCLTemplate.DifferentialEquations.floatODE46.DerivCalcDeleg">
-            <summary>Function to calculate derivatives vector</summary>
-            <param name="x">IN: Scalar. Independent variable.</param>
-            <param name="y">IN: State-space vector.</param>
-            <param name="dydx">OUT: Derivatives</param>
-        </member>
-        <member name="T:OpenCLTemplate.DifferentialEquations.floatODE46.ODE46Source">
-            <summary>OpenCL source</summary>
-        </member>
-        <member name="T:OpenCLTemplate.DifferentialEquations.doubleODE46">
-            <summary>double differential equation integrator</summary>
-        </member>
-        <member name="F:OpenCLTemplate.DifferentialEquations.doubleODE46.KernelFinalizeCalc">
-            <summary>Writes final Y values and estimated absolute errors</summary>
-        </member>
-        <member name="F:OpenCLTemplate.DifferentialEquations.doubleODE46.KernelUpdateX">
-            <summary>Updates X to current time</summary>
-        </member>
-        <member name="F:OpenCLTemplate.DifferentialEquations.doubleODE46.x">
-            <summary>Independent variable current value in OpenCL memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.DifferentialEquations.doubleODE46.y">
-            <summary>Dynamic system current state in OpenCL memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.DifferentialEquations.doubleODE46.Derivs">
-            <summary>Derivative calculator</summary>
-        </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.#ctor(System.Double,System.Double,System.Double[],OpenCLTemplate.DifferentialEquations.doubleODE46.DerivCalcDeleg)">
-            <summary>Constructor.</summary>
-            <param name="InitialState">Initial state of system</param>
-            <param name="StepSize">Desired step per integration pass</param>
-            <param name="InitialIndepVarValue">Initial independent variable value</param>
-            <param name="DerivativeCalculator">Function to calculate derivatives vector</param>
-        </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.Integrate(System.Double)">
-            <summary>Integrates equation set to a final value using current stepsize. Ideally, final value 
-            and currentX should multiples of stepsize.</summary>
-            <param name="FinalValue">Final value to reach.</param>
-        </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.ResetState(System.Double,System.Double[])">
-            <summary>Sets current state</summary>
-            <param name="indepVar">New independent variable value</param>
-            <param name="State">New state values</param>
-        </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.Step(System.Double)">
-            <summary>Takes an integration step. Saves and returns stepsize back to what it was.</summary>
-            <param name="StepSize">Step size to use</param>
-        </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.Step">
-            <summary>Takes an integration step</summary>
-        </member>
-        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.SetStep(System.Double)">
-            <summary>Sets step size.</summary>
-            <param name="StepSize">Step size to use</param>
-        </member>
-        <member name="P:OpenCLTemplate.DifferentialEquations.doubleODE46.State">
-            <summary>Gets current values of space-state variables (from Device).</summary>
-        </member>
-        <member name="P:OpenCLTemplate.DifferentialEquations.doubleODE46.AbsError">
-            <summary>Gets current absolute error sum</summary>
-        </member>
-        <member name="P:OpenCLTemplate.DifferentialEquations.doubleODE46.IndepVar">
-            <summary>Gets current independent variable value (from Device).</summary>
-        </member>
-        <member name="T:OpenCLTemplate.DifferentialEquations.doubleODE46.DerivCalcDeleg">
-            <summary>Function to calculate derivatives vector</summary>
-            <param name="x">IN: Scalar. Independent variable.</param>
-            <param name="y">IN: State-space vector.</param>
-            <param name="dydx">OUT: Derivatives</param>
-        </member>
-        <member name="T:OpenCLTemplate.DifferentialEquations.doubleODE46.ODE46Source">
-            <summary>OpenCL source</summary>
+        <member name="M:OpenCLTemplate.frmCLEdit.btnCompileTest_Click(System.Object,System.EventArgs)">
+            <summary>Button to test code</summary>
         </member>
         <member name="T:OpenCLTemplate.MachineLearning.SVM">
             <summary>
@@ -165,6 +223,99 @@
         </member>
         <member name="F:OpenCLTemplate.MachineLearning.SVM.MAXMINWORKSIZE">
             <summary>Global work size to compute max/min. Has to be a power of 2</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.SVM.TrainingSet">
+            <summary>Training set for this solution</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.SVM.ProblemCfg">
+            <summary>Problem configuration</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.SVM.alphaList">
+            <summary>
+            Lagrange multipliers for solution
+            </summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.SVM.b">
+            <summary>
+            Threshold for solution
+            </summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.SVM.dimension">
+            <summary>
+            The dimension of the training set for which this is a solution
+            </summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.#ctor">
+            <summary>
+             Constructor that initializes with 0s
+            </summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.initializeWithZeros">
+            <summary>
+            Set all values of the solution to 0
+            </summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.SVM.CrossValParams">
+            <summary>Cross validation parameters: [0] - maximum crossValidation value found so far, [1] - lambda, [2] - C.  Returns best performance so far</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.PreCalibrateCfg(System.Single,System.Single)">
+            <summary>Attempts to pre-calibrate configuration parameters.
+            Finds an alpha that enhances similarities between positive examples
+            and reduces similarities between positive and negative examples.
+            Assumes that decreasing lambda increases kernel match.
+            </summary>
+            <param name="tolPositive">Positive kernels average should be greater than tolPositive</param>
+            <param name="tolNegative">Negative kernels average should be lesser than tolNegative</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.TrainWithCrossValidation">
+            <summary>Trains current SVM with cross-validation, adjusting kernel parameter lambda and box parameter C</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.TrainWithCrossValidation(System.Single,System.Single[],System.Single[])">
+            <summary>Trains current SVM with cross-validation, adjusting kernel parameter lambda and box parameter C. Returns best performance so far</summary>
+            <param name="CrossValidationSetPercent">Percentage of training examples that should be used as cross validation set</param>
+            <param name="lambdaSet">Values of lambda to try</param>
+            <param name="CSet">Values of c to try</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.Train">
+            <summary>Trains current SVM</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.PreComputeKernels">
+            <summary>Precomputes kernels of training set</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.ResetSolution">
+            <summary>Resets current SVM solution</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.RemoveNonSupportVectors">
+            <summary>Removes all vectors that are not SVMs, ie, so that alpha[i]=0</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.Classify(OpenCLTemplate.MachineLearning.TrainingUnit)">
+            <summary>Classifies a training unit as positive or negative (true or false)</summary>
+            <param name="Sample">Sample to be classified</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.ClassificationValue(OpenCLTemplate.MachineLearning.TrainingUnit)">
+            <summary>Classifies a training unit with a float. The bigger, the more positive the sample. Values greater than zero
+            are assumed to be positive samples</summary>
+            <param name="Sample">Sample to be classified</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.GetTrainingSetHitRate">
+            <summary>Gets the percentage of training examples classified correctly in the training set</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.GetTrainingSetHitRate(System.Int32)">
+            <summary>Gets the percentage of training examples classified correctly starting from the ind-th training sample</summary>
+            <param name="ind">Index to start reading training set samples</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.GetHitRate(OpenCLTemplate.MachineLearning.TrainingSet)">
+            <summary>Computes hit rates for a given test set</summary>
+            <param name="samples">Test set to be used</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.Load(System.String)">
+            <summary>
+            Copy all values from another solution
+            </summary>
+            <param name="FileName">File containing alpha's data</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.SVM.Save(System.String)">
+            <summary>Writes current solution to a file</summary>
         </member>
         <member name="F:OpenCLTemplate.MachineLearning.SVM.CLResource">
             <summary>Semaphor to ensure thread safety within OpenCL</summary>
@@ -301,99 +452,6 @@
             <summary>Finds minimum E[i] in SVM and returns corresponding i (returns arg min E[i])</summary>
             <param name="svm">SVM to check</param>
         </member>
-        <member name="F:OpenCLTemplate.MachineLearning.SVM.TrainingSet">
-            <summary>Training set for this solution</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.SVM.ProblemCfg">
-            <summary>Problem configuration</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.SVM.alphaList">
-            <summary>
-            Lagrange multipliers for solution
-            </summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.SVM.b">
-            <summary>
-            Threshold for solution
-            </summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.SVM.dimension">
-            <summary>
-            The dimension of the training set for which this is a solution
-            </summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.#ctor">
-            <summary>
-             Constructor that initializes with 0s
-            </summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.initializeWithZeros">
-            <summary>
-            Set all values of the solution to 0
-            </summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.SVM.CrossValParams">
-            <summary>Cross validation parameters: [0] - maximum crossValidation value found so far, [1] - lambda, [2] - C.  Returns best performance so far</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.PreCalibrateCfg(System.Single,System.Single)">
-            <summary>Attempts to pre-calibrate configuration parameters.
-            Finds an alpha that enhances similarities between positive examples
-            and reduces similarities between positive and negative examples.
-            Assumes that decreasing lambda increases kernel match.
-            </summary>
-            <param name="tolPositive">Positive kernels average should be greater than tolPositive</param>
-            <param name="tolNegative">Negative kernels average should be lesser than tolNegative</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.TrainWithCrossValidation">
-            <summary>Trains current SVM with cross-validation, adjusting kernel parameter lambda and box parameter C</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.TrainWithCrossValidation(System.Single,System.Single[],System.Single[])">
-            <summary>Trains current SVM with cross-validation, adjusting kernel parameter lambda and box parameter C. Returns best performance so far</summary>
-            <param name="CrossValidationSetPercent">Percentage of training examples that should be used as cross validation set</param>
-            <param name="lambdaSet">Values of lambda to try</param>
-            <param name="CSet">Values of c to try</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.Train">
-            <summary>Trains current SVM</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.PreComputeKernels">
-            <summary>Precomputes kernels of training set</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.ResetSolution">
-            <summary>Resets current SVM solution</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.RemoveNonSupportVectors">
-            <summary>Removes all vectors that are not SVMs, ie, so that alpha[i]=0</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.Classify(OpenCLTemplate.MachineLearning.TrainingUnit)">
-            <summary>Classifies a training unit as positive or negative (true or false)</summary>
-            <param name="Sample">Sample to be classified</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.ClassificationValue(OpenCLTemplate.MachineLearning.TrainingUnit)">
-            <summary>Classifies a training unit with a float. The bigger, the more positive the sample. Values greater than zero
-            are assumed to be positive samples</summary>
-            <param name="Sample">Sample to be classified</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.GetTrainingSetHitRate">
-            <summary>Gets the percentage of training examples classified correctly in the training set</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.GetTrainingSetHitRate(System.Int32)">
-            <summary>Gets the percentage of training examples classified correctly starting from the ind-th training sample</summary>
-            <param name="ind">Index to start reading training set samples</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.GetHitRate(OpenCLTemplate.MachineLearning.TrainingSet)">
-            <summary>Computes hit rates for a given test set</summary>
-            <param name="samples">Test set to be used</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.Load(System.String)">
-            <summary>
-            Copy all values from another solution
-            </summary>
-            <param name="FileName">File containing alpha's data</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.SVM.Save(System.String)">
-            <summary>Writes current solution to a file</summary>
-        </member>
         <member name="T:OpenCLTemplate.MachineLearning.SVM.ProblemSolver">
             <summary>
             This class aggregates all methods for solving SMO problems
@@ -431,28 +489,89 @@
             <param name="problemSolution">SVM to solve</param>
             <param name="i">Kernel line number to compute</param>
         </member>
-        <member name="T:OpenCLTemplate.frmCLInfo">
-            <summary>Displays OpenCL related information</summary>
+        <member name="T:OpenCLTemplate.MachineLearning.MultiClassSVM">
+            <summary>Multiple training SVM</summary>
         </member>
-        <member name="M:OpenCLTemplate.frmCLInfo.#ctor">
-            <summary>Constructor.</summary>
+        <member name="F:OpenCLTemplate.MachineLearning.MultiClassSVM.Classifications">
+            <summary>List of possible classifications</summary>
         </member>
-        <member name="F:OpenCLTemplate.frmCLInfo.components">
-            <summary>
-            Required designer variable.
-            </summary>
+        <member name="F:OpenCLTemplate.MachineLearning.MultiClassSVM.SVMs">
+            <summary>SVMs to perform each classification</summary>
         </member>
-        <member name="M:OpenCLTemplate.frmCLInfo.Dispose(System.Boolean)">
-            <summary>
-            Clean up any resources being used.
-            </summary>
-            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.#ctor(OpenCLTemplate.MachineLearning.TrainingSet)">
+            <summary>Creates a new multiclass SVM using desired outputs from training set. Classifications -1.0f are negative for all sets</summary>
+            <param name="TSet">Training set</param>
         </member>
-        <member name="M:OpenCLTemplate.frmCLInfo.InitializeComponent">
-            <summary>
-            Required method for Designer support - do not modify
-            the contents of this method with the code editor.
-            </summary>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.#ctor(OpenCLTemplate.MachineLearning.TrainingSet,OpenCLTemplate.MachineLearning.ProblemConfig)">
+            <summary>Creates a new multiclass SVM using desired outputs from training set. Classifications -1.0f are negative for all sets</summary>
+            <param name="TSet">Training set</param>
+            <param name="SVMCfg">Configuration parameters</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.initMultiSVM(OpenCLTemplate.MachineLearning.TrainingSet,OpenCLTemplate.MachineLearning.ProblemConfig)">
+            <summary>Creates a new multiclass SVM using desired outputs from training set. Classifications -1.0f are negative for all sets</summary>
+            <param name="TSet">Training set</param>
+            <param name="SVMCfg">Configuration parameters</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.Train">
+            <summary>Trains all SVMs in this multiclass SVM</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.Train(System.Single,System.Single)">
+            <summary>Trains all SVMs in this multiclass SVM precalibrating kernels</summary>
+            <param name="tolPositive">Positive kernels average should be greater than tolPositive</param>
+            <param name="tolNegative">Negative kernels average should be lesser than tolNegative</param>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.MultiClassSVM.CrossValParams">
+            <summary>Cross validation parameters: [0] - maximum crossValidation value found so far, [1] - lambda, [2] - C.  Returns best performance so far</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.TrainWithCrossValidation(OpenCLTemplate.MachineLearning.TrainingSet)">
+            <summary>Trains current SVM with cross-validation, adjusting kernel parameter lambda and box parameter C.
+            Returns best achieved efficiency.</summary>
+            <param name="CrossValidationSet">Cross validation set</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.TrainWithCrossValidation(OpenCLTemplate.MachineLearning.TrainingSet,System.Single[],System.Single[])">
+            <summary>Trains current SVM with cross-validation, adjusting kernel parameter lambda and box parameter C.
+            Returns best achieved efficiency.</summary>
+            <param name="CrossValidationSet">Cross validation set</param>
+            <param name="LambdaSet">Lambda set</param>
+            <param name="CSet">C values set</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.GetCrossValidationSet(OpenCLTemplate.MachineLearning.TrainingSet,System.Single)">
+            <summary>Extracts a cross validation set from a given set</summary>
+            <param name="Set">Set to extract cross validation from</param>
+            <param name="CrossValidationSetPercent">Percentage of elements to extract</param>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.MultiClassSVM.sample">
+            <summary>Sample to classify</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.MultiClassSVM.ClassificationValues">
+            <summary>Returned classification values</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.ClassifyWithRejection(OpenCLTemplate.MachineLearning.TrainingUnit)">
+            <summary>Attempts to classify a sample within a given category. Returns -1 if no classification was achieved.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.Classify(OpenCLTemplate.MachineLearning.TrainingUnit,System.Single@)">
+            <summary>Classifies a sample within a given category even if all SVMs predict it doesn`t belong to any.</summary>
+            <param name="Sample">Sample to classify</param>
+            <param name="maxVal">Maximum classification value found</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.Classify(OpenCLTemplate.CLCalc.Program.Image2D,System.Single[]@)">
+            <summary>Classifies a given set of Samples (image2d of floats) each one in a category. Each row of the image is a sample
+            to be classified and the features should be stored in the columns. The number of columns Ncol = Nfeatures/4 since 
+            each pixel holds 4 floats</summary>
+            <param name="Samples">Image2D containing samples to be classified</param>
+            <param name="maxVals">Maximum values found</param>
+            <returns></returns>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.Classify(System.Object)">
+            <summary>Classifies a sample using i-th svm</summary>
+            <param name="SVMInd">(int) Index of svm to use</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.GetHitRate(OpenCLTemplate.MachineLearning.TrainingSet)">
+            <summary>Gets SVM hit rate</summary>
+            <param name="TestSet">Test set</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.GetInternalHitRate">
+            <summary>Gets average internal hit rate</summary>
         </member>
         <member name="T:OpenCLTemplate.CLCalc">
             <summary>OpenCL calculations class</summary>
@@ -1405,6 +1524,596 @@
         <member name="F:OpenCLTemplate.CLCalc.CLPrograms.floatBodyPhysics.resetCloseNeighborsArgs">
             <summary>Apply self collision arguments</summary>
         </member>
+        <member name="T:OpenCLTemplate.MachineLearning.XMLFuncs">
+            <summary>Useful XML Functions</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.CreateNewTable(System.String,System.String[])">
+            <summary>Creates new table</summary>
+            <param name="TableName">Name</param>
+            <param name="Fields">Table fields. String. Start with dbl to make doubles.</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.CreateColumn(System.Data.DataTable,System.Windows.Forms.Control)">
+            <summary>Creates a column in a datatable if it does not exist and binds it to the control. 
+            Added controls: Control name starts with txtInt: integer. Control name starts with "txt" - TextBox bound to Double. If textbox ends with "Name" - string.
+            Control name starts with "radio" - Radio button. Boolean.
+            Control name starts with "chk" - Check box. Boolean.
+            Control name starts with "cmb" - Combo box. String.</summary>
+            <param name="t">Datatable to analyze.</param>
+            <param name="c">Control to create column from.</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.MakeTableFromDataGrid(System.Windows.Forms.DataGridView,System.String,System.Data.DataSet)">
+            <summary>Creates a table containing a grid's structure. Sets data type based on column name: if it starts with: int -> Integer data type;
+            string -> String data type; else -> Double.</summary>
+            <param name="grid">DataGridView to read info from.</param>
+            <param name="TableName">Name of table being created.</param>
+            <param name="data">DataSet to store table.</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.CreateForm(System.Windows.Forms.BindingSource,System.Windows.Forms.Control,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.Collections.Generic.List{System.String}})">
+            <summary>Creates a form containing editable data</summary>
+            <param name="BindSrc">Binding source to use</param>
+            <param name="ParentControl">Control where to add items. A new panel is created there.</param>
+            <param name="MultiLineCols">Columns containig multiline data</param>
+            <param name="MultiFieldCols">Columns containing multiple data such as more than 1 objective, etc.</param>
+            <param name="ComboboxCols">Columns which should be combo boxes</param>
+            <param name="ComboboxItems">Data to populate each combobox</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.GenReport(System.Collections.Generic.List{OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow})">
+            <summary>Generates report data</summary>
+            <param name="Rows">Information to be included in the report</param>
+        </member>
+        <member name="T:OpenCLTemplate.MachineLearning.XMLFuncs.FileReader">
+            <summary>Class to read text files.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.FileReader.ReadFile(System.String)">
+            <summary>Reads a text file and stores its lines in string arrays.</summary>
+            <param name="FileName">File to read</param>
+        </member>
+        <member name="T:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField">
+            <summary>Creates a multiple container for varible sizes fields.
+            Example: multiple objectives stored in a single field.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.txtBinded">
+            <summary>Text box bound to data source</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.lstItems">
+            <summary>List box that will contain the items</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.btnAdd">
+            <summary>Button to add a new item</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.btnRemove">
+            <summary>Button to remove an item</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.txtEditItem">
+            <summary>Text box to edit items</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.IsEditing">
+            <summary>Is this class editing the bound textbox?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Fields">
+            <summary>Fields to be added</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.#ctor(System.Windows.Forms.TextBox,System.Windows.Forms.Control)">
+            <summary>Constructor.</summary>
+            <param name="BindedTextBox">TextBox bound to the data source</param>
+            <param name="ParentControl">Control to use to add the necessary items</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.GetNextTop">
+            <summary>Gets next Top position to place controls.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.UpdateListBox">
+            <summary>Uses Fields to update listbox</summary>
+        </member>
+        <member name="T:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config">
+            <summary>MultiField configuration</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.VerticalSpacing">
+            <summary>Vertical spacing</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.HorizSpacing">
+            <summary>Horizontal spacing</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.AddButtonTitle">
+            <summary>"Add button" title</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.RemButtonTitle">
+            <summary>"Remove button" title</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.ItemsListBoxHeight">
+            <summary>Items list box height</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.BtnsWidth">
+            <summary>Buttons width</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.TxtEditHeight">
+            <summary>Editable textbox height</summary>
+        </member>
+        <member name="T:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow">
+            <summary>DataRow information to include in a report</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.Table">
+            <summary>Table of the item to generate in report</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.Row">
+            <summary>Row containing report data</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.DesiredColumns">
+            <summary>Information that should be put in the data</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.#ctor(System.Data.DataTable,System.Data.DataRow,System.Collections.Generic.List{System.String})">
+            <summary>Creates a new report row</summary>
+            <param name="t">Datatable</param>
+            <param name="r">Datarow</param>
+            <param name="DesiredInfo">Columns to include</param>
+        </member>
+        <member name="P:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.ItemTable">
+            <summary>Gets table of the item to generate in report</summary>
+        </member>
+        <member name="P:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.ItemRow">
+            <summary>
+            Row
+            </summary>
+        </member>
+        <member name="M:OpenCLTemplate.Program.Main">
+            <summary>
+            The main entry point for the application.
+            </summary>
+        </member>
+        <member name="T:OpenCLTemplate.frmCLInfo">
+            <summary>Displays OpenCL related information</summary>
+        </member>
+        <member name="F:OpenCLTemplate.frmCLInfo.components">
+            <summary>
+            Required designer variable.
+            </summary>
+        </member>
+        <member name="M:OpenCLTemplate.frmCLInfo.Dispose(System.Boolean)">
+            <summary>
+            Clean up any resources being used.
+            </summary>
+            <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        </member>
+        <member name="M:OpenCLTemplate.frmCLInfo.InitializeComponent">
+            <summary>
+            Required method for Designer support - do not modify
+            the contents of this method with the code editor.
+            </summary>
+        </member>
+        <member name="M:OpenCLTemplate.frmCLInfo.#ctor">
+            <summary>Constructor.</summary>
+        </member>
+        <member name="T:OpenCLTemplate.MachineLearning.TrainingUnit">
+            <summary>
+            This class corresponds to a training unit of the training data with all its inputs and the desired output.
+            </summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.TrainingUnit.xVector">
+            <summary>Features</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.TrainingUnit.y">
+            <summary>Desired output (-1 or 1)</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.TrainingUnit.#ctor(System.Single[],System.Single)">
+            <summary>Creates a new training unit</summary>
+            <param name="newXVector">New unit</param>
+            <param name="Classification">Classification, should ONLY be 1 or -1 for pure SVMs, write desired value for MultiClassSVMs</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.TrainingUnit.getDimension">
+            <summary>Gets dimension of feature vector</summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.TrainingUnit.Clone">
+            <summary>Retuurns a new trainingUnit which is the clone of this one</summary>
+        </member>
+        <member name="T:Utility.ModifyRegistry.ModifyRegistry">
+            <summary>
+            An useful class to read/write/delete/count registry keys
+            </summary>
+        </member>
+        <member name="M:Utility.ModifyRegistry.ModifyRegistry.Read(System.String)">
+            <summary>
+            To read a registry key.
+            input: KeyName (string)
+            output: value (string) 
+            </summary>
+        </member>
+        <member name="M:Utility.ModifyRegistry.ModifyRegistry.Write(System.String,System.Object)">
+            <summary>
+            To write into a registry key.
+            input: KeyName (string) , Value (object)
+            output: true or false 
+            </summary>
+        </member>
+        <member name="M:Utility.ModifyRegistry.ModifyRegistry.DeleteKey(System.String)">
+            <summary>
+            To delete a registry key.
+            input: KeyName (string)
+            output: true or false 
+            </summary>
+        </member>
+        <member name="M:Utility.ModifyRegistry.ModifyRegistry.DeleteSubKeyTree">
+            <summary>
+            To delete a sub key and any child.
+            input: void
+            output: true or false 
+            </summary>
+        </member>
+        <member name="M:Utility.ModifyRegistry.ModifyRegistry.SubKeyCount">
+            <summary>
+            Retrive the count of subkeys at the current key.
+            input: void
+            output: number of subkeys
+            </summary>
+        </member>
+        <member name="M:Utility.ModifyRegistry.ModifyRegistry.ValueCount">
+            <summary>
+            Retrive the count of values in the key.
+            input: void
+            output: number of keys
+            </summary>
+        </member>
+        <member name="P:Utility.ModifyRegistry.ModifyRegistry.ShowError">
+            <summary>
+            A property to show or hide error messages 
+            (default = false)
+            </summary>
+        </member>
+        <member name="P:Utility.ModifyRegistry.ModifyRegistry.SubKey">
+            <summary>
+            A property to set the SubKey value
+            (default = "SOFTWARE\\" + Application.ProductName.ToUpper())
+            </summary>
+        </member>
+        <member name="P:Utility.ModifyRegistry.ModifyRegistry.BaseRegistryKey">
+            <summary>
+            A property to set the BaseRegistryKey value.
+            (default = Registry.LocalMachine)
+            </summary>
+        </member>
+        <member name="T:OpenCLTemplate.MachineLearning.ProblemConfig">
+            <summary>
+            This class stores all variables related to the configuration of a SMO problem
+            </summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.c">
+            <summary>Regularization parameter</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.lambda">
+            <summary>Kernel parameter</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.tol">
+            <summary>
+            Numerical tolerance
+            </summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.maxPasses">
+            <summary>
+            Max # of times to iterate over alphas without changing
+            </summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.kernelType">
+            <summary>
+            Set type of kernel function (default 2)
+            </summary>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.ProblemConfig.#ctor(System.Single,System.Single,System.Single,System.Int32)">
+            <summary>
+            Constructor with the default kernel
+            </summary>
+            <param name="Lambda">Kernel parameter</param>
+            <param name="newC">Regularization parameter</param>
+            <param name="newTol">Numerical tolerance</param>
+            <param name="newMaxPasses">Max # of times to iterate over alphas without changing</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.ProblemConfig.#ctor(System.Single,System.Single,System.Single,System.Int32,OpenCLTemplate.MachineLearning.ProblemConfig.KernelType)">
+            <summary>
+            Constructor
+            </summary>
+            <param name="Lambda">Kernel parameter</param>
+            <param name="newC">Regularization parameter</param>
+            <param name="newTol">Numerical tolerance</param>
+            <param name="newMaxPasses">Max # of times to iterate over alphas without changing</param>
+            <param name="newKernelType">Type of kernel function index</param>
+        </member>
+        <member name="M:OpenCLTemplate.MachineLearning.ProblemConfig.Clone">
+            <summary>Creates a new object equal to this</summary>
+        </member>
+        <member name="T:OpenCLTemplate.MachineLearning.ProblemConfig.KernelType">
+            <summary>Type of SVM kernel to use</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.KernelType.Linear">
+            <summary>Linear: u'*v</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.KernelType.Polynomial">
+            <summary>Polynomial: (gamma*u'*v + coef0)^degree</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.KernelType.RBF">
+            <summary>Radial basis function: exp(-gamma*||u[i]-v[i]||²)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.KernelType.Sigmoid">
+            <summary>Sigmoid: tanh(gamma*u'*v + coef0)</summary>
+        </member>
+        <member name="T:OpenCLTemplate.Isosurface.MarchingCubes">
+            <summary>Marching cubes algorithm for isosurface reconstruction</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.ComputeNormals">
+            <summary>Compute normals of faces?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.step">
+            <summary>X, y and z increments. step[0] = deltaX, step[1] = deltaY, step[2] = deltaZ</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.initVals">
+            <summary>X, y and z initial values. initVals[0] = x0, initVals[1] = y0, initVals[2] = z0</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.isoLevel">
+            <summary>Isolevel to look for</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.funcVals">
+            <summary>Values of the function</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.max">
+            <summary>Length of each dimension - max[0] = maxX, max[1]=maxY, max[2]=maxZ</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.edgeCoords">
+            <summary>Edge coordinates.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.edgeNormals">
+            <summary>Edge normals.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.edgePrelimNormals">
+            <summary>Edge coordinates.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.elementIndex">
+            <summary>Element index to build triangles</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varIsoLevel">
+            <summary>CL variable isolevel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.CLFuncVals">
+            <summary>OpenCL variable that stores function values. F(x,y,z) = CLFuncVals[x+maxX*y+maxX*maxY*z]</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varEdgeCoords">
+            <summary>CL Edge coordinates. Geometry data compatible with OpenGL</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varEdgeNormals">
+            <summary>CL Edge normals. Geometry data compatible with OpenGL</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varElemIndex">
+            <summary>CL Element index array. Geometry data compatible with OpenGL</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varEdgePrelimNormals">
+            <summary>Auxiliary/preliminary normals</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varStep">
+            <summary>OpenCL x, y and z step sizes</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varInitVals">
+            <summary>OpenCL x, y and z initial values within grid</summary>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.kernelInterpPts">
+            <summary>Kernel to interpolate points</summary>
+        </member>
+        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.#ctor(System.Single[0:,0:,0:])">
+            <summary>Creates a new isosurface calculator. You may pass variables created from a OpenGL context to the CL variables if you are using interop or NULL
+            if not using OpenCL/GL interop.</summary>
+            <param name="FuncValues">Values of the evaluated 3D function f(x,y,z). FuncValues=float[maxX,maxY,maxZ]</param>
+        </member>
+        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.#ctor(System.Single[0:,0:,0:],OpenCLTemplate.CLCalc.Program.Variable,OpenCLTemplate.CLCalc.Program.Variable,OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Creates a new isosurface calculator. You may pass variables created from a OpenGL context to the CL variables if you are using interop or NULL
+            if not using OpenCL/GL interop.</summary>
+            <param name="FuncValues">Values of the evaluated 3D function f(x,y,z). FuncValues=float[maxX,maxY,maxZ]</param>
+            <param name="CLEdgeCoords">OpenCL variable (float) to hold edge coordinates. Dimension has to be 9 * maxX * maxY * maxZ</param>
+            <param name="CLEdgeNormals">OpenCL variable (float) to hold edge normals. Dimension has to be 9 * maxX * maxY * maxZ</param>
+            <param name="CLElementArrayIndex">OpenCL variable (int) to hold element array index. Dimension has to be 5 * 3 * (maxX - 1) * (maxY - 1) * (maxZ - 1)</param>
+        </member>
+        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.InitMarchingCubes(System.Single[0:,0:,0:],OpenCLTemplate.CLCalc.Program.Variable,OpenCLTemplate.CLCalc.Program.Variable,OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Creates a new isosurface calculator. You may pass variables created from a OpenGL context to the CL variables if you are using interop or NULL
+            if not using OpenCL/GL interop.</summary>
+            <param name="FuncValues">Values of the evaluated 3D function f(x,y,z). FuncValues=float[maxX,maxY,maxZ]</param>
+            <param name="CLEdgeCoords">OpenCL variable (float) to hold edge coordinates. Dimension has to be 9 * maxX * maxY * maxZ</param>
+            <param name="CLEdgeNormals">OpenCL variable (float) to hold edge normals. Dimension has to be 9 * maxX * maxY * maxZ</param>
+            <param name="CLElementArrayIndex">OpenCL variable (int) to hold element array index. Dimension has to be 5 * 3 * (maxX - 1) * (maxY - 1) * (maxZ - 1)</param>
+        </member>
+        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.SetFuncVals(System.Single[0:,0:,0:])">
+            <summary>Sets function values</summary>
+            <param name="FuncVals">Values to set</param>
+        </member>
+        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.CalcIsoSurface(System.Single)">
+            <summary>Calculates isosurface corresponding to a given isolevel</summary>
+            <param name="isoLvl"></param>
+        </member>
+        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.edges">
+            <summary>Remaps edge coordinates so that ElemArray[ edges[elementIndex[i]] ] points to the same coordinates as elementIndex[i]</summary>
+        </member>
+        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.GetEdgeInfo(System.Collections.Generic.List{System.Single}@,System.Collections.Generic.List{System.Single}@,System.Collections.Generic.List{System.Int32}@)">
+            <summary>Retrieves edge information. Can be used to draw marching cubes geometry using OpenGL</summary>
+            <param name="EdgeCoords">Edge vertexes coordinates</param>
+            <param name="EdgeNormals">Edge vertexes normal vectors</param>
+            <param name="ElemArray">Element index array (triangles)</param>
+        </member>
+        <member name="P:OpenCLTemplate.Isosurface.MarchingCubes.Increments">
+            <summary>Gets or sets x, y and z increments. Increments[0] = deltaX, Increments[1] = deltaY, Increments[2] = deltaZ</summary>
+        </member>
+        <member name="P:OpenCLTemplate.Isosurface.MarchingCubes.InitValues">
+            <summary>Gets or sets x, y and z intial values. InitValues[0] = x0, InitValues[1] = y0, InitValues[2] = z0</summary>
+        </member>
+        <member name="P:OpenCLTemplate.Isosurface.MarchingCubes.IsoLevel">
+            <summary>Gets or sets current isolevel</summary>
+        </member>
+        <member name="T:LinearAlgebra.Matrix">
+            <summary>Creates a Matrix of real numbers.</summary>
+        </member>
+        <member name="F:LinearAlgebra.Matrix.Items">
+            <summary>Matrix items</summary>
+        </member>
+        <member name="F:LinearAlgebra.Matrix.LINALGMAXERROR">
+            <summary> Linear Solve parameter. Maximum mean error allowable to linear solve method.</summary>
+        </member>
+        <member name="F:LinearAlgebra.Matrix.LIMITITERS">
+            <summary> Linear Solve parameter. Limit linear solution correction iterations.</summary>
+        </member>
+        <member name="F:LinearAlgebra.Matrix.IGNOREHARDSINGULARITY">
+            <summary> Linear Solve parameter. Should the solution method halt if a hard singulariry is found in matrix?</summary>
+        </member>
+        <member name="F:LinearAlgebra.Matrix.IGNORENULLDETERMINANT">
+            <summary> Linear Solve parameter. Should the method ignore if the matrix has a close-to-zero determinant and keep solving?</summary>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.#ctor">
+            <summary> Constructor. Initializes a [0,0] matrix.</summary>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.#ctor(System.Double[0:,0:])">
+            <summary> Constructor. Creates matrix from existing items.</summary>
+            <param name="MatrixItems">Matrix items to create matrix from.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.#ctor(LinearAlgebra.Matrix)">
+            <summary> Copy constructor.</summary>
+            <param name="m">Matrix to copy from.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.#ctor(System.Int32,System.Int32)">
+            <summary> Constructor. Creates empty matrix with specified dimensions.</summary>
+            <param name="numRows">Number of rows in matrix.</param>
+            <param name="numCols">Number of columns in matrix.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.op_Addition(LinearAlgebra.Matrix,LinearAlgebra.Matrix)">
+            <summary> Sums two matrixes.</summary>
+            <param name="m1">First matrix to sum.</param>
+            <param name="m2">Second matrix to sum.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.op_Subtraction(LinearAlgebra.Matrix,LinearAlgebra.Matrix)">
+            <summary> Subtracts two matrixes.</summary>
+            <param name="m1">Matrix to subtract from.</param>
+            <param name="m2">Matrix to be subtracted.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.op_Multiply(LinearAlgebra.Matrix,LinearAlgebra.Matrix)">
+            <summary> Matrix multiplication. Notice that m1 rows should be the same as m2 lines for compatibility.</summary>
+            <param name="m1">First matrix to multiply.</param>
+            <param name="m2">Second matrix to multiply.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.op_Multiply(System.Double,LinearAlgebra.Matrix)">
+            <summary> Matrix scalar multiplication.</summary>
+            <param name="m">Matrix to multiply.</param>
+            <param name="num">Scalar to multiply.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.op_Multiply(LinearAlgebra.Matrix,System.Double)">
+            <summary> Matrix scalar multiplication.</summary>
+            <param name="m">Matrix to multiply.</param>
+            <param name="num">Scalar to multiply.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.op_Multiply(LinearAlgebra.Matrix,System.Double[])">
+            <summary> Matrix post-vector multiplication. Notice that a vector is a [1,Cols] matrix which means
+            vector length should be equal matrix number of columns.</summary>
+            <param name="m">Matrix to multiply.</param>
+            <param name="vet">vector to multiply.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.op_Multiply(System.Double[],LinearAlgebra.Matrix)">
+            <summary> Matrix pre-vector multiplication. Notice that a vector is a [1,Cols] matrix which means
+            vector length should be equal matrix number of lines.</summary>
+            <param name="m">Matrix to multiply.</param>
+            <param name="vet">vector to multiply.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.op_Division(LinearAlgebra.Matrix,System.Double)">
+            <summary> Matrix scalar division.</summary>
+            <param name="m">Matrix to multiply.</param>
+            <param name="num">Scalar to divide each element of matrix.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.Equals(LinearAlgebra.Matrix)">
+            <summary>Compares matrixes and returns true if they are identical.</summary>
+            <param name="Matrix">Matrix to compare to.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.Transpose">
+            <summary>Returns matrix transpose.</summary>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.MultiplyElementWise(LinearAlgebra.Matrix)">
+            <summary>Element-wise product. This is not regular matrix product. It multiplies elements 
+            at corresponding positions.</summary>
+            <param name="Matrix">Matrix to multiply element-wise.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.NormEuclidean">
+            <summary>Returns Euclidean norm of the matrix.</summary>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.Dot(LinearAlgebra.Matrix)">
+            <summary>Dot product of two matrixes.</summary>
+            <param name="Matrix">Matrix to dot product with/</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.InvertElements">
+            <summary>Element-wise inversion. Returns the matrix with each element (x) inverted (1/x).</summary>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.LUDecomp">
+            <summary>Creates internal LU factorization of this matrix.</summary>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.LinearSolve(System.Double[])">
+            <summary>Returns the solution x to the linear system Ax=b, A being this matrix.</summary>
+            <param name="b">Right-hand side known values.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.Determinant">
+            <summary>Returns the determinant of this matrix.</summary>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.Inversa">
+            <summary>Returns the inverse of this matrix.</summary>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.IdentifyParameters(System.Double[])">
+            <summary>Returns the solution x to the linear system A'Ax=A'b, A being this matrix.</summary>
+            <param name="Y">Right-hand side known values.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.IdentifyParametersWeighted(System.Double[],LinearAlgebra.Matrix)">
+            <summary>Returns the weighted solution x to the linear system A'WAx=A'Wb, 
+            A being this matrix. TO DO: Correct quality check</summary>
+            <param name="Y">Right-hand side known values.</param>
+            <param name="W">Weight matrix.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.IdentifyParametersWeighted(System.Double[],System.Double[])">
+            <summary>Returns the weighted solution x to the linear system A'DAx=A'Db, 
+            A being this matrix. D is a diagonal weight matrix.</summary>
+            <param name="Y">Right-hand side known values.</param>
+            <param name="w">Main diagonal elements of diagonal weight matrix D.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.CheckQuality(System.Double[],System.Double[])">
+            <summary>Calculates R², corrected R² and Quadratic Error for the trySolution x to the linear system A'Ax=A'b, 
+            A being this matrix.</summary>
+            <param name="Y">Right-hand side known values.</param>
+            <param name="trySolution">Solution to use to evaluate quality indexers.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.GramSchmidt">
+            <summary>Applies the Gram-Schmidt orthonormalization method to this matrix, replacing 
+            it by the orthonormalized matrix.</summary>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.GramSchmidt(System.Double[]@)">
+            <summary>Applies the Gram-Schmidt orthonormalization method to this matrix, replacing 
+            it by the orthonormalized matrix and also correcting right-hand Y values for a linear system solve.</summary>
+            <param name="y">Right-hand side known values.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.GramSchmidt(System.Int32[],System.Int32,System.Double[]@)">
+            <summary>Applies the Gram-Schmidt orthonormalization method to this matrix using 
+            a pre-set order of normalization. Replaces current matrix
+            by the orthonormalized matrix and also correcting 
+            right-hand Y values for a linear system solve.</summary>
+            <param name="y">Right-hand side known values.</param>
+            <param name="lineOrder">Line order to apply the orthonormalization method.</param>
+            <param name="indStart">Starts orthonormalization from line lineOrder[indStart]. Assumes previous lines are already
+            normalized.</param>
+        </member>
+        <member name="M:LinearAlgebra.Matrix.ToString">
+            <summary>Returns a string representing this matrix.</summary>
+        </member>
+        <member name="P:LinearAlgebra.Matrix.Item(System.Int32,System.Int32)">
+            <summary> Accesses items in current matrix.</summary>
+            <param name="i">Row of element to access.</param>
+            <param name="j">Column of element to access.</param>
+        </member>
+        <member name="P:LinearAlgebra.Matrix.rowCount">
+            <summary> Gets the number of rows in this matrix.</summary>
+        </member>
+        <member name="P:LinearAlgebra.Matrix.colCount">
+            <summary> Gets the number of columns in this matrix.</summary>
+        </member>
+        <member name="P:LinearAlgebra.Matrix.RSquareIndex">
+            <summary>Returns the R² index of last fit.</summary>
+        </member>
+        <member name="P:LinearAlgebra.Matrix.RSquareCorrectedIndex">
+            <summary>Returns corrected R² index of last fit.</summary>
+        </member>
+        <member name="P:LinearAlgebra.Matrix.QuadraticError">
+            <summary>Returns the sum of quadratic errors of last fit.</summary>
+        </member>
         <member name="T:OpenCLTemplate.LinearAlgebra.SparseLinalg">
             <summary>OpenCL linear algebra functions</summary>
         </member>
@@ -1616,6 +2325,134 @@
         <member name="T:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLLinalgSrc">
             <summary>OpenCL dot product source</summary>
         </member>
+        <member name="T:OpenCLTemplate.DifferentialEquations.floatODE46">
+            <summary>Float differential equation integrator</summary>
+        </member>
+        <member name="F:OpenCLTemplate.DifferentialEquations.floatODE46.KernelFinalizeCalc">
+            <summary>Writes final Y values and estimated absolute errors</summary>
+        </member>
+        <member name="F:OpenCLTemplate.DifferentialEquations.floatODE46.KernelUpdateX">
+            <summary>Updates X to current time</summary>
+        </member>
+        <member name="F:OpenCLTemplate.DifferentialEquations.floatODE46.x">
+            <summary>Independent variable current value in OpenCL memory</summary>
+        </member>
+        <member name="F:OpenCLTemplate.DifferentialEquations.floatODE46.y">
+            <summary>Dynamic system current state in OpenCL memory</summary>
+        </member>
+        <member name="F:OpenCLTemplate.DifferentialEquations.floatODE46.Derivs">
+            <summary>Derivative calculator</summary>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.#ctor(System.Single,System.Single,System.Single[],OpenCLTemplate.DifferentialEquations.floatODE46.DerivCalcDeleg)">
+            <summary>Constructor.</summary>
+            <param name="InitialState">Initial state of system</param>
+            <param name="StepSize">Desired step per integration pass</param>
+            <param name="InitialIndepVarValue">Initial independent variable value</param>
+            <param name="DerivativeCalculator">Function to calculate derivatives vector</param>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.Integrate(System.Single)">
+            <summary>Integrates equation set to a final value using current stepsize. Ideally, final value 
+            and currentX should multiples of stepsize.</summary>
+            <param name="FinalValue">Final value to reach.</param>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.ResetState(System.Single,System.Single[])">
+            <summary>Sets current state</summary>
+            <param name="indepVar">New independent variable value</param>
+            <param name="State">New state values</param>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.Step(System.Single)">
+            <summary>Takes an integration step. Saves and returns stepsize back to what it was.</summary>
+            <param name="StepSize">Step size to use</param>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.Step">
+            <summary>Takes an integration step</summary>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.floatODE46.SetStep(System.Single)">
+            <summary>Sets step size.</summary>
+            <param name="StepSize">Step size to use</param>
+        </member>
+        <member name="P:OpenCLTemplate.DifferentialEquations.floatODE46.State">
+            <summary>Gets current values of space-state variables (from Device).</summary>
+        </member>
+        <member name="P:OpenCLTemplate.DifferentialEquations.floatODE46.AbsError">
+            <summary>Gets current absolute error sum</summary>
+        </member>
+        <member name="P:OpenCLTemplate.DifferentialEquations.floatODE46.IndepVar">
+            <summary>Gets current independent variable value (from Device).</summary>
+        </member>
+        <member name="T:OpenCLTemplate.DifferentialEquations.floatODE46.DerivCalcDeleg">
+            <summary>Function to calculate derivatives vector</summary>
+            <param name="x">IN: Scalar. Independent variable.</param>
+            <param name="y">IN: State-space vector.</param>
+            <param name="dydx">OUT: Derivatives</param>
+        </member>
+        <member name="T:OpenCLTemplate.DifferentialEquations.floatODE46.ODE46Source">
+            <summary>OpenCL source</summary>
+        </member>
+        <member name="T:OpenCLTemplate.DifferentialEquations.doubleODE46">
+            <summary>double differential equation integrator</summary>
+        </member>
+        <member name="F:OpenCLTemplate.DifferentialEquations.doubleODE46.KernelFinalizeCalc">
+            <summary>Writes final Y values and estimated absolute errors</summary>
+        </member>
+        <member name="F:OpenCLTemplate.DifferentialEquations.doubleODE46.KernelUpdateX">
+            <summary>Updates X to current time</summary>
+        </member>
+        <member name="F:OpenCLTemplate.DifferentialEquations.doubleODE46.x">
+            <summary>Independent variable current value in OpenCL memory</summary>
+        </member>
+        <member name="F:OpenCLTemplate.DifferentialEquations.doubleODE46.y">
+            <summary>Dynamic system current state in OpenCL memory</summary>
+        </member>
+        <member name="F:OpenCLTemplate.DifferentialEquations.doubleODE46.Derivs">
+            <summary>Derivative calculator</summary>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.#ctor(System.Double,System.Double,System.Double[],OpenCLTemplate.DifferentialEquations.doubleODE46.DerivCalcDeleg)">
+            <summary>Constructor.</summary>
+            <param name="InitialState">Initial state of system</param>
+            <param name="StepSize">Desired step per integration pass</param>
+            <param name="InitialIndepVarValue">Initial independent variable value</param>
+            <param name="DerivativeCalculator">Function to calculate derivatives vector</param>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.Integrate(System.Double)">
+            <summary>Integrates equation set to a final value using current stepsize. Ideally, final value 
+            and currentX should multiples of stepsize.</summary>
+            <param name="FinalValue">Final value to reach.</param>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.ResetState(System.Double,System.Double[])">
+            <summary>Sets current state</summary>
+            <param name="indepVar">New independent variable value</param>
+            <param name="State">New state values</param>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.Step(System.Double)">
+            <summary>Takes an integration step. Saves and returns stepsize back to what it was.</summary>
+            <param name="StepSize">Step size to use</param>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.Step">
+            <summary>Takes an integration step</summary>
+        </member>
+        <member name="M:OpenCLTemplate.DifferentialEquations.doubleODE46.SetStep(System.Double)">
+            <summary>Sets step size.</summary>
+            <param name="StepSize">Step size to use</param>
+        </member>
+        <member name="P:OpenCLTemplate.DifferentialEquations.doubleODE46.State">
+            <summary>Gets current values of space-state variables (from Device).</summary>
+        </member>
+        <member name="P:OpenCLTemplate.DifferentialEquations.doubleODE46.AbsError">
+            <summary>Gets current absolute error sum</summary>
+        </member>
+        <member name="P:OpenCLTemplate.DifferentialEquations.doubleODE46.IndepVar">
+            <summary>Gets current independent variable value (from Device).</summary>
+        </member>
+        <member name="T:OpenCLTemplate.DifferentialEquations.doubleODE46.DerivCalcDeleg">
+            <summary>Function to calculate derivatives vector</summary>
+            <param name="x">IN: Scalar. Independent variable.</param>
+            <param name="y">IN: State-space vector.</param>
+            <param name="dydx">OUT: Derivatives</param>
+        </member>
+        <member name="T:OpenCLTemplate.DifferentialEquations.doubleODE46.ODE46Source">
+            <summary>OpenCL source</summary>
+        </member>
         <member name="T:OpenCLTemplate.Properties.Resources">
             <summary>
               A strongly-typed resource class, for looking up localized strings, etc.
@@ -1631,805 +2468,6 @@
               Overrides the current thread's CurrentUICulture property for all
               resource lookups using this strongly typed resource class.
             </summary>
-        </member>
-        <member name="T:OpenCLTemplate.OpenCLRTBController">
-            <summary>Class to help editing OpenCL code</summary>
-        </member>
-        <member name="M:OpenCLTemplate.OpenCLRTBController.#ctor(System.Windows.Forms.RichTextBox)">
-            <summary>Constructor. Takes care of a Rich Text Box KeyUp event to paint things</summary>
-            <param name="rTBOpenCL">RichTextBox to control</param>
-        </member>
-        <member name="F:OpenCLTemplate.OpenCLRTBController.HelpIndentation">
-            <summary>Help indentation?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.OpenCLRTBController.NormalTextColor">
-            <summary>Regular text color</summary>
-        </member>
-        <member name="F:OpenCLTemplate.OpenCLRTBController.NormalTextFont">
-            <summary>Regular text font</summary>
-        </member>
-        <member name="F:OpenCLTemplate.OpenCLRTBController.CommentColor">
-            <summary>Comments color</summary>
-        </member>
-        <member name="F:OpenCLTemplate.OpenCLRTBController.CommentTextFont">
-            <summary>Comments font</summary>
-        </member>
-        <member name="F:OpenCLTemplate.OpenCLRTBController.OpenCLStrings">
-            <summary>List of string structures to mark</summary>
-        </member>
-        <member name="M:OpenCLTemplate.OpenCLRTBController.rTB_KeyUp(System.Object,System.Windows.Forms.KeyEventArgs)">
-            <summary>KeyUp event handler</summary>
-        </member>
-        <member name="M:OpenCLTemplate.OpenCLRTBController.Update">
-            <summary>Forces OpenCL RichTextBox to be updated</summary>
-        </member>
-        <member name="M:OpenCLTemplate.OpenCLRTBController.StartedUpdating(System.Windows.Forms.RichTextBox)">
-            <summary>Stops updating text box while coloring text</summary>
-            <param name="rTB">Rich text box to lock</param>
-        </member>
-        <member name="M:OpenCLTemplate.OpenCLRTBController.StoppedUpdating(System.Windows.Forms.RichTextBox)">
-            <summary>Restarts updating text box</summary>
-            <param name="rTB">Rich text box to unlock</param>
-        </member>
-        <member name="T:OpenCLTemplate.OpenCLRTBController.StringsToMark">
-            <summary>Defines a structure of strings to mark</summary>
-        </member>
-        <member name="F:OpenCLTemplate.OpenCLRTBController.StringsToMark.Description">
-            <summary>Description of string type</summary>
-        </member>
-        <member name="F:OpenCLTemplate.OpenCLRTBController.StringsToMark.StringsColor">
-            <summary>Color to use for this string type</summary>
-        </member>
-        <member name="F:OpenCLTemplate.OpenCLRTBController.StringsToMark.StringsFont">
-            <summary>Font to be used in this list of strings</summary>
-        </member>
-        <member name="F:OpenCLTemplate.OpenCLRTBController.StringsToMark.Strings">
-            <summary>List of strings of this type</summary>
-        </member>
-        <member name="M:OpenCLTemplate.Program.Main">
-            <summary>
-            The main entry point for the application.
-            </summary>
-        </member>
-        <member name="T:OpenCLTemplate.MachineLearning.MultiClassSVM">
-            <summary>Multiple training SVM</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.MultiClassSVM.Classifications">
-            <summary>List of possible classifications</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.MultiClassSVM.SVMs">
-            <summary>SVMs to perform each classification</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.#ctor(OpenCLTemplate.MachineLearning.TrainingSet)">
-            <summary>Creates a new multiclass SVM using desired outputs from training set. Classifications -1.0f are negative for all sets</summary>
-            <param name="TSet">Training set</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.#ctor(OpenCLTemplate.MachineLearning.TrainingSet,OpenCLTemplate.MachineLearning.ProblemConfig)">
-            <summary>Creates a new multiclass SVM using desired outputs from training set. Classifications -1.0f are negative for all sets</summary>
-            <param name="TSet">Training set</param>
-            <param name="SVMCfg">Configuration parameters</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.initMultiSVM(OpenCLTemplate.MachineLearning.TrainingSet,OpenCLTemplate.MachineLearning.ProblemConfig)">
-            <summary>Creates a new multiclass SVM using desired outputs from training set. Classifications -1.0f are negative for all sets</summary>
-            <param name="TSet">Training set</param>
-            <param name="SVMCfg">Configuration parameters</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.Train">
-            <summary>Trains all SVMs in this multiclass SVM</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.Train(System.Single,System.Single)">
-            <summary>Trains all SVMs in this multiclass SVM precalibrating kernels</summary>
-            <param name="tolPositive">Positive kernels average should be greater than tolPositive</param>
-            <param name="tolNegative">Negative kernels average should be lesser than tolNegative</param>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.MultiClassSVM.CrossValParams">
-            <summary>Cross validation parameters: [0] - maximum crossValidation value found so far, [1] - lambda, [2] - C.  Returns best performance so far</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.TrainWithCrossValidation(OpenCLTemplate.MachineLearning.TrainingSet)">
-            <summary>Trains current SVM with cross-validation, adjusting kernel parameter lambda and box parameter C.
-            Returns best achieved efficiency.</summary>
-            <param name="CrossValidationSet">Cross validation set</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.TrainWithCrossValidation(OpenCLTemplate.MachineLearning.TrainingSet,System.Single[],System.Single[])">
-            <summary>Trains current SVM with cross-validation, adjusting kernel parameter lambda and box parameter C.
-            Returns best achieved efficiency.</summary>
-            <param name="CrossValidationSet">Cross validation set</param>
-            <param name="LambdaSet">Lambda set</param>
-            <param name="CSet">C values set</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.GetCrossValidationSet(OpenCLTemplate.MachineLearning.TrainingSet,System.Single)">
-            <summary>Extracts a cross validation set from a given set</summary>
-            <param name="Set">Set to extract cross validation from</param>
-            <param name="CrossValidationSetPercent">Percentage of elements to extract</param>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.MultiClassSVM.sample">
-            <summary>Sample to classify</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.MultiClassSVM.ClassificationValues">
-            <summary>Returned classification values</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.ClassifyWithRejection(OpenCLTemplate.MachineLearning.TrainingUnit)">
-            <summary>Attempts to classify a sample within a given category. Returns -1 if no classification was achieved.</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.Classify(OpenCLTemplate.MachineLearning.TrainingUnit,System.Single@)">
-            <summary>Classifies a sample within a given category even if all SVMs predict it doesn`t belong to any.</summary>
-            <param name="Sample">Sample to classify</param>
-            <param name="maxVal">Maximum classification value found</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.Classify(OpenCLTemplate.CLCalc.Program.Image2D,System.Single[]@)">
-            <summary>Classifies a given set of Samples (image2d of floats) each one in a category. Each row of the image is a sample
-            to be classified and the features should be stored in the columns. The number of columns Ncol = Nfeatures/4 since 
-            each pixel holds 4 floats</summary>
-            <param name="Samples">Image2D containing samples to be classified</param>
-            <param name="maxVals">Maximum values found</param>
-            <returns></returns>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.Classify(System.Object)">
-            <summary>Classifies a sample using i-th svm</summary>
-            <param name="SVMInd">(int) Index of svm to use</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.GetHitRate(OpenCLTemplate.MachineLearning.TrainingSet)">
-            <summary>Gets SVM hit rate</summary>
-            <param name="TestSet">Test set</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.GetInternalHitRate">
-            <summary>Gets average internal hit rate</summary>
-        </member>
-        <member name="T:LinearAlgebra.Matrix">
-            <summary>Creates a Matrix of real numbers.</summary>
-        </member>
-        <member name="F:LinearAlgebra.Matrix.Items">
-            <summary>Matrix items</summary>
-        </member>
-        <member name="F:LinearAlgebra.Matrix.LINALGMAXERROR">
-            <summary> Linear Solve parameter. Maximum mean error allowable to linear solve method.</summary>
-        </member>
-        <member name="F:LinearAlgebra.Matrix.LIMITITERS">
-            <summary> Linear Solve parameter. Limit linear solution correction iterations.</summary>
-        </member>
-        <member name="F:LinearAlgebra.Matrix.IGNOREHARDSINGULARITY">
-            <summary> Linear Solve parameter. Should the solution method halt if a hard singulariry is found in matrix?</summary>
-        </member>
-        <member name="F:LinearAlgebra.Matrix.IGNORENULLDETERMINANT">
-            <summary> Linear Solve parameter. Should the method ignore if the matrix has a close-to-zero determinant and keep solving?</summary>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.#ctor">
-            <summary> Constructor. Initializes a [0,0] matrix.</summary>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.#ctor(System.Double[0:,0:])">
-            <summary> Constructor. Creates matrix from existing items.</summary>
-            <param name="MatrixItems">Matrix items to create matrix from.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.#ctor(LinearAlgebra.Matrix)">
-            <summary> Copy constructor.</summary>
-            <param name="m">Matrix to copy from.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.#ctor(System.Int32,System.Int32)">
-            <summary> Constructor. Creates empty matrix with specified dimensions.</summary>
-            <param name="numRows">Number of rows in matrix.</param>
-            <param name="numCols">Number of columns in matrix.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.op_Addition(LinearAlgebra.Matrix,LinearAlgebra.Matrix)">
-            <summary> Sums two matrixes.</summary>
-            <param name="m1">First matrix to sum.</param>
-            <param name="m2">Second matrix to sum.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.op_Subtraction(LinearAlgebra.Matrix,LinearAlgebra.Matrix)">
-            <summary> Subtracts two matrixes.</summary>
-            <param name="m1">Matrix to subtract from.</param>
-            <param name="m2">Matrix to be subtracted.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.op_Multiply(LinearAlgebra.Matrix,LinearAlgebra.Matrix)">
-            <summary> Matrix multiplication. Notice that m1 rows should be the same as m2 lines for compatibility.</summary>
-            <param name="m1">First matrix to multiply.</param>
-            <param name="m2">Second matrix to multiply.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.op_Multiply(System.Double,LinearAlgebra.Matrix)">
-            <summary> Matrix scalar multiplication.</summary>
-            <param name="m">Matrix to multiply.</param>
-            <param name="num">Scalar to multiply.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.op_Multiply(LinearAlgebra.Matrix,System.Double)">
-            <summary> Matrix scalar multiplication.</summary>
-            <param name="m">Matrix to multiply.</param>
-            <param name="num">Scalar to multiply.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.op_Multiply(LinearAlgebra.Matrix,System.Double[])">
-            <summary> Matrix post-vector multiplication. Notice that a vector is a [1,Cols] matrix which means
-            vector length should be equal matrix number of columns.</summary>
-            <param name="m">Matrix to multiply.</param>
-            <param name="vet">vector to multiply.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.op_Multiply(System.Double[],LinearAlgebra.Matrix)">
-            <summary> Matrix pre-vector multiplication. Notice that a vector is a [1,Cols] matrix which means
-            vector length should be equal matrix number of lines.</summary>
-            <param name="m">Matrix to multiply.</param>
-            <param name="vet">vector to multiply.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.op_Division(LinearAlgebra.Matrix,System.Double)">
-            <summary> Matrix scalar division.</summary>
-            <param name="m">Matrix to multiply.</param>
-            <param name="num">Scalar to divide each element of matrix.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.Equals(LinearAlgebra.Matrix)">
-            <summary>Compares matrixes and returns true if they are identical.</summary>
-            <param name="Matrix">Matrix to compare to.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.Transpose">
-            <summary>Returns matrix transpose.</summary>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.MultiplyElementWise(LinearAlgebra.Matrix)">
-            <summary>Element-wise product. This is not regular matrix product. It multiplies elements 
-            at corresponding positions.</summary>
-            <param name="Matrix">Matrix to multiply element-wise.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.NormEuclidean">
-            <summary>Returns Euclidean norm of the matrix.</summary>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.Dot(LinearAlgebra.Matrix)">
-            <summary>Dot product of two matrixes.</summary>
-            <param name="Matrix">Matrix to dot product with/</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.InvertElements">
-            <summary>Element-wise inversion. Returns the matrix with each element (x) inverted (1/x).</summary>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.LUDecomp">
-            <summary>Creates internal LU factorization of this matrix.</summary>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.LinearSolve(System.Double[])">
-            <summary>Returns the solution x to the linear system Ax=b, A being this matrix.</summary>
-            <param name="b">Right-hand side known values.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.Determinant">
-            <summary>Returns the determinant of this matrix.</summary>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.Inversa">
-            <summary>Returns the inverse of this matrix.</summary>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.IdentifyParameters(System.Double[])">
-            <summary>Returns the solution x to the linear system A'Ax=A'b, A being this matrix.</summary>
-            <param name="Y">Right-hand side known values.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.IdentifyParametersWeighted(System.Double[],LinearAlgebra.Matrix)">
-            <summary>Returns the weighted solution x to the linear system A'WAx=A'Wb, 
-            A being this matrix. TO DO: Correct quality check</summary>
-            <param name="Y">Right-hand side known values.</param>
-            <param name="W">Weight matrix.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.IdentifyParametersWeighted(System.Double[],System.Double[])">
-            <summary>Returns the weighted solution x to the linear system A'DAx=A'Db, 
-            A being this matrix. D is a diagonal weight matrix.</summary>
-            <param name="Y">Right-hand side known values.</param>
-            <param name="w">Main diagonal elements of diagonal weight matrix D.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.CheckQuality(System.Double[],System.Double[])">
-            <summary>Calculates R², corrected R² and Quadratic Error for the trySolution x to the linear system A'Ax=A'b, 
-            A being this matrix.</summary>
-            <param name="Y">Right-hand side known values.</param>
-            <param name="trySolution">Solution to use to evaluate quality indexers.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.GramSchmidt">
-            <summary>Applies the Gram-Schmidt orthonormalization method to this matrix, replacing 
-            it by the orthonormalized matrix.</summary>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.GramSchmidt(System.Double[]@)">
-            <summary>Applies the Gram-Schmidt orthonormalization method to this matrix, replacing 
-            it by the orthonormalized matrix and also correcting right-hand Y values for a linear system solve.</summary>
-            <param name="y">Right-hand side known values.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.GramSchmidt(System.Int32[],System.Int32,System.Double[]@)">
-            <summary>Applies the Gram-Schmidt orthonormalization method to this matrix using 
-            a pre-set order of normalization. Replaces current matrix
-            by the orthonormalized matrix and also correcting 
-            right-hand Y values for a linear system solve.</summary>
-            <param name="y">Right-hand side known values.</param>
-            <param name="lineOrder">Line order to apply the orthonormalization method.</param>
-            <param name="indStart">Starts orthonormalization from line lineOrder[indStart]. Assumes previous lines are already
-            normalized.</param>
-        </member>
-        <member name="M:LinearAlgebra.Matrix.ToString">
-            <summary>Returns a string representing this matrix.</summary>
-        </member>
-        <member name="P:LinearAlgebra.Matrix.Item(System.Int32,System.Int32)">
-            <summary> Accesses items in current matrix.</summary>
-            <param name="i">Row of element to access.</param>
-            <param name="j">Column of element to access.</param>
-        </member>
-        <member name="P:LinearAlgebra.Matrix.rowCount">
-            <summary> Gets the number of rows in this matrix.</summary>
-        </member>
-        <member name="P:LinearAlgebra.Matrix.colCount">
-            <summary> Gets the number of columns in this matrix.</summary>
-        </member>
-        <member name="P:LinearAlgebra.Matrix.RSquareIndex">
-            <summary>Returns the R² index of last fit.</summary>
-        </member>
-        <member name="P:LinearAlgebra.Matrix.RSquareCorrectedIndex">
-            <summary>Returns corrected R² index of last fit.</summary>
-        </member>
-        <member name="P:LinearAlgebra.Matrix.QuadraticError">
-            <summary>Returns the sum of quadratic errors of last fit.</summary>
-        </member>
-        <member name="T:OpenCLTemplate.MachineLearning.XMLFuncs">
-            <summary>Useful XML Functions</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.CreateNewTable(System.String,System.String[])">
-            <summary>Creates new table</summary>
-            <param name="TableName">Name</param>
-            <param name="Fields">Table fields. String. Start with dbl to make doubles.</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.CreateColumn(System.Data.DataTable,System.Windows.Forms.Control)">
-            <summary>Creates a column in a datatable if it does not exist and binds it to the control. 
-            Added controls: Control name starts with txtInt: integer. Control name starts with "txt" - TextBox bound to Double. If textbox ends with "Name" - string.
-            Control name starts with "radio" - Radio button. Boolean.
-            Control name starts with "chk" - Check box. Boolean.
-            Control name starts with "cmb" - Combo box. String.</summary>
-            <param name="t">Datatable to analyze.</param>
-            <param name="c">Control to create column from.</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.MakeTableFromDataGrid(System.Windows.Forms.DataGridView,System.String,System.Data.DataSet)">
-            <summary>Creates a table containing a grid's structure. Sets data type based on column name: if it starts with: int -> Integer data type;
-            string -> String data type; else -> Double.</summary>
-            <param name="grid">DataGridView to read info from.</param>
-            <param name="TableName">Name of table being created.</param>
-            <param name="data">DataSet to store table.</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.CreateForm(System.Windows.Forms.BindingSource,System.Windows.Forms.Control,System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.String},System.Collections.Generic.List{System.Collections.Generic.List{System.String}})">
-            <summary>Creates a form containing editable data</summary>
-            <param name="BindSrc">Binding source to use</param>
-            <param name="ParentControl">Control where to add items. A new panel is created there.</param>
-            <param name="MultiLineCols">Columns containig multiline data</param>
-            <param name="MultiFieldCols">Columns containing multiple data such as more than 1 objective, etc.</param>
-            <param name="ComboboxCols">Columns which should be combo boxes</param>
-            <param name="ComboboxItems">Data to populate each combobox</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.GenReport(System.Collections.Generic.List{OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow})">
-            <summary>Generates report data</summary>
-            <param name="Rows">Information to be included in the report</param>
-        </member>
-        <member name="T:OpenCLTemplate.MachineLearning.XMLFuncs.FileReader">
-            <summary>Class to read text files.</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.FileReader.ReadFile(System.String)">
-            <summary>Reads a text file and stores its lines in string arrays.</summary>
-            <param name="FileName">File to read</param>
-        </member>
-        <member name="T:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField">
-            <summary>Creates a multiple container for varible sizes fields.
-            Example: multiple objectives stored in a single field.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.txtBinded">
-            <summary>Text box bound to data source</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.lstItems">
-            <summary>List box that will contain the items</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.btnAdd">
-            <summary>Button to add a new item</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.btnRemove">
-            <summary>Button to remove an item</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.txtEditItem">
-            <summary>Text box to edit items</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.IsEditing">
-            <summary>Is this class editing the bound textbox?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Fields">
-            <summary>Fields to be added</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.#ctor(System.Windows.Forms.TextBox,System.Windows.Forms.Control)">
-            <summary>Constructor.</summary>
-            <param name="BindedTextBox">TextBox bound to the data source</param>
-            <param name="ParentControl">Control to use to add the necessary items</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.GetNextTop">
-            <summary>Gets next Top position to place controls.</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.UpdateListBox">
-            <summary>Uses Fields to update listbox</summary>
-        </member>
-        <member name="T:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config">
-            <summary>MultiField configuration</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.VerticalSpacing">
-            <summary>Vertical spacing</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.HorizSpacing">
-            <summary>Horizontal spacing</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.AddButtonTitle">
-            <summary>"Add button" title</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.RemButtonTitle">
-            <summary>"Remove button" title</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.ItemsListBoxHeight">
-            <summary>Items list box height</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.BtnsWidth">
-            <summary>Buttons width</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.MultiField.Config.TxtEditHeight">
-            <summary>Editable textbox height</summary>
-        </member>
-        <member name="T:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow">
-            <summary>DataRow information to include in a report</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.Table">
-            <summary>Table of the item to generate in report</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.Row">
-            <summary>Row containing report data</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.DesiredColumns">
-            <summary>Information that should be put in the data</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.#ctor(System.Data.DataTable,System.Data.DataRow,System.Collections.Generic.List{System.String})">
-            <summary>Creates a new report row</summary>
-            <param name="t">Datatable</param>
-            <param name="r">Datarow</param>
-            <param name="DesiredInfo">Columns to include</param>
-        </member>
-        <member name="P:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.ItemTable">
-            <summary>Gets table of the item to generate in report</summary>
-        </member>
-        <member name="P:OpenCLTemplate.MachineLearning.XMLFuncs.ReportRow.ItemRow">
-            <summary>
-            Row
-            </summary>
-        </member>
-        <member name="T:OpenCLTemplate.MachineLearning.TrainingUnit">
-            <summary>
-            This class corresponds to a training unit of the training data with all its inputs and the desired output.
-            </summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.TrainingUnit.xVector">
-            <summary>Features</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.TrainingUnit.y">
-            <summary>Desired output (-1 or 1)</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.TrainingUnit.#ctor(System.Single[],System.Single)">
-            <summary>Creates a new training unit</summary>
-            <param name="newXVector">New unit</param>
-            <param name="Classification">Classification, should ONLY be 1 or -1 for pure SVMs, write desired value for MultiClassSVMs</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.TrainingUnit.getDimension">
-            <summary>Gets dimension of feature vector</summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.TrainingUnit.Clone">
-            <summary>Retuurns a new trainingUnit which is the clone of this one</summary>
-        </member>
-        <member name="T:OpenCLTemplate.MachineLearning.ProblemConfig">
-            <summary>
-            This class stores all variables related to the configuration of a SMO problem
-            </summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.c">
-            <summary>Regularization parameter</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.lambda">
-            <summary>Kernel parameter</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.tol">
-            <summary>
-            Numerical tolerance
-            </summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.maxPasses">
-            <summary>
-            Max # of times to iterate over alphas without changing
-            </summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.kernelType">
-            <summary>
-            Set type of kernel function (default 2)
-            </summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.ProblemConfig.#ctor(System.Single,System.Single,System.Single,System.Int32)">
-            <summary>
-            Constructor with the default kernel
-            </summary>
-            <param name="Lambda">Kernel parameter</param>
-            <param name="newC">Regularization parameter</param>
-            <param name="newTol">Numerical tolerance</param>
-            <param name="newMaxPasses">Max # of times to iterate over alphas without changing</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.ProblemConfig.#ctor(System.Single,System.Single,System.Single,System.Int32,OpenCLTemplate.MachineLearning.ProblemConfig.KernelType)">
-            <summary>
-            Constructor
-            </summary>
-            <param name="Lambda">Kernel parameter</param>
-            <param name="newC">Regularization parameter</param>
-            <param name="newTol">Numerical tolerance</param>
-            <param name="newMaxPasses">Max # of times to iterate over alphas without changing</param>
-            <param name="newKernelType">Type of kernel function index</param>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.ProblemConfig.Clone">
-            <summary>Creates a new object equal to this</summary>
-        </member>
-        <member name="T:OpenCLTemplate.MachineLearning.ProblemConfig.KernelType">
-            <summary>Type of SVM kernel to use</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.KernelType.Linear">
-            <summary>Linear: u'*v</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.KernelType.Polynomial">
-            <summary>Polynomial: (gamma*u'*v + coef0)^degree</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.KernelType.RBF">
-            <summary>Radial basis function: exp(-gamma*||u[i]-v[i]||²)</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.ProblemConfig.KernelType.Sigmoid">
-            <summary>Sigmoid: tanh(gamma*u'*v + coef0)</summary>
-        </member>
-        <member name="T:OpenCLTemplate.Isosurface.MarchingCubes">
-            <summary>Marching cubes algorithm for isosurface reconstruction</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.ComputeNormals">
-            <summary>Compute normals of faces?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.step">
-            <summary>X, y and z increments. step[0] = deltaX, step[1] = deltaY, step[2] = deltaZ</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.initVals">
-            <summary>X, y and z initial values. initVals[0] = x0, initVals[1] = y0, initVals[2] = z0</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.isoLevel">
-            <summary>Isolevel to look for</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.funcVals">
-            <summary>Values of the function</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.max">
-            <summary>Length of each dimension - max[0] = maxX, max[1]=maxY, max[2]=maxZ</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.edgeCoords">
-            <summary>Edge coordinates.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.edgeNormals">
-            <summary>Edge normals.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.edgePrelimNormals">
-            <summary>Edge coordinates.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.elementIndex">
-            <summary>Element index to build triangles</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varIsoLevel">
-            <summary>CL variable isolevel</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.CLFuncVals">
-            <summary>OpenCL variable that stores function values. F(x,y,z) = CLFuncVals[x+maxX*y+maxX*maxY*z]</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varEdgeCoords">
-            <summary>CL Edge coordinates. Geometry data compatible with OpenGL</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varEdgeNormals">
-            <summary>CL Edge normals. Geometry data compatible with OpenGL</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varElemIndex">
-            <summary>CL Element index array. Geometry data compatible with OpenGL</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varEdgePrelimNormals">
-            <summary>Auxiliary/preliminary normals</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varStep">
-            <summary>OpenCL x, y and z step sizes</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.varInitVals">
-            <summary>OpenCL x, y and z initial values within grid</summary>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.kernelInterpPts">
-            <summary>Kernel to interpolate points</summary>
-        </member>
-        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.#ctor(System.Single[0:,0:,0:])">
-            <summary>Creates a new isosurface calculator. You may pass variables created from a OpenGL context to the CL variables if you are using interop or NULL
-            if not using OpenCL/GL interop.</summary>
-            <param name="FuncValues">Values of the evaluated 3D function f(x,y,z). FuncValues=float[maxX,maxY,maxZ]</param>
-        </member>
-        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.#ctor(System.Single[0:,0:,0:],OpenCLTemplate.CLCalc.Program.Variable,OpenCLTemplate.CLCalc.Program.Variable,OpenCLTemplate.CLCalc.Program.Variable)">
-            <summary>Creates a new isosurface calculator. You may pass variables created from a OpenGL context to the CL variables if you are using interop or NULL
-            if not using OpenCL/GL interop.</summary>
-            <param name="FuncValues">Values of the evaluated 3D function f(x,y,z). FuncValues=float[maxX,maxY,maxZ]</param>
-            <param name="CLEdgeCoords">OpenCL variable (float) to hold edge coordinates. Dimension has to be 9 * maxX * maxY * maxZ</param>
-            <param name="CLEdgeNormals">OpenCL variable (float) to hold edge normals. Dimension has to be 9 * maxX * maxY * maxZ</param>
-            <param name="CLElementArrayIndex">OpenCL variable (int) to hold element array index. Dimension has to be 5 * 3 * (maxX - 1) * (maxY - 1) * (maxZ - 1)</param>
-        </member>
-        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.InitMarchingCubes(System.Single[0:,0:,0:],OpenCLTemplate.CLCalc.Program.Variable,OpenCLTemplate.CLCalc.Program.Variable,OpenCLTemplate.CLCalc.Program.Variable)">
-            <summary>Creates a new isosurface calculator. You may pass variables created from a OpenGL context to the CL variables if you are using interop or NULL
-            if not using OpenCL/GL interop.</summary>
-            <param name="FuncValues">Values of the evaluated 3D function f(x,y,z). FuncValues=float[maxX,maxY,maxZ]</param>
-            <param name="CLEdgeCoords">OpenCL variable (float) to hold edge coordinates. Dimension has to be 9 * maxX * maxY * maxZ</param>
-            <param name="CLEdgeNormals">OpenCL variable (float) to hold edge normals. Dimension has to be 9 * maxX * maxY * maxZ</param>
-            <param name="CLElementArrayIndex">OpenCL variable (int) to hold element array index. Dimension has to be 5 * 3 * (maxX - 1) * (maxY - 1) * (maxZ - 1)</param>
-        </member>
-        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.SetFuncVals(System.Single[0:,0:,0:])">
-            <summary>Sets function values</summary>
-            <param name="FuncVals">Values to set</param>
-        </member>
-        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.CalcIsoSurface(System.Single)">
-            <summary>Calculates isosurface corresponding to a given isolevel</summary>
-            <param name="isoLvl"></param>
-        </member>
-        <member name="F:OpenCLTemplate.Isosurface.MarchingCubes.edges">
-            <summary>Remaps edge coordinates so that ElemArray[ edges[elementIndex[i]] ] points to the same coordinates as elementIndex[i]</summary>
-        </member>
-        <member name="M:OpenCLTemplate.Isosurface.MarchingCubes.GetEdgeInfo(System.Collections.Generic.List{System.Single}@,System.Collections.Generic.List{System.Single}@,System.Collections.Generic.List{System.Int32}@)">
-            <summary>Retrieves edge information. Can be used to draw marching cubes geometry using OpenGL</summary>
-            <param name="EdgeCoords">Edge vertexes coordinates</param>
-            <param name="EdgeNormals">Edge vertexes normal vectors</param>
-            <param name="ElemArray">Element index array (triangles)</param>
-        </member>
-        <member name="P:OpenCLTemplate.Isosurface.MarchingCubes.Increments">
-            <summary>Gets or sets x, y and z increments. Increments[0] = deltaX, Increments[1] = deltaY, Increments[2] = deltaZ</summary>
-        </member>
-        <member name="P:OpenCLTemplate.Isosurface.MarchingCubes.InitValues">
-            <summary>Gets or sets x, y and z intial values. InitValues[0] = x0, InitValues[1] = y0, InitValues[2] = z0</summary>
-        </member>
-        <member name="P:OpenCLTemplate.Isosurface.MarchingCubes.IsoLevel">
-            <summary>Gets or sets current isolevel</summary>
-        </member>
-        <member name="T:Utility.ModifyRegistry.ModifyRegistry">
-            <summary>
-            An useful class to read/write/delete/count registry keys
-            </summary>
-        </member>
-        <member name="M:Utility.ModifyRegistry.ModifyRegistry.Read(System.String)">
-            <summary>
-            To read a registry key.
-            input: KeyName (string)
-            output: value (string) 
-            </summary>
-        </member>
-        <member name="M:Utility.ModifyRegistry.ModifyRegistry.Write(System.String,System.Object)">
-            <summary>
-            To write into a registry key.
-            input: KeyName (string) , Value (object)
-            output: true or false 
-            </summary>
-        </member>
-        <member name="M:Utility.ModifyRegistry.ModifyRegistry.DeleteKey(System.String)">
-            <summary>
-            To delete a registry key.
-            input: KeyName (string)
-            output: true or false 
-            </summary>
-        </member>
-        <member name="M:Utility.ModifyRegistry.ModifyRegistry.DeleteSubKeyTree">
-            <summary>
-            To delete a sub key and any child.
-            input: void
-            output: true or false 
-            </summary>
-        </member>
-        <member name="M:Utility.ModifyRegistry.ModifyRegistry.SubKeyCount">
-            <summary>
-            Retrive the count of subkeys at the current key.
-            input: void
-            output: number of subkeys
-            </summary>
-        </member>
-        <member name="M:Utility.ModifyRegistry.ModifyRegistry.ValueCount">
-            <summary>
-            Retrive the count of values in the key.
-            input: void
-            output: number of keys
-            </summary>
-        </member>
-        <member name="P:Utility.ModifyRegistry.ModifyRegistry.ShowError">
-            <summary>
-            A property to show or hide error messages 
-            (default = false)
-            </summary>
-        </member>
-        <member name="P:Utility.ModifyRegistry.ModifyRegistry.SubKey">
-            <summary>
-            A property to set the SubKey value
-            (default = "SOFTWARE\\" + Application.ProductName.ToUpper())
-            </summary>
-        </member>
-        <member name="P:Utility.ModifyRegistry.ModifyRegistry.BaseRegistryKey">
-            <summary>
-            A property to set the BaseRegistryKey value.
-            (default = Registry.LocalMachine)
-            </summary>
-        </member>
-        <member name="T:OpenCLTemplate.MachineLearning.TrainingSet">
-            <summary>
-            This class encapsulates all training data.
-            </summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.TrainingSet.trainingArray">
-            <summary>
-            List of training units
-            </summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.TrainingSet.kernels">
-            <summary>Auxiliar variable used during training, kernels values</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.TrainingSet.IsKernelCalculated">
-            <summary>Is kernel K[i][p], p=0..n, calculated?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.TrainingSet.errors">
-            <summary>
-            Auxiliar variable used during training
-            </summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.TrainingSet.addTrainingUnit(OpenCLTemplate.MachineLearning.TrainingUnit)">
-            <summary>Adds a new training unit to the set</summary>
-            <param name="newTrainingUnit">New training unit to add</param>
-        </member>
-        <member name="F:OpenCLTemplate.MachineLearning.TrainingSet.rnd">
-            <summary>
-            Random number generator
-            </summary>
-        </member>
-        <member name="M:OpenCLTemplate.MachineLearning.TrainingSet.removeRandomTrainingUnit">
-            <summary>Removes a random training unit from the set</summary>
-        </member>
-        <member name="P:OpenCLTemplate.MachineLearning.TrainingSet.getN">
-            <summary>
-            Gets the number of elements in the training set (equivalent to trainingArray.Count)
-            </summary>
-        </member>
-        <member name="T:OpenCLTemplate.FourierTransform.CLFFTfloat">
-            <summary>Computes Fast Fourier Transform of floats</summary>
-        </member>
-        <member name="F:OpenCLTemplate.FourierTransform.CLFFTfloat.kernelfft_radix16">
-            <summary>Radix FFT kernel</summary>
-        </member>
-        <member name="F:OpenCLTemplate.FourierTransform.CLFFTfloat.kernelfft_radix4">
-            <summary>Radix FFT kernel</summary>
-        </member>
-        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.FFT16(System.Single[])">
-            <summary>Computes the Discrete Fourier Transform of a float2 vector x whose length is a power of 16. 
-            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
-        </member>
-        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.iFFT16(System.Single[])">
-            <summary>Computes the inverse Discrete Fourier Transform of a float2 vector x whose length is a power of 16. 
-            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
-        </member>
-        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.FFT4(System.Single[])">
-            <summary>Computes the Discrete Fourier Transform of a float2 vector x whose length is a power of 4. 
-            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
-        </member>
-        <member name="M:OpenCLTemplate.FourierTransform.CLFFTfloat.iFFT4(System.Single[])">
-            <summary>Computes the inverse Discrete Fourier Transform of a float2 vector x whose length is a power of 4. 
-            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
-        </member>
-        <member name="T:OpenCLTemplate.FourierTransform.CLFFTfloat.CLFFTSrc">
-            <summary>Fast Fourier Transform source code</summary>
-        </member>
-        <member name="T:OpenCLTemplate.FourierTransform.CLFFTdouble">
-            <summary>Computes Fast Fourier Transform of doubles</summary>
-        </member>
-        <member name="F:OpenCLTemplate.FourierTransform.CLFFTdouble.kernelfft_radix16">
-            <summary>Radix FFT kernel</summary>
-        </member>
-        <member name="F:OpenCLTemplate.FourierTransform.CLFFTdouble.kernelfft_radix4">
-            <summary>Radix FFT kernel</summary>
-        </member>
-        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.FFT16(System.Double[])">
-            <summary>Computes the Discrete Fourier Transform of a double2 vector x whose length is a power of 16. 
-            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
-        </member>
-        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.iFFT16(System.Double[])">
-            <summary>Computes the inverse Discrete Fourier Transform of a double2 vector x whose length is a power of 16. 
-            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
-        </member>
-        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.FFT4(System.Double[])">
-            <summary>Computes the Discrete Fourier Transform of a double2 vector x whose length is a power of 4. 
-            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
-        </member>
-        <member name="M:OpenCLTemplate.FourierTransform.CLFFTdouble.iFFT4(System.Double[])">
-            <summary>Computes the inverse Discrete Fourier Transform of a double2 vector x whose length is a power of 4. 
-            x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
-        </member>
-        <member name="T:OpenCLTemplate.FourierTransform.CLFFTdouble.CLFFTSrc">
-            <summary>Fast Fourier Transform source code</summary>
         </member>
     </members>
 </doc>
