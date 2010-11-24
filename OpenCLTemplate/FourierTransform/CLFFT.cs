@@ -260,8 +260,10 @@ __kernel void fft_radix16(__global const float2 * x,__global float2 * y, __globa
 
         /// <summary>Computes the Discrete Fourier Transform of a float2 vector x whose length is a power of 16. 
         /// x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
-        public static CLCalc.Program.Variable FFT16(CLCalc.Program.Variable CLx)
+        public static CLCalc.Program.Variable FFT16(ref CLCalc.Program.Variable CLx)
         {
+            if (CLy == null || CLy.OriginalVarLength != CLx.OriginalVarLength) CLy = new CLCalc.Program.Variable(new float[CLx.OriginalVarLength]);
+
             if (CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL) return null;
 
             int nn = (int)Math.Log(CLx.OriginalVarLength >> 1, 16);
@@ -294,8 +296,13 @@ __kernel void fft_radix16(__global const float2 * x,__global float2 * y, __globa
 
             }
 
-            if (usar2) return CLx;
-            else return CLy;
+            if (usar2)
+            {
+                CLCalc.Program.Variable temp = CLx;
+                CLx = CLy; CLy = temp;
+            }
+
+            return CLy;
         }
 
         /// <summary>Computes the Discrete Fourier Transform of a float2 vector x whose length is a power of 16. 
@@ -312,7 +319,7 @@ __kernel void fft_radix16(__global const float2 * x,__global float2 * y, __globa
             //Writes original content
             CLx.WriteToDevice(x);
 
-            CLy = FFT16(CLx);
+            CLy = FFT16(ref CLx);
 
 
             float[] y = new float[x.Length];
@@ -357,7 +364,7 @@ __kernel void fft_radix16(__global const float2 * x,__global float2 * y, __globa
             kernelConjugate.Execute(new CLCalc.Program.Variable[] { CLx, CLScale }, CLx.OriginalVarLength >> 1);
             CLx.ReadFromDeviceTo(vx);
 
-            CLy = FFT16(CLx);
+            CLy = FFT16(ref CLx);
 
             scale[0] = 1 / (float)(CLx.OriginalVarLength >> 1);
             CLScale.WriteToDevice(scale);
@@ -372,8 +379,10 @@ __kernel void fft_radix16(__global const float2 * x,__global float2 * y, __globa
 
         /// <summary>Computes the Discrete Fourier Transform of a float2 vector x whose length is a power of 4. 
         /// x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
-        public static CLCalc.Program.Variable FFT4(CLCalc.Program.Variable CLx)
+        public static CLCalc.Program.Variable FFT4(ref CLCalc.Program.Variable CLx)
         {
+            if (CLy == null || CLy.OriginalVarLength != CLx.OriginalVarLength) CLy = new CLCalc.Program.Variable(new float[CLx.OriginalVarLength]);
+
             if (CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL) return null;
 
             int nn = (int)Math.Log(CLx.OriginalVarLength >> 1, 4);
@@ -406,8 +415,13 @@ __kernel void fft_radix16(__global const float2 * x,__global float2 * y, __globa
 
             }
 
-            if (usar2) return CLx;
-            else return CLy;
+            if (usar2)
+            {
+                CLCalc.Program.Variable temp = CLx;
+                CLx = CLy; CLy = temp;
+            }
+
+            return CLy;
         }
 
         /// <summary>Computes the Discrete Fourier Transform of a float2 vector x whose length is a power of 4. 
@@ -424,7 +438,7 @@ __kernel void fft_radix16(__global const float2 * x,__global float2 * y, __globa
             CLx.WriteToDevice(x);
 
 
-            CLy = FFT4(CLx);
+            CLy = FFT4(ref CLx);
 
             float[] y = new float[x.Length];
             CLy.ReadFromDeviceTo(y);
@@ -469,7 +483,7 @@ __kernel void fft_radix16(__global const float2 * x,__global float2 * y, __globa
             kernelConjugate.Execute(new CLCalc.Program.Variable[] { CLx, CLScale }, CLx.OriginalVarLength >> 1);
             CLx.ReadFromDeviceTo(vx);
 
-            CLy = FFT4(CLx);
+            CLy = FFT4(ref CLx);
 
             scale[0] = 1 / (float)(CLx.OriginalVarLength >> 1);
             CLScale.WriteToDevice(scale);
@@ -743,8 +757,10 @@ __kernel void fft_radix16(__global const double2 * x,__global double2 * y, __glo
 
         /// <summary>Computes the Discrete Fourier Transform of a double2 vector x whose length is a power of 16. 
         /// x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 16 (Length = 2*pow(16,n))</summary>
-        public static CLCalc.Program.Variable FFT16(CLCalc.Program.Variable CLx)
+        public static CLCalc.Program.Variable FFT16(ref CLCalc.Program.Variable CLx)
         {
+            if (CLy == null || CLy.OriginalVarLength != CLx.OriginalVarLength) CLy = new CLCalc.Program.Variable(new float[CLx.OriginalVarLength]);
+
             if (CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL) return null;
 
             int nn = (int)Math.Log(CLx.OriginalVarLength >> 1, 16);
@@ -777,8 +793,13 @@ __kernel void fft_radix16(__global const double2 * x,__global double2 * y, __glo
 
             }
 
-            if (usar2) return CLx;
-            else return CLy;
+            if (usar2)
+            {
+                CLCalc.Program.Variable temp = CLx;
+                CLx = CLy; CLy = temp;
+            }
+
+            return CLy;
         }
 
         /// <summary>Computes the Discrete Fourier Transform of a double2 vector x whose length is a power of 16. 
@@ -795,7 +816,7 @@ __kernel void fft_radix16(__global const double2 * x,__global double2 * y, __glo
             //Writes original content
             CLx.WriteToDevice(x);
 
-            CLy = FFT16(CLx);
+            CLy = FFT16(ref CLx);
 
 
             double[] y = new double[x.Length];
@@ -840,7 +861,7 @@ __kernel void fft_radix16(__global const double2 * x,__global double2 * y, __glo
             kernelConjugate.Execute(new CLCalc.Program.Variable[] { CLx, CLScale }, CLx.OriginalVarLength >> 1);
             CLx.ReadFromDeviceTo(vx);
 
-            CLy = FFT16(CLx);
+            CLy = FFT16(ref CLx);
 
             scale[0] = 1 / (double)(CLx.OriginalVarLength >> 1);
             CLScale.WriteToDevice(scale);
@@ -855,8 +876,10 @@ __kernel void fft_radix16(__global const double2 * x,__global double2 * y, __glo
 
         /// <summary>Computes the Discrete Fourier Transform of a double2 vector x whose length is a power of 4. 
         /// x = { Re[x0] Im[x0] Re[x1] Im[x1] ... Re[xn] Im[xn] }, n = power of 4 (Length = 2*pow(4,n))</summary>
-        public static CLCalc.Program.Variable FFT4(CLCalc.Program.Variable CLx)
+        public static CLCalc.Program.Variable FFT4(ref CLCalc.Program.Variable CLx)
         {
+            if (CLy == null || CLy.OriginalVarLength != CLx.OriginalVarLength) CLy = new CLCalc.Program.Variable(new float[CLx.OriginalVarLength]);
+
             if (CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL) return null;
 
             int nn = (int)Math.Log(CLx.OriginalVarLength >> 1, 4);
@@ -889,8 +912,13 @@ __kernel void fft_radix16(__global const double2 * x,__global double2 * y, __glo
 
             }
 
-            if (usar2) return CLx;
-            else return CLy;
+            if (usar2)
+            {
+                CLCalc.Program.Variable temp = CLx;
+                CLx = CLy; CLy = temp;
+            }
+            
+            return CLy;
         }
 
         /// <summary>Computes the Discrete Fourier Transform of a double2 vector x whose length is a power of 4. 
@@ -907,7 +935,7 @@ __kernel void fft_radix16(__global const double2 * x,__global double2 * y, __glo
             CLx.WriteToDevice(x);
 
 
-            CLy = FFT4(CLx);
+            CLy = FFT4(ref CLx);
 
             double[] y = new double[x.Length];
             CLy.ReadFromDeviceTo(y);
@@ -952,7 +980,7 @@ __kernel void fft_radix16(__global const double2 * x,__global double2 * y, __glo
             kernelConjugate.Execute(new CLCalc.Program.Variable[] { CLx, CLScale }, CLx.OriginalVarLength >> 1);
             CLx.ReadFromDeviceTo(vx);
 
-            CLy = FFT4(CLx);
+            CLy = FFT4(ref CLx);
 
             scale[0] = 1 / (double)(CLx.OriginalVarLength >> 1);
             CLScale.WriteToDevice(scale);
@@ -964,3 +992,4 @@ __kernel void fft_radix16(__global const double2 * x,__global double2 * y, __glo
 
     }
 }
+
