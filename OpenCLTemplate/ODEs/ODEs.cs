@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using OpenCLTemplate;
-using GASS.OpenCL;
 using System.Text;
 
 namespace OpenCLTemplate.DifferentialEquations
@@ -226,15 +225,12 @@ namespace OpenCLTemplate.DifferentialEquations
         public void Step()
         {
             #region Salva as variaveis iniciais
-            CLEvent Ev = new CLEvent();
 
-            CLError err = OpenCLDriver.clEnqueueCopyBuffer(CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ], x.VarPointer, xsav.VarPointer, new GASS.Types.SizeT(0), new GASS.Types.SizeT(0),
-                new GASS.Types.SizeT(sizeof(float)), 0, null, ref Ev);
-            if (err != CLError.Success) throw new Exception("Error copying variable");
 
-            err = OpenCLDriver.clEnqueueCopyBuffer(CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ], y.VarPointer, ysav.VarPointer, new GASS.Types.SizeT(0), new GASS.Types.SizeT(0),
-                new GASS.Types.SizeT(NStates[0] * sizeof(float)), 0, null, ref Ev);
-            if (err != CLError.Success) throw new Exception("Error copying variable");
+            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<float>((Cloo.ComputeBuffer<float>)x.VarPointer, (Cloo.ComputeBuffer<float>)xsav.VarPointer, CLCalc.Program.Event);
+            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<float>((Cloo.ComputeBuffer<float>)y.VarPointer, (Cloo.ComputeBuffer<float>)ysav.VarPointer, CLCalc.Program.Event);
+
+
             #endregion
 
             //Step 1
@@ -661,15 +657,10 @@ namespace OpenCLTemplate.DifferentialEquations
         public void Step()
         {
             #region Salva as variaveis iniciais
-            CLEvent Ev = new CLEvent();
 
-            CLError err = OpenCLDriver.clEnqueueCopyBuffer(CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ], x.VarPointer, xsav.VarPointer, new GASS.Types.SizeT(0), new GASS.Types.SizeT(0),
-                new GASS.Types.SizeT(sizeof(double)), 0, null, ref Ev);
-            if (err != CLError.Success) throw new Exception("Error copying variable");
+            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<double>((Cloo.ComputeBuffer<double>)x.VarPointer, (Cloo.ComputeBuffer<double>)xsav.VarPointer, CLCalc.Program.Event);
+            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<double>((Cloo.ComputeBuffer<double>)y.VarPointer, (Cloo.ComputeBuffer<double>)ysav.VarPointer, CLCalc.Program.Event);
 
-            err = OpenCLDriver.clEnqueueCopyBuffer(CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ], y.VarPointer, ysav.VarPointer, new GASS.Types.SizeT(0), new GASS.Types.SizeT(0),
-                new GASS.Types.SizeT(NStates[0] * sizeof(double)), 0, null, ref Ev);
-            if (err != CLError.Success) throw new Exception("Error copying variable");
             #endregion
 
             //Step 1

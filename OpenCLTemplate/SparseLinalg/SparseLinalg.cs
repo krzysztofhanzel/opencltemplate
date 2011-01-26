@@ -364,7 +364,7 @@ namespace OpenCLTemplate.LinearAlgebra
             CLCalc.Program.MemoryObject[] args = new CLCalc.Program.MemoryObject[] { v1.CLVector, v2.CLVector, dotProd, vLenBy4 };
 
             //kernelDotProduct.Execute(args, GLOBALWORKSIZE);
-            kernelDotProduct.Execute(args, new int[] { GLOBALWORKSIZE }, new int[] { CLCalc.CLDevices[CLCalc.Program.DefaultCQ].CLDeviceMaxWorkItemSizes[0] });
+            kernelDotProduct.Execute(args, new int[] { GLOBALWORKSIZE }, new int[] { (int)CLCalc.CLDevices[CLCalc.Program.DefaultCQ].MaxWorkItemSizes[0] });
 
             //Sums what's left
             int i = GLOBALWORKSIZE >> 3;

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 using System.Runtime.InteropServices;
-using GASS.OpenCL;
+using Cloo;
 
 namespace OpenCLTemplate
 {
@@ -56,116 +56,58 @@ namespace OpenCLTemplate
         /// <summary>Initializes OpenCL and reads devices</summary>
         public static void InitCL()
         {
-            InitCL(IntPtr.Zero, IntPtr.Zero);
+            InitCL(ComputeDeviceTypes.All);
         }
 
-        /// <summary>Initializes OpenCL from an existing Context and reads devices</summary>
-        /// <param name="ContextPtr">Existing context pointer</param>
-        /// <param name="CommandQueuePtr">Existing command queue pointer</param>
-        public static void InitCL(IntPtr ContextPtr, IntPtr CommandQueuePtr)
+        /// <summary>Initializes OpenCL and reads devices</summary>
+        public static void InitCL(ComputeDeviceTypes DevicesToUse)
         {
             if (CLAcceleration != CLAccelerationType.UsingCL)
             {
                 try
                 {
-                    CLAccel = CLAccelerationType.UsingCL;
+                    if (ComputePlatform.Platforms.Count > 0) CLAccel = CLAccelerationType.UsingCL;
+                    else CLAccel = CLAccelerationType.NotUsingCL;
 
-                    //Lê quais plataformas existem (Uma?)
-                    uint num_plat_entries = 50;
-                    uint num_platforms = 0;
-                    CLPlatformID[] Platforms = new CLPlatformID[num_plat_entries];
-                    LastError = OpenCLDriver.clGetPlatformIDs(num_plat_entries, Platforms, ref  num_platforms);
+                    Program.Event = new List<ComputeEventBase>();
 
-                    //Armazena as plataformas existentes
-                    CLPlatforms = new List<CLPlatform>();
-                    for (int i = 0; i < num_platforms; i++)
+                    CLPlatforms = new List<ComputePlatform>();
+                    foreach (ComputePlatform pp in ComputePlatform.Platforms) CLPlatforms.Add(pp);
+
+                    ComputeContextPropertyList Properties = new ComputeContextPropertyList(ComputePlatform.Platforms[0]);
+                    Program.Context = new ComputeContext(DevicesToUse, Properties, null, IntPtr.Zero);
+
+                    CLDevices = new List<ComputeDevice>();
+                    for (int i = 0; i < Program.Context.Devices.Count; i++)
                     {
-                        CLPlatform plat = new CLPlatform(Platforms[i]);
-                        CLPlatforms.Add(plat);
+                        CLDevices.Add(Program.Context.Devices[i]);
+
                     }
 
-                    #region Leitura dos devices existentes
-                    CLDevices = new List<CLDevice>();
-                    foreach (CLPlatform Platform in CLPlatforms)
-                    {
-                        uint num_dev_Entries = 50;
-                        CLDeviceID[] devices = new CLDeviceID[num_dev_Entries];
-                        uint num_devs = 50;
-                        LastError = OpenCLDriver.clGetDeviceIDs(Platform.ID, CLDeviceType.All, num_dev_Entries, devices, ref num_devs);
-
-                        for (int i = 0; i < num_devs; i++)
-                        {
-                            CLDevice dev = new CLDevice(devices[i]);
-                            CLDevices.Add(dev);
-                        }
-                    }
-                    #endregion
-
-                    #region Cria contexto
-                    GASS.Types.SizeT Properties = new GASS.Types.SizeT();
-                    OpenCLDriver.LoggingFunction NotifFunc = new OpenCLDriver.LoggingFunction(NotifyFunc);
-                    IntPtr usrData = new IntPtr();
-                    CLError Erro = CLError.Success;
-
-                    CLDeviceID[] devs = new CLDeviceID[CLDevices.Count];
-                    for (int i = 0; i < CLDevices.Count; i++) devs[i] = CLDevices[i].ID;
-
-                    if (ContextPtr == IntPtr.Zero)
-                    {
-                        Program.Context = OpenCLDriver.clCreateContext(ref Properties, (uint)CLDevices.Count, devs, NotifyFunc, usrData, ref Erro);
-                    }
-                    else
-                    {
-                        Program.Context = new CLContext();
-                        Program.Context.Value = ContextPtr;
-                    }
-
-                    LastError = Erro;
-                    #endregion
-
-                    #region Cria comandos
-                    Program.CommQueues = new List<CLCommandQueue>();
-                    Program.AsyncCommQueues = new List<CLCommandQueue>();
+                    Program.CommQueues = new List<ComputeCommandQueue>();
+                    Program.AsyncCommQueues = new List<ComputeCommandQueue>();
                     Program.DefaultCQ = -1;
 
-                    if (CommandQueuePtr == IntPtr.Zero)
-                    {
-                        for (int i = 0; i < CLDevices.Count; i++)
-                        {
-                            //Comandos para os devices
-                            CLCommandQueue CQ = OpenCLDriver.clCreateCommandQueue(Program.Context, CLDevices[i].ID, 0, ref Err);
-                            if (ContextPtr == IntPtr.Zero) LastError = Err;
-                            CLCommandQueue AsyncCQ = OpenCLDriver.clCreateCommandQueue(Program.Context, CLDevices[i].ID, CLCommandQueueProperties.OutOfOrderExecModeEnable, ref Err);
-                            if (ContextPtr == IntPtr.Zero) LastError = Err;
-
-                            if (Err == CLError.Success)
-                            {
-                                //Comando para a primeira GPU
-                                if ((CLDevices[i].CLDeviceType == "4" || CLDevices[i].CLDeviceType == "8") && Program.DefaultCQ < 0)
-                                    Program.DefaultCQ = i;
-
-                                Program.CommQueues.Add(CQ);
-                                Program.AsyncCommQueues.Add(AsyncCQ);
-                            }
-                        }
-                        //Só tem CPU
-                        if (Program.DefaultCQ < 0 && Program.CommQueues.Count > 0) Program.DefaultCQ = 0;
-                    }
-                    else
-                    { //User gave command queue
-                        CLCommandQueue CQ = new CLCommandQueue();
-                        CQ.Value = CommandQueuePtr;
-                        Program.CommQueues.Add(CQ);
-                        Program.DefaultCQ = 0;
-                    }
-                    #endregion
-
-                    #region Testa a disponibilidade dos devices
                     for (int i = 0; i < CLDevices.Count; i++)
                     {
-                        CLDevices[i].CLDeviceAvailable = CheckDevice(i);
+                        //Comandos para os devices
+                        ComputeCommandQueue CQ = new ComputeCommandQueue(Program.Context, CLDevices[i], ComputeCommandQueueFlags.None);
+
+                        ComputeCommandQueue AsyncCQ = new ComputeCommandQueue(Program.Context, CLDevices[i], ComputeCommandQueueFlags.OutOfOrderExecution);
+
+
+
+                        //Comando para a primeira GPU
+                        if ((CLDevices[i].Type == ComputeDeviceTypes.Gpu || CLDevices[i].Type == ComputeDeviceTypes.Accelerator) && Program.DefaultCQ < 0)
+                            Program.DefaultCQ = i;
+
+                        Program.CommQueues.Add(CQ);
+                        Program.AsyncCommQueues.Add(AsyncCQ);
+
                     }
-                    #endregion
+                    //Só tem CPU
+                    if (Program.DefaultCQ < 0 && Program.CommQueues.Count > 0) Program.DefaultCQ = 0;
+
                 }
                 catch (Exception ex)
                 {
@@ -175,263 +117,19 @@ namespace OpenCLTemplate
             }
         }
 
-        /// <summary>Tries to execute actual code in device to check its availability.</summary>
-        /// <param name="num">Command queue number to check</param>
-        private static bool CheckDevice(int num)
-        {
-            int DefDevice = OpenCLTemplate.CLCalc.Program.DefaultCQ;
-            try
-            {
-                OpenCLTemplate.CLCalc.Program.DefaultCQ = num;
-                float[] x = new float[] { 1, 2, 3, 0.123f };
-                float[] y = new float[] { 1, 2, 1, 1 };
-                float[] z = new float[4];
-                for (int i = 0; i < 4; i++) z[i] = x[i] + y[i];
-
-                string s = @"
-                       kernel void
-                       sum (global float4 * x, global float4 * y)
-                       {
-                           x[0] = x[0] + y[0];
-                       }
-";
-
-                CLCalc.Program.Compile(new string[] { s });
-                CLCalc.Program.Kernel sum = new CLCalc.Program.Kernel("sum");
-
-                CLCalc.Program.Variable varx = new CLCalc.Program.Variable(x);
-                CLCalc.Program.Variable vary = new CLCalc.Program.Variable(y);
-                CLCalc.Program.Variable[] args = { varx, vary };
-
-                int[] max = new int[] { 1 };
-
-                sum.Execute(args, max);
-
-                varx.ReadFromDeviceTo(x);
-
-                float temp = 0;
-                for (int i = 0; i < 4; i++) temp += (x[i] - z[i]) * (x[i] - z[i]);
-                
-                OpenCLTemplate.CLCalc.Program.DefaultCQ = DefDevice;
-                return (temp < 1e-6);
-            }
-            catch
-            {
-                OpenCLTemplate.CLCalc.Program.DefaultCQ = DefDevice;
-                return false;
-            }
-
-        }
 
 
-        private static void NotifyFunc(IntPtr errInfo, IntPtr privateInfo, GASS.Types.SizeT cb, IntPtr usrData)
-        {
-            int i = 0;
-            i++;
-        }
-
-        /// <summary>Releases OpenCL resources</summary>
-        public static void FinishCL()
-        {
-            OpenCLDriver.clReleaseContext(Program.Context);
-            for (int i = 0; i < Program.CommQueues.Count; i++)
-            {
-                OpenCLDriver.clReleaseCommandQueue(Program.CommQueues[i]);
-                OpenCLDriver.clReleaseCommandQueue(Program.AsyncCommQueues[i]);
-            }
-            OpenCLDriver.clReleaseProgram(Program.Prog);
-            CLAccel = CLCalc.CLAccelerationType.NotUsingCL;
-        }
 
         #endregion
 
-        #region Controle de erros
-        /// <summary>Last found error</summary>
-        private static CLError Err;
-        /// <summary>Last error. Throws exception if not set to success.</summary>
-        public static CLError LastError
-        {
-            get
-            {
-                return Err;
-            }
-            set
-            {
-                Err = value;
-                if (Err != CLError.Success) throw new Exception(Err.ToString());
-            }
-        }
-        #endregion
 
-        #region Informacoes de hardware
+        #region Hardware information
 
-        /// <summary>Class to hold OpenCL devices</summary>
-        public class CLDevice
-        {
-            #region Informacoes do device
-            /// <summary>Device ID</summary>
-            public CLDeviceID ID;
-            /// <summary>Device type string</summary>
-            public string CLDeviceType;
-            /// <summary>Device name string</summary>
-            public string CLDeviceName;
-            /// <summary>Device vendor string</summary>
-            public string CLDeviceVendor;
-            /// <summary>OpenCL version string</summary>
-            public string CLDeviceVersion;
-            /// <summary>Execution capabilities of the device</summary>
-            public string CLDeviceExecCapab;
-            /// <summary>Is device available?</summary>
-            public bool CLDeviceAvailable;
-            /// <summary>Is device compiler available?</summary>
-            public bool CLDeviceCompilerAvailable;
-            /// <summary>Maximum memory allocation size in bytes</summary>
-            public ulong CLDeviceMaxMallocSize;
-            /// <summary>Memory size in bytes</summary>
-            public ulong CLDeviceMemSize;
-            /// <summary>Maximum number of work-items 
-            /// that can be specified in each dimension of the work-group 
-            /// to clEnqueueNDRangeKernel.</summary>
-            public int[] CLDeviceMaxWorkItemSizes = new int[3];
-            /// <summary>Maximum number of work-items in a 
-            /// work-group executing a kernel using the data parallel execution model.</summary>
-            public int CLDeviceMaxWorkGroupSize;
-
-            #endregion
-
-            /// <summary>Constructor</summary>
-            /// <param name="DeviceID">Device ID</param>
-            public CLDevice(CLDeviceID DeviceID)
-            {
-                this.ID = DeviceID;
-
-                int n = 300;
-                GASS.Types.SizeT param_value_size = new GASS.Types.SizeT(n);
-                GASS.Types.SizeT param_value_size_ret = new GASS.Types.SizeT(n);
-                byte[] param_value = new byte[n];
-
-                //Tipo
-                LastError = OpenCLDriver.clGetDeviceInfo(DeviceID, CLDeviceInfo.Type, param_value_size, param_value, ref param_value_size_ret);
-                CLDeviceType = param_value[0].ToString();
-
-                //Nome
-                LastError = OpenCLDriver.clGetDeviceInfo(DeviceID, CLDeviceInfo.Name, param_value_size, param_value, ref param_value_size_ret);
-                CLDeviceName = System.Text.Encoding.ASCII.GetString(param_value).Substring(0, param_value_size_ret - 1).Replace("\0", "");
-
-                //Vendedor
-                LastError = OpenCLDriver.clGetDeviceInfo(DeviceID, CLDeviceInfo.Vendor, param_value_size, param_value, ref param_value_size_ret);
-                CLDeviceVendor = System.Text.Encoding.ASCII.GetString(param_value).Substring(0, param_value_size_ret - 1).Replace("\0", "");
-
-                //Versao
-                LastError = OpenCLDriver.clGetDeviceInfo(DeviceID, CLDeviceInfo.Version, param_value_size, param_value, ref param_value_size_ret);
-                CLDeviceVersion = System.Text.Encoding.ASCII.GetString(param_value).Substring(0, param_value_size_ret - 1).Replace("\0", "");
-
-                //Capacidade
-                LastError = OpenCLDriver.clGetDeviceInfo(DeviceID, CLDeviceInfo.ExecutionCapabilities, param_value_size, param_value, ref param_value_size_ret);
-                CLDeviceExecCapab = param_value[0].ToString();
-
-                //Disponibilidade
-                LastError = OpenCLDriver.clGetDeviceInfo(DeviceID, CLDeviceInfo.Available, param_value_size, param_value, ref param_value_size_ret);
-                CLDeviceAvailable = param_value[0] == 1;
-
-                //Compilador
-                LastError = OpenCLDriver.clGetDeviceInfo(DeviceID, CLDeviceInfo.CompilerAvailable, param_value_size, param_value, ref param_value_size_ret);
-                CLDeviceCompilerAvailable = param_value[0] == 1;
-
-                //Memoria
-                unsafe
-                {
-                    ulong y;
-                    IntPtr x = new IntPtr(&y);
-                    LastError = OpenCLDriver.clGetDeviceInfo(DeviceID, CLDeviceInfo.MaxMemAllocSize, sizeof(ulong), x, ref param_value_size_ret);
-                    CLDeviceMaxMallocSize = y;
-                    LastError = OpenCLDriver.clGetDeviceInfo(DeviceID, CLDeviceInfo.GlobalMemSize, sizeof(ulong), x, ref param_value_size_ret);
-                    CLDeviceMemSize = y;
-                }
-
-                //Max workers
-                unsafe
-                {
-                    GASS.Types.SizeT[] pvals = new GASS.Types.SizeT[n];
-                    fixed (GASS.Types.SizeT* ptrVals = pvals)
-                    {
-                        LastError = OpenCLDriver.clGetDeviceInfo(DeviceID, CLDeviceInfo.MaxWorkItemSizes, param_value_size, (IntPtr)ptrVals, ref param_value_size_ret);
-                    }
-                    for (int i=0;i<3;i++) CLDeviceMaxWorkItemSizes[i] = int.Parse(pvals[i].ToString());
-                }
-
-                //Max workgroup size
-                unsafe
-                {
-                    GASS.Types.SizeT[] pvals = new GASS.Types.SizeT[n];
-                    fixed (GASS.Types.SizeT* ptrVals = pvals)
-                    {
-                        LastError = OpenCLDriver.clGetDeviceInfo(DeviceID, CLDeviceInfo.MaxWorkGroupSize, param_value_size, (IntPtr)(ptrVals), ref param_value_size_ret);
-                    }
-                    CLDeviceMaxWorkGroupSize = int.Parse(pvals[0].ToString());
-                }
-
-            }
-        }
-
-        /// <summary>Class to hold OpenCL Platforms</summary>
-        public class CLPlatform
-        {
-            #region Informacoes da plataforma
-            /// <summary>Platform ID</summary>
-            public CLPlatformID ID;
-            /// <summary>OpenCL profile string. Profile name supported by the implementation.</summary>
-            public string CLPlatformProfile;
-            /// <summary>OpenCL version string.</summary>
-            public string CLPlatformVersion;
-            /// <summary>OpenCL name string.</summary>
-            public string CLPlatformName;
-            /// <summary>OpenCL vendor string.</summary>
-            public string CLPlatformVendor;
-            /// <summary>OpenCL extensions string.</summary>
-            public string CLPlatformExtensions;
-            #endregion
-
-            /// <summary>Constructor.</summary>
-            /// <param name="PlatformID">Sets this platform's ID</param>
-            public CLPlatform(CLPlatformID PlatformID)
-            {
-                this.ID = PlatformID;
-
-                #region Leitura de informacoes da plataforma
-                int n = 300;
-                GASS.Types.SizeT param_value_size = new GASS.Types.SizeT(n);
-                GASS.Types.SizeT param_value_size_ret = new GASS.Types.SizeT(n);
-                byte[] param_value = new byte[n];
-
-                //Profile
-                LastError = OpenCLDriver.clGetPlatformInfo(this.ID, CLPlatformInfo.Profile, param_value_size, param_value, ref param_value_size_ret);
-                CLPlatformProfile = System.Text.Encoding.ASCII.GetString(param_value);
-                CLPlatformProfile = CLPlatformProfile.Substring(0, param_value_size_ret - 1);
-
-                //Versao
-                LastError = OpenCLDriver.clGetPlatformInfo(this.ID, CLPlatformInfo.Version, param_value_size, param_value, ref param_value_size_ret);
-                CLPlatformVersion = System.Text.Encoding.ASCII.GetString(param_value).Substring(0, param_value_size_ret - 1);
-
-                //Nome
-                LastError = OpenCLDriver.clGetPlatformInfo(this.ID, CLPlatformInfo.Name, param_value_size, param_value, ref param_value_size_ret);
-                CLPlatformName = System.Text.Encoding.ASCII.GetString(param_value).Substring(0, param_value_size_ret - 1);
-
-                //Fabricante
-                LastError = OpenCLDriver.clGetPlatformInfo(this.ID, CLPlatformInfo.Vender, param_value_size, param_value, ref param_value_size_ret);
-                CLPlatformVendor = System.Text.Encoding.ASCII.GetString(param_value).Substring(0, param_value_size_ret - 1);
-
-                //Extensoes
-                LastError = OpenCLDriver.clGetPlatformInfo(this.ID, CLPlatformInfo.Extensions, param_value_size, param_value, ref param_value_size_ret);
-                CLPlatformExtensions = System.Text.Encoding.ASCII.GetString(param_value).Substring(0, param_value_size_ret - 1);
-                #endregion
-            }
-        }
         /// <summary>List of available platforms</summary>
-        public static List<CLPlatform> CLPlatforms;
+        public static List<ComputePlatform> CLPlatforms;
 
         /// <summary>List of available devices</summary>
-        public static List<CLDevice> CLDevices;
+        public static List<ComputeDevice> CLDevices;
 
 
         #endregion
@@ -439,30 +137,30 @@ namespace OpenCLTemplate
         /// <summary>Program related stuff</summary>
         public static class Program
         {
-            /// <summary>Local event</summary>
-            private static CLEvent Event = new CLEvent();
+            /// <summary>Event list</summary>
+            public static List<ComputeEventBase> Event;
 
             /// <summary>OpenCL context using all devices</summary>
-            public static CLContext Context;
+            public static ComputeContext Context;
 
             /// <summary>Synchronous command queues that are executed in call order</summary>
-            public static List<CLCommandQueue> CommQueues;
+            public static List<ComputeCommandQueue> CommQueues;
             /// <summary>Asynchronous command queues</summary>
-            public static List<CLCommandQueue> AsyncCommQueues;
+            public static List<ComputeCommandQueue> AsyncCommQueues;
 
             /// <summary>Default synchronous command queue set as the first GPU, for ease of use.</summary>
             public static int DefaultCQ;
 
             /// <summary>Compiled program</summary>
-            public static CLProgram Prog;
+            public static ComputeProgram Prog;
 
             /// <summary>Ends all commands being executed</summary>
             public static void Sync()
             {
                 for (int i = 0; i < CommQueues.Count; i++)
                 {
-                    LastError = OpenCLDriver.clFinish(CommQueues[i]);
-                    LastError = OpenCLDriver.clFinish(AsyncCommQueues[i]);
+                    CommQueues[i].Finish();
+                    AsyncCommQueues[i].Finish();
                 }
             }
 
@@ -497,27 +195,22 @@ namespace OpenCLTemplate
             public static void Compile(string[] SourceCode, out List<string> BuildLogs)
             {
                 //CLProgram Prog = OpenCLDriver.clCreateProgramWithSource(ContextoGPUs, 1, new string[] { sProgramSource }, null, ref Err);
-
-                Prog = OpenCLDriver.clCreateProgramWithSource(Context, (uint)SourceCode.Length, SourceCode, null, ref Err);
-                LastError = Err;
+                Prog = new ComputeProgram(Context, SourceCode);
 
 
-                IntPtr user_Data = new IntPtr();
                 //Verifica se compilou em algum device
                 bool funcionou = false;
+
                 for (int i = 0; i < CLCalc.CLDevices.Count; i++)
                 {
-                    Err = OpenCLDriver.clBuildProgram(Prog, 1, new CLDeviceID[] { CLCalc.CLDevices[i].ID }, null, null, user_Data);
                     try
                     {
-                        LastError = Err;
+                        Prog.Build(new List<ComputeDevice>() { CLCalc.CLDevices[i] }, "", null, IntPtr.Zero);
                         funcionou = true;
-                        CLCalc.CLDevices[i].CLDeviceAvailable = true;
                     }
                     catch
                     {
-                        //Se nao compilou naquele device nao pode usar nele
-                        CLCalc.CLDevices[i].CLDeviceAvailable = false;
+                        
                     }
                 }
 
@@ -528,33 +221,20 @@ namespace OpenCLTemplate
                     string LogInfo = "";
                     try
                     {
-                        unsafe
-                        {
-                            byte[] info = new byte[5000];
-                            GASS.Types.SizeT ActualSize = new GASS.Types.SizeT();
-                            fixed (void* ponteiro = info)
-                            {
-                                OpenCLDriver.clGetProgramBuildInfo(Prog, CLDevices[DefaultCQ].ID, CLProgramBuildInfo.Log,
-                                             new GASS.Types.SizeT(5000), new IntPtr(ponteiro), ref ActualSize);
-                            }
-
-
-                            System.Text.Encoding enc = System.Text.Encoding.ASCII;
-                            LogInfo = enc.GetString(info).Substring(0, ActualSize);
-                        }
+                        LogInfo = Prog.GetBuildLog(CLCalc.CLDevices[i]);
                     }
                     catch
                     {
                         LogInfo = "Error retrieving build info";
                     }
-                    if (!CLCalc.CLDevices[i].CLDeviceAvailable) LogInfo = "Possible compilation failure for device " + i.ToString() + "\n" + LogInfo;
+                    //if (!CLCalc.CLDevices[i].CLDeviceAvailable) LogInfo = "Possible compilation failure for device " + i.ToString() + "\n" + LogInfo;
                     BuildLogs.Add(LogInfo);
                 }
 
                 //Nao compilou em nenhum, joga exception
                 if (!funcionou)
                 {
-                    LastError = Err;
+                    throw new Exception("Could not compile program");
                 }
             }
             #endregion
@@ -569,7 +249,7 @@ namespace OpenCLTemplate
                 public int OriginalVarLength;
 
                 /// <summary>Handle to memory object</summary>
-                public CLMem VarPointer;
+                public ComputeMemory VarPointer;
 
                 /// <summary>Returns the size of the stored variable</summary>
                 public int Size
@@ -583,7 +263,7 @@ namespace OpenCLTemplate
                 /// <summary>Releases variable from memory.</summary>
                 public void Dispose()
                 {
-                    OpenCLDriver.clReleaseMemObject(VarPointer);
+                    VarPointer.Dispose();
                 }
 
                 /// <summary>Destructor</summary>
@@ -595,15 +275,9 @@ namespace OpenCLTemplate
                 /// <summary>Sets this variable as an argument for a kernel</summary>
                 /// <param name="ArgIndex">Index of kernel argument</param>
                 /// <param name="Kernel">Kernel to receive argument</param>
-                public void SetAsArgument(uint ArgIndex, CLKernel Kernel)
+                public void SetAsArgument(int ArgIndex, ComputeKernel Kernel)
                 {
-                    unsafe
-                    {
-                        fixed (CLMem* ptrBuff = &VarPointer)
-                        {
-                            LastError = OpenCLDriver.clSetKernelArg(Kernel, ArgIndex, new GASS.Types.SizeT(sizeof(CLMem)), new IntPtr(ptrBuff));
-                        }
-                    }
+                    Kernel.SetMemoryArgument(ArgIndex, VarPointer);
                 }
 
             }
@@ -614,26 +288,6 @@ namespace OpenCLTemplate
 
                 #region Constructor. int[], float[], long[], double[], byte[]
 
-                private unsafe void CLMalloc(void* p)
-                {
-                    VarPointer = OpenCLDriver.clCreateBuffer(Context, CLMemFlags.ReadWrite | CLMemFlags.CopyHostPtr,
-                              new GASS.Types.SizeT(Size), new IntPtr(p), ref Err);
-                    //VarPointer = OpenCLDriver.clCreateBuffer(Context, CLMemFlags.ReadWrite | CLMemFlags.UseHostPtr,
-                    //          new GASS.Types.SizeT(Size), new IntPtr(p), ref Err);
-
-                    LastError = Err;
-                }
-
-                /// <summary>Constructor. Creates from an existing OpenCL variable</summary>
-                /// <param name="OpenCLVarPointer">OpenCL variable pointer</param>
-                /// <param name="varSize">Original array length</param>
-                /// <param name="sizeOfType">sizeOf(array datatype)</param>
-                public Variable(IntPtr OpenCLVarPointer, int varSize, int sizeOfType)
-                {
-                    OriginalVarLength = varSize;
-                    VarSize = OriginalVarLength * sizeOfType;
-                    this.VarPointer.Value = OpenCLVarPointer;
-                }
 
                 /// <summary>Constructor.</summary>
                 /// <param name="Values">Variable whose size will be allocated in device memory.</param>
@@ -644,10 +298,8 @@ namespace OpenCLTemplate
                     {
                         OriginalVarLength = Values.Length;
                         VarSize = Values.Length * sizeof(float);
-                        fixed (void* ponteiro = Values)
-                        {
-                            CLMalloc(ponteiro);
-                        }
+
+                        VarPointer = new ComputeBuffer<float>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, Values);
                     }
                 }
                 /// <summary>Constructor.</summary>
@@ -659,10 +311,8 @@ namespace OpenCLTemplate
                     {
                         OriginalVarLength = Values.Length;
                         VarSize = Values.Length * sizeof(int);
-                        fixed (void* ponteiro = Values)
-                        {
-                            CLMalloc(ponteiro);
-                        }
+
+                        VarPointer = new ComputeBuffer<int>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, Values);
                     }
                 }
                 /// <summary>Constructor.</summary>
@@ -674,10 +324,9 @@ namespace OpenCLTemplate
                     {
                         OriginalVarLength = Values.Length;
                         VarSize = Values.Length * sizeof(long);
-                        fixed (void* ponteiro = Values)
-                        {
-                            CLMalloc(ponteiro);
-                        }
+
+                        VarPointer = new ComputeBuffer<long>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, Values);
+
                     }
                 }
                 /// <summary>Constructor.</summary>
@@ -689,10 +338,9 @@ namespace OpenCLTemplate
                     {
                         OriginalVarLength = Values.Length;
                         VarSize = Values.Length * sizeof(double);
-                        fixed (void* ponteiro = Values)
-                        {
-                            CLMalloc(ponteiro);
-                        }
+
+                        VarPointer = new ComputeBuffer<double>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, Values);
+
                     }
                 }
 
@@ -705,10 +353,9 @@ namespace OpenCLTemplate
                     {
                         OriginalVarLength = Values.Length;
                         VarSize = Values.Length * sizeof(char);
-                        fixed (void* ponteiro = Values)
-                        {
-                            CLMalloc(ponteiro);
-                        }
+
+                        VarPointer = new ComputeBuffer<char>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, Values);
+
                     }
                 }
 
@@ -721,41 +368,42 @@ namespace OpenCLTemplate
                     {
                         OriginalVarLength = Values.Length;
                         VarSize = Values.Length * sizeof(byte);
-                        fixed (void* ponteiro = Values)
-                        {
-                            CLMalloc(ponteiro);
-                        }
+
+                        VarPointer = new ComputeBuffer<byte>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, Values);
+
                     }
                 }
 
                 #endregion
 
                 #region Write to Device memory. int[], float[], long[], double[], byte[]
-                private unsafe void WriteToDevice(void* p, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
-                {
-                    uint n = 0;
-                    if (Event_Wait_List != null) n = (uint)Event_Wait_List.Length;
+                //private unsafe void WriteToDevice(void* p, ComputeCommandQueue CQ, bool BlockingWrite, ComputeEvent Event, CLEvent[] Event_Wait_List)
+                //{
+                //    uint n = 0;
+                //    if (Event_Wait_List != null) n = (uint)Event_Wait_List.Length;
 
-                    Err = OpenCLDriver.clEnqueueWriteBuffer(CQ, VarPointer, BlockingWrite, new GASS.Types.SizeT(0),
-                        new GASS.Types.SizeT(Size), new IntPtr(p), n, Event_Wait_List, ref Event);
+                //    CQ.w
 
-                    LastError = Err;
-                }
+                //    Err = OpenCLDriver.clEnqueueWriteBuffer(CQ, VarPointer, BlockingWrite, new GASS.Types.SizeT(0),
+                //        new GASS.Types.SizeT(Size), new IntPtr(p), n, Event_Wait_List, ref Event);
+
+                //    LastError = Err;
+                //}
 
                 /// <summary>Writes variable to device</summary>
                 /// <param name="Values">Values to write to device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-                /// <param name="Event">OpenCL Event associated to this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void WriteToDevice(float[] Values, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated to this operation</param>
+                public void WriteToDevice(float[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            WriteToDevice(ponteiro, CQ, BlockingWrite, Event, Event_Wait_List);
+                            CQ.Write<float>((ComputeBuffer<float>)VarPointer, BlockingWrite, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -765,7 +413,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(float[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -773,16 +421,15 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to write to device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-                /// <param name="Event">OpenCL Event associated to this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void WriteToDevice(int[] Values, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated to this operation</param>
+                public void WriteToDevice(int[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            WriteToDevice(ponteiro, CQ, BlockingWrite, Event, Event_Wait_List);
+                            CQ.Write<int>((ComputeBuffer<int>)VarPointer, BlockingWrite, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -792,7 +439,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(int[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -800,16 +447,15 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to write to device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-                /// <param name="Event">OpenCL Event associated to this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void WriteToDevice(long[] Values, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated to this operation</param>
+                public void WriteToDevice(long[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            WriteToDevice(ponteiro, CQ, BlockingWrite, Event, Event_Wait_List);
+                            CQ.Write<long>((ComputeBuffer<long>)VarPointer, BlockingWrite, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -819,7 +465,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(long[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -827,16 +473,15 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to write to device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-                /// <param name="Event">OpenCL Event associated to this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void WriteToDevice(double[] Values, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated to this operation</param>
+                public void WriteToDevice(double[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            WriteToDevice(ponteiro, CQ, BlockingWrite, Event, Event_Wait_List);
+                            CQ.Write<double>((ComputeBuffer<double>)VarPointer, BlockingWrite, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -846,7 +491,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(double[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -854,16 +499,16 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to write to device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-                /// <param name="Event">OpenCL Event associated to this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void WriteToDevice(char[] Values, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated to this operation</param>
+                 
+                public void WriteToDevice(char[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            WriteToDevice(ponteiro, CQ, BlockingWrite, Event, Event_Wait_List);
+                            CQ.Write<char>((ComputeBuffer<char>)VarPointer, BlockingWrite, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -873,7 +518,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(char[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -881,16 +526,16 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to write to device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-                /// <param name="Event">OpenCL Event associated to this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void WriteToDevice(byte[] Values, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated to this operation</param>
+                 
+                public void WriteToDevice(byte[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            WriteToDevice(ponteiro, CQ, BlockingWrite, Event, Event_Wait_List);
+                            CQ.Write<byte>((ComputeBuffer<byte>)VarPointer, BlockingWrite, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -900,7 +545,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(byte[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -908,24 +553,24 @@ namespace OpenCLTemplate
 
                 #region Read from Device memory. int[], float[], long[], double[], byte[]
 
-                private unsafe void ReadFromDeviceTo(void* p, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
-                {
-                    uint n = 0;
-                    if (Event_Wait_List != null) n = (uint)Event_Wait_List.Length;
+                //private unsafe void ReadFromDeviceTo(void* p, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                //{
+                //    uint n = 0;
+                //    if (Event_Wait_List != null) n = (uint)Event_Wait_List.Length;
 
-                    Err = OpenCLDriver.clEnqueueReadBuffer(CQ, VarPointer, BlockingRead, new GASS.Types.SizeT(0),
-                        new GASS.Types.SizeT(Size), new IntPtr(p), n, Event_Wait_List, ref Event);
+                //    Err = OpenCLDriver.clEnqueueReadBuffer(CQ, VarPointer, BlockingRead, new GASS.Types.SizeT(0),
+                //        new GASS.Types.SizeT(Size), new IntPtr(p), n, Event_Wait_List, ref Event);
 
-                    LastError = Err;
-                }
+                //    LastError = Err;
+                //}
 
                 /// <summary>Reads variable from device.</summary>
                 /// <param name="Values">Values to store data coming from device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
-                /// <param name="Event">OpenCL Event associated with this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void ReadFromDeviceTo(float[] Values, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                 
+                public void ReadFromDeviceTo(float[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
 
@@ -933,7 +578,7 @@ namespace OpenCLTemplate
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, Event, Event_Wait_List);
+                            CQ.Read<float>((ComputeBuffer<float>)VarPointer, BlockingRead, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -943,7 +588,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(float[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -952,16 +597,15 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to store data coming from device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
-                /// <param name="Event">OpenCL Event associated with this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void ReadFromDeviceTo(int[] Values, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                public void ReadFromDeviceTo(int[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, Event, Event_Wait_List);
+                            CQ.Read<int>((ComputeBuffer<int>)VarPointer, BlockingRead, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -971,7 +615,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(int[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -980,16 +624,16 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to store data coming from device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
-                /// <param name="Event">OpenCL Event associated with this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void ReadFromDeviceTo(long[] Values, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                 
+                public void ReadFromDeviceTo(long[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, Event, Event_Wait_List);
+                            CQ.Read<long>((ComputeBuffer<long>)VarPointer, BlockingRead, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -999,7 +643,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(long[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1008,16 +652,16 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to store data coming from device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
-                /// <param name="Event">OpenCL Event associated with this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void ReadFromDeviceTo(double[] Values, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                 
+                public void ReadFromDeviceTo(double[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, Event, Event_Wait_List);
+                            CQ.Read<double>((ComputeBuffer<double>)VarPointer, BlockingRead, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -1027,7 +671,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(double[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1036,16 +680,15 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to store data coming from device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
-                /// <param name="Event">OpenCL Event associated with this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void ReadFromDeviceTo(char[] Values, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                public void ReadFromDeviceTo(char[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, Event, Event_Wait_List);
+                            CQ.Read<char>((ComputeBuffer<char>)VarPointer, BlockingRead, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -1055,7 +698,8 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(char[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
+
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1064,16 +708,15 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to store data coming from device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
-                /// <param name="Event">OpenCL Event associated with this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void ReadFromDeviceTo(byte[] Values, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                public void ReadFromDeviceTo(byte[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, Event, Event_Wait_List);
+                            CQ.Read<byte>((ComputeBuffer<byte>)VarPointer, BlockingRead, 0, Values.Length, (IntPtr)ponteiro, events);
                         }
                     }
                 }
@@ -1083,7 +726,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(byte[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1117,18 +760,14 @@ namespace OpenCLTemplate
                 /// <summary>Unsafe allocation of memory</summary>
                 /// <param name="p">Pointer to data</param>
                 /// <param name="DataType">Data type: float, uint8 (byte), int32, etc.</param>
-                private unsafe void CLMalloc(void* p, CLChannelType DataType)
+                private unsafe void CLMalloc(void* p, ComputeImageChannelType DataType)
                 {
-                    CLImageFormat format = new CLImageFormat();
-                    format.image_channel_data_type = DataType;
-                    format.image_channel_order = CLChannelOrder.RGBA;
+                    ComputeImageFormat format = new ComputeImageFormat(ComputeImageChannelOrder.Rgba, DataType);
 
                     if (OriginalVarLength != 4 * width * height) throw new Exception("Vector length should be 4*width*height");
 
-                    VarPointer = OpenCLDriver.clCreateImage2D(Context, CLMemFlags.ReadWrite | CLMemFlags.CopyHostPtr, ref format, new GASS.Types.SizeT(width), new GASS.Types.SizeT(height),
-                        new GASS.Types.SizeT(0), new IntPtr(p), ref Err);
+                    VarPointer = new ComputeImage2D(Program.Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, format, width, height, 0, new IntPtr(p));
 
-                    LastError = Err;
                 }
 
                 /// <summary>Constructor.</summary>
@@ -1140,7 +779,7 @@ namespace OpenCLTemplate
                     //Aloca memoria no contexto especificado
                     unsafe
                     {
-                        CLChannelType DataType = CLChannelType.Float;
+                        ComputeImageChannelType DataType = ComputeImageChannelType.Float;
                         VarSize = Values.Length * sizeof(float);
 
                         width = Width;
@@ -1163,7 +802,7 @@ namespace OpenCLTemplate
                     //Aloca memoria no contexto especificado
                     unsafe
                     {
-                        CLChannelType DataType = CLChannelType.SignedInt32;
+                        ComputeImageChannelType DataType = ComputeImageChannelType.SignedInt32;
                         VarSize = Values.Length * sizeof(int);
 
                         width = Width;
@@ -1186,7 +825,7 @@ namespace OpenCLTemplate
                     //Aloca memoria no contexto especificado
                     unsafe
                     {
-                        CLChannelType DataType = CLChannelType.UnSignedInt8;
+                        ComputeImageChannelType DataType = ComputeImageChannelType.UnsignedInt8;
                         VarSize = Values.Length * sizeof(byte);
 
                         width = Width;
@@ -1215,7 +854,7 @@ namespace OpenCLTemplate
 
                     unsafe
                     {
-                        CLMalloc((void*)bitmapdata.Scan0, CLChannelType.UnSignedInt8);
+                        CLMalloc((void*)bitmapdata.Scan0, ComputeImageChannelType.UnsignedInt8);
                     }
 
 
@@ -1227,35 +866,24 @@ namespace OpenCLTemplate
                 #region Write to Device memory. float[], int[], byte[], Bitmap
 
 
-                private unsafe void WriteToDevice(void* p, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
+                private unsafe void WriteToDevice(void* p, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
-                    uint n = 0;
-                    if (Event_Wait_List != null) n = (uint)Event_Wait_List.Length;
-
-                    //Writes from zero
-                    GASS.Types.SizeT[] Origin = new GASS.Types.SizeT[] { new GASS.Types.SizeT(0),new GASS.Types.SizeT(0),new GASS.Types.SizeT(0)};
-                    GASS.Types.SizeT[] Region = new GASS.Types.SizeT[] { new GASS.Types.SizeT(width),new GASS.Types.SizeT(height),new GASS.Types.SizeT(1)};
-
-                    Err = OpenCLDriver.clEnqueueWriteImage(CQ, VarPointer, BlockingWrite, Origin, Region, new GASS.Types.SizeT(0), new GASS.Types.SizeT(0), new IntPtr(p),
-                        n, Event_Wait_List, ref Event);
-
-                    LastError = Err;
+                    CQ.Write((ComputeImage)VarPointer, BlockingWrite, new SysIntX3(0, 0, 0), new SysIntX3(width, height, 1), 0, 0, new IntPtr(p), events);
                 }
 
                 /// <summary>Writes variable to device</summary>
                 /// <param name="Values">Values to write to device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-                /// <param name="Event">OpenCL Event associated to this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void WriteToDevice(float[] Values, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated to this operation</param>
+                public void WriteToDevice(float[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            WriteToDevice(ponteiro, CQ, BlockingWrite, Event, Event_Wait_List);
+                            WriteToDevice(ponteiro, CQ, BlockingWrite, events);
                         }
                     }
                 }
@@ -1265,7 +893,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(float[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Event);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -1273,16 +901,16 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to write to device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-                /// <param name="Event">OpenCL Event associated to this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void WriteToDevice(int[] Values, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated to this operation</param>
+                 
+                public void WriteToDevice(int[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            WriteToDevice(ponteiro, CQ, BlockingWrite, Event, Event_Wait_List);
+                            WriteToDevice(ponteiro, CQ, BlockingWrite, events);
                         }
                     }
                 }
@@ -1292,7 +920,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(int[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Event);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -1300,16 +928,16 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to write to device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-                /// <param name="Event">OpenCL Event associated to this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void WriteToDevice(byte[] Values, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated to this operation</param>
+                 
+                public void WriteToDevice(byte[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            WriteToDevice(ponteiro, CQ, BlockingWrite, Event, Event_Wait_List);
+                            WriteToDevice(ponteiro, CQ, BlockingWrite, events);
                         }
                     }
                 }
@@ -1319,17 +947,16 @@ namespace OpenCLTemplate
                 public void WriteToDevice(byte[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Event);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
                 /// <summary>Writes bitmap to device memory. Remember, Bitmap uses the BGRA byte order.</summary>
                 /// <param name="bmp">Bitmap to write</param>
                 /// <param name="CQ">Command queue to use</param>
-                /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
-                /// <param name="Event">OpenCL Event associated with this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void WriteBitmap(System.Drawing.Bitmap bmp, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="BlockingWrite">TRUE to return only after completed reading.</param>
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                public void WriteBitmap(System.Drawing.Bitmap bmp, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (bmp.Width != this.width || bmp.Height != this.height) throw new Exception("Bitmap dimensions not compatible");
 
@@ -1340,7 +967,7 @@ namespace OpenCLTemplate
 
                     unsafe
                     {
-                        WriteToDevice((void*)bitmapdata.Scan0, CQ, BlockingRead, Event, Event_Wait_List);
+                        WriteToDevice((void*)bitmapdata.Scan0, CQ, BlockingWrite, events);
                     }
 
 
@@ -1351,7 +978,7 @@ namespace OpenCLTemplate
                 public void WriteBitmap(System.Drawing.Bitmap bmp)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteBitmap(bmp, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    WriteBitmap(bmp, CommQueues[DefaultCQ],true, Event);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1360,27 +987,18 @@ namespace OpenCLTemplate
 
                 #region Read from Device memory. float[], int[], byte[], Bitmap
 
-                private unsafe void ReadFromDeviceTo(void* p, CLCommandQueue CQ, CLBool BlockingWrite, CLEvent Event, CLEvent[] Event_Wait_List)
+                private unsafe void ReadFromDeviceTo(void* p, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
-                    uint n = 0;
-                    if (Event_Wait_List != null) n = (uint)Event_Wait_List.Length;
-
-                    //Writes from zero
-                    GASS.Types.SizeT[] Origin = new GASS.Types.SizeT[] { new GASS.Types.SizeT(0), new GASS.Types.SizeT(0), new GASS.Types.SizeT(0) };
-                    GASS.Types.SizeT[] Region = new GASS.Types.SizeT[] { new GASS.Types.SizeT(width), new GASS.Types.SizeT(height), new GASS.Types.SizeT(1) };
-                    Err = OpenCLDriver.clEnqueueReadImage(CQ, VarPointer, BlockingWrite, Origin, Region, new GASS.Types.SizeT(0), new GASS.Types.SizeT(0), new IntPtr(p),
-                        n, Event_Wait_List, ref Event);
-
-                    LastError = Err;
+                    CQ.Read((ComputeImage)VarPointer, BlockingRead, new SysIntX3(0, 0, 0), new SysIntX3(width, height, 1), 0, 0, new IntPtr(p), events);
                 }
 
                 /// <summary>Reads variable from device.</summary>
                 /// <param name="Values">Values to store data coming from device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
-                /// <param name="Event">OpenCL Event associated with this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void ReadFromDeviceTo(float[] Values, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                 
+                public void ReadFromDeviceTo(float[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
 
@@ -1388,7 +1006,7 @@ namespace OpenCLTemplate
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, Event, Event_Wait_List);
+                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, events);
                         }
                     }
                 }
@@ -1398,7 +1016,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(float[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1407,9 +1025,8 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to store data coming from device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
-                /// <param name="Event">OpenCL Event associated with this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void ReadFromDeviceTo(int[] Values, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                public void ReadFromDeviceTo(int[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
 
@@ -1417,7 +1034,7 @@ namespace OpenCLTemplate
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, Event, Event_Wait_List);
+                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, events);
                         }
                     }
                 }
@@ -1427,7 +1044,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(int[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1436,9 +1053,9 @@ namespace OpenCLTemplate
                 /// <param name="Values">Values to store data coming from device</param>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
-                /// <param name="Event">OpenCL Event associated with this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public void ReadFromDeviceTo(byte[] Values, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                 
+                public void ReadFromDeviceTo(byte[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
 
@@ -1446,7 +1063,7 @@ namespace OpenCLTemplate
                     {
                         fixed (void* ponteiro = Values)
                         {
-                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, Event, Event_Wait_List);
+                            ReadFromDeviceTo(ponteiro, CQ, BlockingRead, events);
                         }
                     }
                 }
@@ -1456,7 +1073,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(byte[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1464,9 +1081,9 @@ namespace OpenCLTemplate
                 /// <summary>Reads contents of device memory as bytes and writes bitmap. Remember, Bitmap uses the BGRA byte order.</summary>
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
-                /// <param name="Event">OpenCL Event associated with this operation</param>
-                /// <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
-                public System.Drawing.Bitmap ReadBitmap(CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                 
+                public System.Drawing.Bitmap ReadBitmap(ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     System.Drawing.Bitmap bmp = new System.Drawing.Bitmap(width, height);
                     System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, bmp.Width, bmp.Height);
@@ -1476,7 +1093,7 @@ namespace OpenCLTemplate
 
                     unsafe
                     {
-                        ReadFromDeviceTo((void*)bitmapdata.Scan0, CQ, BlockingRead, Event, Event_Wait_List);
+                        ReadFromDeviceTo((void*)bitmapdata.Scan0, CQ, BlockingRead, events);
                     }
 
 
@@ -1489,7 +1106,7 @@ namespace OpenCLTemplate
                 public System.Drawing.Bitmap ReadBitmap()
                 {
                     //CLEvent Event = new CLEvent();
-                    return ReadBitmap(CommQueues[DefaultCQ], CLBool.True, Event, null);
+                    return ReadBitmap(CommQueues[DefaultCQ], true, Event);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1503,31 +1120,19 @@ namespace OpenCLTemplate
             public class Kernel : IDisposable
             {
                 /// <summary>Local kernel storage</summary>
-                private CLKernel kernel;
+                private ComputeKernel kernel;
 
-                /// <summary>Number of arguments</summary>
-                private int nArgs = 0;
-                /// <summary>Gets how many arguments this kernel has</summary>
-                public int NumberOfArguments { get { return nArgs; } }
+                ///// <summary>Number of arguments</summary>
+                //private int nArgs = 0;
+                ///// <summary>Gets how many arguments this kernel has</summary>
+                //public int NumberOfArguments { get { return nArgs; } }
 
 
                 /// <summary>Creates a new Kernel</summary>
                 /// <param name="KernelName"></param>
                 public Kernel(string KernelName)
                 {
-                    kernel = OpenCLDriver.clCreateKernel(Prog, KernelName, ref Err);
-                    LastError = Err;
-
-                    GASS.Types.SizeT param_value_size = sizeof(uint);
-                    GASS.Types.SizeT param_value_size_ret = new GASS.Types.SizeT();
-
-                    //Lê número de argumentos
-                    uint n = 0;
-                    unsafe
-                    {
-                        LastError = OpenCLDriver.clGetKernelInfo(kernel, CLKernelInfo.NumArgs, param_value_size, new IntPtr(&n), ref param_value_size_ret);
-                    }
-                    nArgs = (int)n;
+                    kernel = Prog.CreateKernel(KernelName);
                 }
 
                 /// <summary>"Remember" variables</summary>
@@ -1537,11 +1142,11 @@ namespace OpenCLTemplate
                 /// <param name="Variables">Variables to be set as arguments</param>
                 private void SetArguments(CLCalc.Program.MemoryObject[] Variables)
                 {
-                    if (Variables.Length != nArgs) throw new Exception("Wrong number of arguments");
+                    //if (Variables.Length != nArgs) throw new Exception("Wrong number of arguments");
                     if (Vars != Variables)
                     {
                         Vars = Variables;
-                        for (uint i = 0; i < Variables.Length; i++)
+                        for (int i = 0; i < Variables.Length; i++)
                         {
                             Variables[i].SetAsArgument(i, kernel);
                         }
@@ -1552,23 +1157,16 @@ namespace OpenCLTemplate
                 /// <param name="CQ">Command queue to use</param>
                 /// <param name="Arguments">Arguments of the kernel function</param>
                 /// <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
-                /// <param name="Event_Wait_List">Events to wait before executing this</param>
-                /// <param name="Event">Event of this command</param>
-                public void Execute(CLCommandQueue CQ, CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize, CLEvent[] Event_Wait_List, CLEvent Event)
+                /// <param name="events">Event of this command</param>
+                public void Execute(ComputeCommandQueue CQ, CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize, ICollection<ComputeEventBase> events)
                 {
                     SetArguments(Arguments);
 
-                    GASS.Types.SizeT[] global_work_size = new GASS.Types.SizeT[GlobalWorkSize.Length];
-                    for (int i = 0; i < GlobalWorkSize.Length; i++)
-                    {
-                        global_work_size[i] = new GASS.Types.SizeT(GlobalWorkSize[i]);
-                    }
+                    long[] globWSize=new long[GlobalWorkSize.Length];
+                    for (int i=0;i<globWSize.Length;i++) globWSize[i]=GlobalWorkSize[i];
 
+                    CQ.Execute(kernel, null, globWSize, null, events);
 
-                    uint n = 0;
-                    if (Event_Wait_List != null) n = (uint)Event_Wait_List.Length;
-                    LastError = OpenCLDriver.clEnqueueNDRangeKernel(CQ, kernel, (uint)global_work_size.Length, null, global_work_size, null,
-                        n, Event_Wait_List, ref Event);
                 }
 
                 /// <summary>Execute this kernel</summary>
@@ -1576,24 +1174,25 @@ namespace OpenCLTemplate
                 /// <param name="Arguments">Arguments of the kernel function</param>
                 /// <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
                 /// <param name="LocalWorkSize">Local work sizes</param>
-                /// <param name="Event_Wait_List">Events to wait before executing this</param>
-                /// <param name="Event">Event of this command</param>
-                public void Execute(CLCommandQueue CQ, CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize, int[] LocalWorkSize, CLEvent[] Event_Wait_List, CLEvent Event)
+                /// <param name="events">Event of this command</param>
+                public void Execute(ComputeCommandQueue CQ, CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize, int[] LocalWorkSize, ICollection<ComputeEventBase> events)
                 {
                     SetArguments(Arguments);
-                    if (GlobalWorkSize.Length != LocalWorkSize.Length) throw new Exception("Global and local work size must have same dimension");
+                    if (LocalWorkSize != null && GlobalWorkSize.Length != LocalWorkSize.Length) throw new Exception("Global and local work size must have same dimension");
 
-                    GASS.Types.SizeT[] global_work_size = new GASS.Types.SizeT[GlobalWorkSize.Length];
-                    GASS.Types.SizeT[] local_work_size = new GASS.Types.SizeT[GlobalWorkSize.Length];
-                    for (int i = 0; i < GlobalWorkSize.Length; i++)
+
+                    long[] globWSize = new long[GlobalWorkSize.Length];
+                    for (int i = 0; i < globWSize.Length; i++) globWSize[i] = GlobalWorkSize[i];
+                    long[] locWSize = null;
+
+                    if (LocalWorkSize != null)
                     {
-                        global_work_size[i] = new GASS.Types.SizeT(GlobalWorkSize[i]);
-                        local_work_size[i] = new GASS.Types.SizeT(LocalWorkSize[i]);
+                        locWSize = new long[LocalWorkSize.Length];
+                        for (int i = 0; i < locWSize.Length; i++) locWSize[i] = LocalWorkSize[i];
                     }
-                    uint n = 0;
-                    if (Event_Wait_List != null) n = (uint)Event_Wait_List.Length;
-                    LastError = OpenCLDriver.clEnqueueNDRangeKernel(CQ, kernel, (uint)global_work_size.Length, null, global_work_size, local_work_size,
-                        n, Event_Wait_List, ref Event);
+
+                    CQ.Execute(kernel, null, globWSize, locWSize, events);
+
                 }
 
                 /// <summary>Execute this kernel</summary>
@@ -1623,7 +1222,7 @@ namespace OpenCLTemplate
                 public void Execute(CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize, int[] LocalWorkSize)
                 {
                     //CLEvent Event=new CLEvent();
-                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, LocalWorkSize, null, Event);
+                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, LocalWorkSize, Event);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -1631,7 +1230,7 @@ namespace OpenCLTemplate
                 /// <summary>Releases kernel from memory</summary>
                 public void Dispose()
                 {
-                    OpenCLDriver.clReleaseKernel(kernel);
+                    kernel.Dispose();
                 }
 
                 /// <summary>Destructor</summary>
