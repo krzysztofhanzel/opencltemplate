@@ -472,20 +472,8 @@
         <member name="M:OpenCLTemplate.CLCalc.InitCL">
             <summary>Initializes OpenCL and reads devices</summary>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.InitCL(System.IntPtr,System.IntPtr)">
-            <summary>Initializes OpenCL from an existing Context and reads devices</summary>
-            <param name="ContextPtr">Existing context pointer</param>
-            <param name="CommandQueuePtr">Existing command queue pointer</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLCalc.CheckDevice(System.Int32)">
-            <summary>Tries to execute actual code in device to check its availability.</summary>
-            <param name="num">Command queue number to check</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLCalc.FinishCL">
-            <summary>Releases OpenCL resources</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.Err">
-            <summary>Last found error</summary>
+        <member name="M:OpenCLTemplate.CLCalc.InitCL(Cloo.ComputeDeviceTypes)">
+            <summary>Initializes OpenCL and reads devices</summary>
         </member>
         <member name="F:OpenCLTemplate.CLCalc.CLPlatforms">
             <summary>List of available platforms</summary>
@@ -502,9 +490,6 @@
         <member name="P:OpenCLTemplate.CLCalc.CLInitError">
             <summary>Gets initialization error description</summary>
         </member>
-        <member name="P:OpenCLTemplate.CLCalc.LastError">
-            <summary>Last error. Throws exception if not set to success.</summary>
-        </member>
         <member name="T:OpenCLTemplate.CLCalc.CLAccelerationType">
             <summary>OpenCL accelerations</summary>
         </member>
@@ -517,82 +502,11 @@
         <member name="F:OpenCLTemplate.CLCalc.CLAccelerationType.NotUsingCL">
             <summary>No OpenCL used/supported</summary>
         </member>
-        <member name="T:OpenCLTemplate.CLCalc.CLDevice">
-            <summary>Class to hold OpenCL devices</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.ID">
-            <summary>Device ID</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.CLDeviceType">
-            <summary>Device type string</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.CLDeviceName">
-            <summary>Device name string</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.CLDeviceVendor">
-            <summary>Device vendor string</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.CLDeviceVersion">
-            <summary>OpenCL version string</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.CLDeviceExecCapab">
-            <summary>Execution capabilities of the device</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.CLDeviceAvailable">
-            <summary>Is device available?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.CLDeviceCompilerAvailable">
-            <summary>Is device compiler available?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.CLDeviceMaxMallocSize">
-            <summary>Maximum memory allocation size in bytes</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.CLDeviceMemSize">
-            <summary>Memory size in bytes</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.CLDeviceMaxWorkItemSizes">
-            <summary>Maximum number of work-items 
-            that can be specified in each dimension of the work-group 
-            to clEnqueueNDRangeKernel.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLDevice.CLDeviceMaxWorkGroupSize">
-            <summary>Maximum number of work-items in a 
-            work-group executing a kernel using the data parallel execution model.</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLCalc.CLDevice.#ctor(GASS.OpenCL.CLDeviceID)">
-            <summary>Constructor</summary>
-            <param name="DeviceID">Device ID</param>
-        </member>
-        <member name="T:OpenCLTemplate.CLCalc.CLPlatform">
-            <summary>Class to hold OpenCL Platforms</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLPlatform.ID">
-            <summary>Platform ID</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLPlatform.CLPlatformProfile">
-            <summary>OpenCL profile string. Profile name supported by the implementation.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLPlatform.CLPlatformVersion">
-            <summary>OpenCL version string.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLPlatform.CLPlatformName">
-            <summary>OpenCL name string.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLPlatform.CLPlatformVendor">
-            <summary>OpenCL vendor string.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.CLPlatform.CLPlatformExtensions">
-            <summary>OpenCL extensions string.</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLCalc.CLPlatform.#ctor(GASS.OpenCL.CLPlatformID)">
-            <summary>Constructor.</summary>
-            <param name="PlatformID">Sets this platform's ID</param>
-        </member>
         <member name="T:OpenCLTemplate.CLCalc.Program">
             <summary>Program related stuff</summary>
         </member>
         <member name="F:OpenCLTemplate.CLCalc.Program.Event">
-            <summary>Local event</summary>
+            <summary>Event list</summary>
         </member>
         <member name="F:OpenCLTemplate.CLCalc.Program.Context">
             <summary>OpenCL context using all devices</summary>
@@ -648,7 +562,7 @@
         <member name="M:OpenCLTemplate.CLCalc.Program.MemoryObject.Finalize">
             <summary>Destructor</summary>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.MemoryObject.SetAsArgument(System.UInt32,GASS.OpenCL.CLKernel)">
+        <member name="M:OpenCLTemplate.CLCalc.Program.MemoryObject.SetAsArgument(System.Int32,Cloo.ComputeKernel)">
             <summary>Sets this variable as an argument for a kernel</summary>
             <param name="ArgIndex">Index of kernel argument</param>
             <param name="Kernel">Kernel to receive argument</param>
@@ -658,12 +572,6 @@
         </member>
         <member name="T:OpenCLTemplate.CLCalc.Program.Variable">
             <summary>Variables class</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.#ctor(System.IntPtr,System.Int32,System.Int32)">
-            <summary>Constructor. Creates from an existing OpenCL variable</summary>
-            <param name="OpenCLVarPointer">OpenCL variable pointer</param>
-            <param name="varSize">Original array length</param>
-            <param name="sizeOfType">sizeOf(array datatype)</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.#ctor(System.Single[])">
             <summary>Constructor.</summary>
@@ -689,145 +597,133 @@
             <summary>Constructor.</summary>
             <param name="Values">Variable whose size will be allocated in device memory.</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Single[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Single[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-            <param name="Event">OpenCL Event associated to this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated to this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Single[])">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Int32[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Int32[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-            <param name="Event">OpenCL Event associated to this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated to this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Int32[])">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Int64[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Int64[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-            <param name="Event">OpenCL Event associated to this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated to this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Int64[])">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Double[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Double[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-            <param name="Event">OpenCL Event associated to this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated to this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Double[])">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Char[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Char[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-            <param name="Event">OpenCL Event associated to this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated to this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Char[])">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Byte[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Byte[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-            <param name="Event">OpenCL Event associated to this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated to this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.WriteToDevice(System.Byte[])">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Single[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Single[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Reads variable from device.</summary>
             <param name="Values">Values to store data coming from device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingRead">TRUE to return only after completed reading.</param>
-            <param name="Event">OpenCL Event associated with this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated with this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Single[])">
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
             <param name="Values">Values to store data coming from device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Int32[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Int32[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Reads variable from device.</summary>
             <param name="Values">Values to store data coming from device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingRead">TRUE to return only after completed reading.</param>
-            <param name="Event">OpenCL Event associated with this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated with this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Int32[])">
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
             <param name="Values">Values to store data coming from device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Int64[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Int64[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Reads variable from device.</summary>
             <param name="Values">Values to store data coming from device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingRead">TRUE to return only after completed reading.</param>
-            <param name="Event">OpenCL Event associated with this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated with this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Int64[])">
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
             <param name="Values">Values to store data coming from device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Double[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Double[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Reads variable from device.</summary>
             <param name="Values">Values to store data coming from device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingRead">TRUE to return only after completed reading.</param>
-            <param name="Event">OpenCL Event associated with this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated with this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Double[])">
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
             <param name="Values">Values to store data coming from device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Char[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Char[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Reads variable from device.</summary>
             <param name="Values">Values to store data coming from device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingRead">TRUE to return only after completed reading.</param>
-            <param name="Event">OpenCL Event associated with this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated with this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Char[])">
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
             <param name="Values">Values to store data coming from device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Byte[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Byte[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Reads variable from device.</summary>
             <param name="Values">Values to store data coming from device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingRead">TRUE to return only after completed reading.</param>
-            <param name="Event">OpenCL Event associated with this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated with this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Byte[])">
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
@@ -842,7 +738,7 @@
         <member name="F:OpenCLTemplate.CLCalc.Program.Image2D.height">
             <summary>Image height</summary>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.CLMalloc(System.Void*,GASS.OpenCL.CLChannelType)">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.CLMalloc(System.Void*,Cloo.ComputeImageChannelType)">
             <summary>Unsafe allocation of memory</summary>
             <param name="p">Pointer to data</param>
             <param name="DataType">Data type: float, uint8 (byte), int32, etc.</param>
@@ -869,95 +765,87 @@
             <summary>Constructor. Remember, Bitmap uses the BGRA byte order.</summary>
             <param name="bmp">Bitmap to create OpenCL image from.</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteToDevice(System.Single[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteToDevice(System.Single[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-            <param name="Event">OpenCL Event associated to this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated to this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteToDevice(System.Single[])">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteToDevice(System.Int32[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteToDevice(System.Int32[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-            <param name="Event">OpenCL Event associated to this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated to this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteToDevice(System.Int32[])">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteToDevice(System.Byte[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteToDevice(System.Byte[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingWrite">TRUE to return only after completed writing.</param>
-            <param name="Event">OpenCL Event associated to this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated to this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteToDevice(System.Byte[])">
             <summary>Writes variable to device</summary>
             <param name="Values">Values to write to device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteBitmap(System.Drawing.Bitmap,GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteBitmap(System.Drawing.Bitmap,Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes bitmap to device memory. Remember, Bitmap uses the BGRA byte order.</summary>
             <param name="bmp">Bitmap to write</param>
             <param name="CQ">Command queue to use</param>
-            <param name="BlockingRead">TRUE to return only after completed reading.</param>
-            <param name="Event">OpenCL Event associated with this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="BlockingWrite">TRUE to return only after completed reading.</param>
+            <param name="events">OpenCL Event associated with this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteBitmap(System.Drawing.Bitmap)">
             <summary>Writes bitmap to device memory</summary>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadFromDeviceTo(System.Single[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadFromDeviceTo(System.Single[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Reads variable from device.</summary>
             <param name="Values">Values to store data coming from device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingRead">TRUE to return only after completed reading.</param>
-            <param name="Event">OpenCL Event associated with this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated with this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadFromDeviceTo(System.Single[])">
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
             <param name="Values">Values to store data coming from device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadFromDeviceTo(System.Int32[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadFromDeviceTo(System.Int32[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Reads variable from device.</summary>
             <param name="Values">Values to store data coming from device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingRead">TRUE to return only after completed reading.</param>
-            <param name="Event">OpenCL Event associated with this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated with this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadFromDeviceTo(System.Int32[])">
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
             <param name="Values">Values to store data coming from device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadFromDeviceTo(System.Byte[],GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadFromDeviceTo(System.Byte[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Reads variable from device.</summary>
             <param name="Values">Values to store data coming from device</param>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingRead">TRUE to return only after completed reading.</param>
-            <param name="Event">OpenCL Event associated with this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated with this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadFromDeviceTo(System.Byte[])">
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
             <param name="Values">Values to store data coming from device</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadBitmap(GASS.OpenCL.CLCommandQueue,GASS.OpenCL.CLBool,GASS.OpenCL.CLEvent,GASS.OpenCL.CLEvent[])">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadBitmap(Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Reads contents of device memory as bytes and writes bitmap. Remember, Bitmap uses the BGRA byte order.</summary>
             <param name="CQ">Command queue to use</param>
             <param name="BlockingRead">TRUE to return only after completed reading.</param>
-            <param name="Event">OpenCL Event associated with this operation</param>
-            <param name="Event_Wait_List">OpenCL Events that need to finish before this one can start</param>
+            <param name="events">OpenCL Event associated with this operation</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.ReadBitmap">
             <summary>Reads contents of device memory as bytes and writes bitmap</summary>
@@ -974,9 +862,6 @@
         <member name="F:OpenCLTemplate.CLCalc.Program.Kernel.kernel">
             <summary>Local kernel storage</summary>
         </member>
-        <member name="F:OpenCLTemplate.CLCalc.Program.Kernel.nArgs">
-            <summary>Number of arguments</summary>
-        </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.#ctor(System.String)">
             <summary>Creates a new Kernel</summary>
             <param name="KernelName"></param>
@@ -988,22 +873,20 @@
             <summary>Sets kernel arguments</summary>
             <param name="Variables">Variables to be set as arguments</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.Execute(GASS.OpenCL.CLCommandQueue,OpenCLTemplate.CLCalc.Program.MemoryObject[],System.Int32[],GASS.OpenCL.CLEvent[],GASS.OpenCL.CLEvent)">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.Execute(Cloo.ComputeCommandQueue,OpenCLTemplate.CLCalc.Program.MemoryObject[],System.Int32[],System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Execute this kernel</summary>
             <param name="CQ">Command queue to use</param>
             <param name="Arguments">Arguments of the kernel function</param>
             <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
-            <param name="Event_Wait_List">Events to wait before executing this</param>
-            <param name="Event">Event of this command</param>
+            <param name="events">Event of this command</param>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.Execute(GASS.OpenCL.CLCommandQueue,OpenCLTemplate.CLCalc.Program.MemoryObject[],System.Int32[],System.Int32[],GASS.OpenCL.CLEvent[],GASS.OpenCL.CLEvent)">
+        <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.Execute(Cloo.ComputeCommandQueue,OpenCLTemplate.CLCalc.Program.MemoryObject[],System.Int32[],System.Int32[],System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Execute this kernel</summary>
             <param name="CQ">Command queue to use</param>
             <param name="Arguments">Arguments of the kernel function</param>
             <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
             <param name="LocalWorkSize">Local work sizes</param>
-            <param name="Event_Wait_List">Events to wait before executing this</param>
-            <param name="Event">Event of this command</param>
+            <param name="events">Event of this command</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.Execute(OpenCLTemplate.CLCalc.Program.MemoryObject[],System.Int32[])">
             <summary>Execute this kernel</summary>
@@ -1026,9 +909,6 @@
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.Finalize">
             <summary>Destructor</summary>
-        </member>
-        <member name="P:OpenCLTemplate.CLCalc.Program.Kernel.NumberOfArguments">
-            <summary>Gets how many arguments this kernel has</summary>
         </member>
         <member name="T:OpenCLTemplate.CLCalc.CLPrograms">
             <summary>OpenCL programs</summary>

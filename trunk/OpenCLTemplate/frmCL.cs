@@ -7,7 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 
-using GASS.OpenCL;
+using Cloo;
 
 namespace OpenCLTemplate
 {
@@ -16,7 +16,8 @@ namespace OpenCLTemplate
     {
         private void frmCLInfo_Load(object sender, EventArgs e)
         {
-            CLCalc.InitCL();
+            CLCalc.InitCL(ComputeDeviceTypes.All);
+
             if (CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL)
             {
                 cmbPlat.Items.Add("OpenCL ERROR");
@@ -24,25 +25,25 @@ namespace OpenCLTemplate
             }
             else
             {
-                foreach(CLCalc.CLPlatform p in CLCalc.CLPlatforms)
+                foreach(ComputePlatform p in CLCalc.CLPlatforms)
                 {
-                    cmbPlat.Items.Add(p.CLPlatformName + " " + p.CLPlatformProfile + " " + p.CLPlatformVendor + " " + p.CLPlatformVersion);
+                    cmbPlat.Items.Add(p.Name + " " + p.Profile + " " + p.Vendor + " " + p.Version);
                 }
                 if (cmbPlat.Items.Count > 0) cmbPlat.SelectedIndex = 0;
 
                 int i=0;
-                foreach (CLCalc.CLDevice d in CLCalc.CLDevices)
+                foreach (ComputeDevice d in CLCalc.CLDevices)
                 {
-                    if (d.CLDeviceAvailable)
-                    {
-                        cmbDevices.Items.Add(d.CLDeviceName + " " + d.CLDeviceType + " " + d.CLDeviceVendor + " " + d.CLDeviceVersion);
-                        cmbCurDevice.Items.Add(d.CLDeviceName + " " + d.CLDeviceType + " " + d.CLDeviceVendor + " " + d.CLDeviceVersion);
-                    }
-                    else
-                    {
-                        cmbDevices.Items.Add("NOT AVAILABLE: " + d.CLDeviceName + " " + d.CLDeviceType + " " + d.CLDeviceVendor + " " + d.CLDeviceVersion);
-                        cmbCurDevice.Items.Add("NOT AVAILABLE: " + d.CLDeviceName + " " + d.CLDeviceType + " " + d.CLDeviceVendor + " " + d.CLDeviceVersion);
-                    }
+                    //if (d.CLDeviceAvailable)
+                    //{
+                        cmbDevices.Items.Add(d.Name + " " + d.Type + " " + d.Vendor + " " + d.Version);
+                        cmbCurDevice.Items.Add(d.Name + " " + d.Type + " " + d.Vendor + " " + d.Version);
+                    //}
+                    //else
+                    //{
+                    //    cmbDevices.Items.Add("NOT AVAILABLE: " + d.CLDeviceName + " " + d.CLDeviceType + " " + d.CLDeviceVendor + " " + d.CLDeviceVersion);
+                    //    cmbCurDevice.Items.Add("NOT AVAILABLE: " + d.CLDeviceName + " " + d.CLDeviceType + " " + d.CLDeviceVendor + " " + d.CLDeviceVersion);
+                    //}
 
                     i++;
                 }
@@ -55,6 +56,28 @@ namespace OpenCLTemplate
             }
 
             ReadImportantRegistryEntries();
+
+
+
+            //int[] n = new int[3] {1,1,1};
+            //int[] nn = new int[3];
+            //CLCalc.Program.Variable v = new CLCalc.Program.Variable(n);
+
+            //v.WriteToDevice(n);
+
+            //v.ReadFromDeviceTo(nn);
+
+            string s = @" kernel void teste() {}";
+
+            CLCalc.Program.Compile(s);
+            try
+            {
+                CLCalc.Program.Kernel k = new CLCalc.Program.Kernel("teste");
+            }
+            catch
+            {
+                MessageBox.Show("");
+            }
         }
 
         private void ReadImportantRegistryEntries()
@@ -94,13 +117,13 @@ namespace OpenCLTemplate
                 lblTdrDdiDelay.Text = lblNotFound.Text;
             }
 
-            ulong size = 32;
+            long size = 32;
             for (int i = 0; i < CLCalc.CLDevices.Count; i++)
             {
-                if (CLCalc.CLDevices[i].CLDeviceType == "4" || CLCalc.CLDevices[i].CLDeviceType == "8")
+                if (CLCalc.CLDevices[i].Type == ComputeDeviceTypes.Gpu || CLCalc.CLDevices[i].Type == ComputeDeviceTypes.Accelerator )
                 {
-                    if (CLCalc.CLDevices[i].CLDeviceMemSize > size)
-                        size = CLCalc.CLDevices[i].CLDeviceMemSize / (1024 * 1024);
+                    if (CLCalc.CLDevices[i].GlobalMemorySize > size)
+                        size = CLCalc.CLDevices[i].GlobalMemorySize / (1024 * 1024);
                 }
             }
 
@@ -153,15 +176,15 @@ namespace OpenCLTemplate
         {
             int ind = cmbDevices.SelectedIndex;
             lstDevDetails.Items.Clear();
-            CLCalc.CLDevice d = CLCalc.CLDevices[ind];
-            lstDevDetails.Items.Add("Name: " + d.CLDeviceName);
-            lstDevDetails.Items.Add("Type: " + d.CLDeviceType);
-            lstDevDetails.Items.Add("Vendor: " + d.CLDeviceVendor);
-            lstDevDetails.Items.Add("Version: " + d.CLDeviceVersion);
-            lstDevDetails.Items.Add("Memory size (Mb): " + d.CLDeviceMemSize/(1024*1024));
-            lstDevDetails.Items.Add("Maximum allocation size (Mb):" + d.CLDeviceMaxMallocSize / (1024 * 1024));
-            lstDevDetails.Items.Add("Compiler available? " + d.CLDeviceCompilerAvailable);
-            lstDevDetails.Items.Add("Device available? " + d.CLDeviceAvailable);
+            ComputeDevice d = CLCalc.CLDevices[ind];
+            lstDevDetails.Items.Add("Name: " + d.Name);
+            lstDevDetails.Items.Add("Type: " + d.Type);
+            lstDevDetails.Items.Add("Vendor: " + d.Vendor);
+            lstDevDetails.Items.Add("Version: " + d.Version);
+            lstDevDetails.Items.Add("Memory size (Mb): " + d.GlobalMemorySize/(1024*1024));
+            lstDevDetails.Items.Add("Maximum allocation size (Mb):" + d.MaxMemoryAllocationSize / (1024 * 1024));
+            lstDevDetails.Items.Add("Compiler available? " + d.CompilerAvailable);
+            //lstDevDetails.Items.Add("Device available? " + d.CLDeviceAvailable);
         }
 
 
