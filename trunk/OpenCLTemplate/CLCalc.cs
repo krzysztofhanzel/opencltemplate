@@ -56,7 +56,7 @@ namespace OpenCLTemplate
         /// <summary>Initializes OpenCL and reads devices</summary>
         public static void InitCL()
         {
-            InitCL(ComputeDeviceTypes.All);
+            InitCL(ComputeDeviceTypes.Gpu);
         }
 
         /// <summary>Initializes OpenCL and reads devices</summary>
