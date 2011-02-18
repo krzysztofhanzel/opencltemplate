@@ -475,6 +475,9 @@
         <member name="M:OpenCLTemplate.CLCalc.InitCL(Cloo.ComputeDeviceTypes)">
             <summary>Initializes OpenCL and reads devices</summary>
         </member>
+        <member name="M:OpenCLTemplate.CLCalc.InitCL(Cloo.ComputeDeviceTypes,Cloo.ComputeContext,Cloo.ComputeCommandQueue)">
+            <summary>Initializes OpenCL and reads devices. Uses previously created context and command queue if supplied. In that case DevicesToUse is ignored.</summary>
+        </member>
         <member name="F:OpenCLTemplate.CLCalc.CLPlatforms">
             <summary>List of available platforms</summary>
         </member>
@@ -572,6 +575,23 @@
         </member>
         <member name="T:OpenCLTemplate.CLCalc.Program.Variable">
             <summary>Variables class</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLCalc.Program.Variable._CreatedFromGLBuffer">
+            <summary>Was this buffer created from a OpenGL buffer?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLCalc.Program.Variable._AcquiredInOpenCL">
+            <summary>Was this buffer acquired in OpenCL?</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.#ctor(System.Int32,System.Type)">
+            <summary>Creates variable from OpenGL buffer</summary>
+            <param name="GLBuffer">Valid OpenGL Buffer</param>
+            <param name="BufferType">Type of OpenGL Buffer: typeof (int, float, double, long)</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.#ctor(Cloo.ComputeMemory,System.Int32,System.Int32)">
+            <summary>Creates a OpenCLTemplate variable from a Cloo ComputeBuffer</summary>
+            <param name="ClooMemoryObject">Cloo computebuffer to create from</param>
+            <param name="Size">ClooMemoryObject.Size</param>
+            <param name="Count">ClooMemoryObject.Count</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.#ctor(System.Single[])">
             <summary>Constructor.</summary>
@@ -728,6 +748,12 @@
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.ReadFromDeviceTo(System.Byte[])">
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
             <param name="Values">Values to store data coming from device</param>
+        </member>
+        <member name="P:OpenCLTemplate.CLCalc.Program.Variable.CreatedFromGLBuffer">
+            <summary>Returns true if this Variable was created from an OpenGL buffer</summary>
+        </member>
+        <member name="P:OpenCLTemplate.CLCalc.Program.Variable.AcquiredInOpenCL">
+            <summary>Returns true if this variable has been acquired for use in OpenCL (available for OpenCL)</summary>
         </member>
         <member name="T:OpenCLTemplate.CLCalc.Program.Image2D">
             <summary>Image2D class. Uses channel type RGBA.</summary>
@@ -2245,6 +2271,443 @@
         </member>
         <member name="P:OpenCLTemplate.Isosurface.MarchingCubes.IsoLevel">
             <summary>Gets or sets current isolevel</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender">
+            <summary>OpenGL render control</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.ParentForm">
+            <summary>Parent form</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.sOGL">
+            <summary>OpenGL control</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.CreateCLGLContext(System.Int32)">
+            <summary>Sets CL GL shared variables</summary>
+            <param name="DeviceNumber">Index of device to use from ComputePlatform.Platforms[0].Devices. Use -1 for default</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.#ctor(System.Windows.Forms.Form,System.Boolean,System.Int32)">
+            <summary>Constructor. Adds a OpenGL Control to desired form</summary>
+            <param name="ParentForm">OpenGL control parent form</param>
+            <param name="CreateCLGLCtx">Create OpenGL/OpenCL shared context?</param>
+            <param name="DeviceNumber">Index of device to use from ComputePlatform.Platforms[0].Devices. Use -1 for default</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.InitGL">
+            <summary>Typical OpenGL initialization</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.MouseMode">
+            <summary>Mouse rotation mode</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.RecalcZnearZFar">
+            <summary>Automatically recalculates zNear and zFar values</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.center">
+            <summary>Point where camera is looking at</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.eye">
+            <summary>Point where camera is standing</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.front">
+            <summary>Front vector</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.up">
+            <summary>Up vector</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.esq">
+            <summary>Left vector</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.distEye">
+            <summary>Camera eye distance.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.zFar">
+            <summary>Far distance to clip at.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.zNear">
+            <summary>Near distance to clip at</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.RepositionCamera(System.Single,System.Single,OpenCLTemplate.CLGLInterop.GLRender.MouseMoveMode)">
+            <summary>Repositions camera.</summary>
+            <param name="mouseDX">X mouse displacement.</param>
+            <param name="mouseDY">Y mouse displacement.</param>
+            <param name="modo">Mouse displacement mode (user wants translation or rotation?)</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.Fly(OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Function to advance view and allow "fly" simulations.</summary>
+            <param name="Distance">Distance to fly</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.ConsolidateRepositioning">
+            <summary>Updates temporary displacement vectors to internal drawing vectors.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.RepositionLight">
+            <summary>Repositions light.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.Mouse3D">
+            <summary>Mouse 3D model</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.lblMouseToCenterDist">
+            <summary>Show mouse to center distance in this label if not null</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.Create3DMouseModel(System.Single[])">
+            <summary>Creates a 3D Model for the mouse</summary>
+            <param name="Color">Desired color</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.Reset3DMousePos">
+            <summary>Resets 3D mouse position to center of view</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.Translate3DMouseXY(System.Single,System.Single,System.Single)">
+            <summary>Translates 3D mouse to a given Left - Top</summary>
+            <param name="x">Left relative value, 0 to 1</param>
+            <param name="y">Up relative value, 0 to 1</param>
+            <param name="dz">Z (depth) relative value</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.Increment3DMousePos(System.Single,System.Single,System.Single)">
+            <summary>Increments current mouse position</summary>
+            <param name="dx">Left relative value</param>
+            <param name="dy">Up relative value</param>
+            <param name="dz">Z (depth) relative value</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.Process3DMouseHit(System.Windows.Forms.MouseEventArgs)">
+            <summary>Processes 3D mouse event</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.CLGLCtx">
+            <summary>OpenGL/CL shared context</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.CQ">
+            <summary>OpenGL/CL shared command queue</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.CLMousePos">
+            <summary>Mouse position in GPU memory</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.MousePosAnt">
+            <summary>Previous mouse position (when clicked)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.CLMousePosAnt">
+            <summary>Previous mouse position in GPU memory</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.CLMouseRadius">
+            <summary>Mouse radius in GPU memory</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.kernelHide">
+            <summary>Hide/show kernel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.kernelShowAll">
+            <summary>Hide/show kernel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.kernelHideLines">
+            <summary>Hide/show kernel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.kernelDisplace">
+            <summary>Displacement kernel</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.InitCLDisp">
+            <summary>Initializes OpenCL kernels to calculate displacement and hide objects</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.CQWrite(Cloo.ComputeBuffer{System.Single},System.Single[])">
+            <summary>Writes information to a buffer</summary>
+            <param name="buffer">Buffer object</param>
+            <param name="Values">Values to write</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.ShowAllElements">
+            <summary>Undoes all hide operations and shows all elements</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.HideElements">
+            <summary>Hides elements in this GLRender which are close to the 3D mouse</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.DisplaceElements">
+            <summary>Displace elements according to mouse command</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.Models">
+            <summary>List of OpenGL VBOs to draw</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.StereoscopicDraw">
+            <summary>Draw in stereographic projection?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.StereoDistance">
+            <summary>Stereographic distance.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.ClearColor">
+            <summary>Background color</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.ReDraw">
+            <summary>Forces the control to redraw its contents</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.PreDrawFunc">
+            <summary>Function to be invoked prior to every drawing</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.Draw">
+            <summary>Controls the camera positioning for the OpenGL scene</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.DrawAxes">
+            <summary>Draw axes at center?</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.DoDraw">
+            <summary>Draws OpenGL scene</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.SetCenter(OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Sets center of camera and recalculates appropriate vectors</summary>
+            <param name="NewCenter">Desired center</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.SetDistance(System.Double)">
+            <summary>Sets the camera distance from the center of where it's looking</summary>
+            <param name="Distance">New distance</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GetCenter">
+            <summary>Gets camera center (the center of where the camera is looking at)</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GetDistance">
+            <summary>Gets camera distance from the center</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.MouseMoveMode">
+            <summary>Mouse action when used to move the 3D Model</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.MouseMoveMode.RotateModel">
+            <summary>Mouse rotation mode index.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.MouseMoveMode.TranslateModel">
+            <summary>Mouse translation mode index.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.MouseMoveMode.Mouse3D">
+            <summary>Enter 3D mousing mode</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.MouseMoveMode.None">
+            <summary>No mouse movement.</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.VoidFunc">
+            <summary>Void function delegate</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel">
+            <summary>OpenGL Model created from vertex buffer objects</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Name">
+            <summary>Model name</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.#ctor(OpenTK.Graphics.OpenGL.BeginMode)">
+            <summary>Constructor. Receives draw mode of the model. REMINDER: Vertex, color and element data are necessary for drawing.</summary>
+            <param name="DrawMode">OpenGL Draw model</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Dispose">
+            <summary>Disposes buffer objects</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.DrawMode">
+            <summary>VBO draw mode</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GLVertexBuffer">
+            <summary>GL Vertex VBO (xyz)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GLColorBuffer">
+            <summary>GL Color VBO (RGBA)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GLNormalBuffer">
+            <summary>GL Normals VBO (xyz)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GLTexCoordBuffer">
+            <summary>GL Tex Coords VBO (xy)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GLElemBuffer">
+            <summary>GL Element buffer VBO (v1 v2 v3)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.ElemLength">
+            <summary>Length of elements vector (total triangles = ElemLength/3)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.numVertexes">
+            <summary>How many vertexes are there?</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetVertexData(System.Single[])">
+            <summary>Sets vertex data information</summary>
+            <param name="VertexData">Vertex data information. v[3i] = x component of i-th vector, x[3i+1] = y component, x[3i+2] = z component</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetVertexData(System.Single[],OpenTK.Graphics.OpenGL.BufferUsageHint)">
+            <summary>Sets vertex data information</summary>
+            <param name="VertexData">Vertex data information. v[3i] = x component of i-th vector, x[3i+1] = y component, x[3i+2] = z component</param>
+            <param name="Hint">OpenGL buffer usage hint</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetNormalData(System.Single[])">
+            <summary>Sets vertex normals data information</summary>
+            <param name="NormalVertexData">Normals data information. v[3i] = x component of i-th vector normal, x[3i+1] = y component, x[3i+2] = z component</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetNormalData(System.Single[],OpenTK.Graphics.OpenGL.BufferUsageHint)">
+            <summary>Sets vertex normals data information</summary>
+            <param name="NormalVertexData">Normals data information. v[3i] = x component of i-th vector normal, x[3i+1] = y component, x[3i+2] = z component</param>
+            <param name="Hint">OpenGL buffer usage hint</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetTexCoordData(System.Single[])">
+            <summary>Sets texture coordinate data information</summary>
+            <param name="TexData">Vertex data information. v[2i] = x texture coord, x[2i+1] = y texture coordinate</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetTexCoordData(System.Single[],OpenTK.Graphics.OpenGL.BufferUsageHint)">
+            <summary>Sets texture coordinate data information</summary>
+            <param name="TexData">Vertex data information. v[2i] = x texture coord, x[2i+1] = y texture coordinate</param>
+            <param name="Hint">OpenGL buffer usage hint</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetColorData(System.Single[])">
+            <summary>Sets color information</summary>
+            <param name="ColorData">Vertex data information. v[4i] = R, x[4i+1] = G, x[4i+2]=B, x[4i+3]=alpha</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetColorData(System.Single[],OpenTK.Graphics.OpenGL.BufferUsageHint)">
+            <summary>Sets color information</summary>
+            <param name="ColorData">Vertex data information. v[4i] = R, x[4i+1] = G, x[4i+2]=B, x[4i+3]=alpha</param>
+            <param name="Hint">OpenGL buffer usage hint</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetElemData(System.Int32[])">
+            <summary>Sets vertex normals data information</summary>
+            <param name="ElemData">Element data information. v[3i]  v[3i+1] and v[3i+2] are indexes of vertexes that will be drawn</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetElemData(System.Int32[],OpenTK.Graphics.OpenGL.BufferUsageHint)">
+            <summary>Sets vertex normals data information</summary>
+            <param name="ElemData">Element data information. v[3i]  v[3i+1] and v[3i+2] are indexes of vertexes that will be drawn</param>
+            <param name="Hint">OpenGL buffer usage hint</param>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.rad2deg">
+            <summary>Radian to degree conversion</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.ShowModel">
+            <summary>Show this model?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.vetTransl">
+            <summary>Object translation vector from origin.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.vetRot">
+            <summary>Object rotation vector in Euler angles (psi-theta-phi).</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Scale">
+            <summary>Model scaling</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.DrawModel">
+            <summary>Draws this model</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CLElemBuffer">
+            <summary>Local storage of element data buffer</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GetCLElemBuffer">
+            <summary>Retrieves an OpenCL float buffer from this object's OpenGL elements VBO (3 ints per element)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CLColorBuffer">
+            <summary>Local storage of color buffer</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GetCLColorBuffer">
+            <summary>Retrieves an OpenCL float buffer from this object's OpenGL color data VBO (4 floats per vertex)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CLTexCoordBuffer">
+            <summary>Local storage of texture coordinates buffer</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GetCLTexCoordBuffer">
+            <summary>Retrieves an OpenCL float buffer from this object's OpenGL texture coordinate data VBO (2 floats per vertex)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CLNormalBuffer">
+            <summary>Local storage of vertex normals buffer</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GetCLNormalBuffer">
+            <summary>Retrieves an OpenCL float buffer from this object's OpenGL vertex normals data VBO (3 floats per vertex)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CLVertexBuffer">
+            <summary>Local storage of vertex buffer</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GetCLVertexBuffer">
+            <summary>Retrieves an OpenCL float buffer from this object's OpenGL vertex data VBO (3 floats per vertex)</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CreateSurface(System.Single[],System.Single[],System.String[],System.String[],System.String[])">
+            <summary>Creates a surface from given equations. Parameters are u and v (strings). Eg: vertexEqs[0] = "u+v"</summary>
+            <param name="uParams">U coordinate parameters: [0] - uMin, [1] - uMax, [2] - number of points</param>
+            <param name="vParams">V coordinate parameters: [0] - vMin, [1] - vMax, [2] - number of points</param>
+            <param name="vertexEqs">Array containing 3 strings that will define vertex positions. [0] x(u,v), [1] y(u,v), [2] z(u,v)</param>
+            <param name="colorEqs">Array containing 4 strings that will define vertex colors R(u,v), G(u,v), B(u,v), A(u,v). May contain only RGB</param>
+            <param name="normalsEqs">Array containing strings that will define vertex normals</param>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions">
+            <summary>Encapsulates functions needed to acquire and release OpenCL/GL shared objects</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.AcquireGLElements(OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Acquires one OpenCL variable created from GL buffers in order to use it. Ignores variables not created from OpenGL buffer</summary>
+            <param name="CLGLVar">Variable to be acquired</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.AcquireGLElements(OpenCLTemplate.CLCalc.Program.Variable[])">
+            <summary>Acquires OpenCL variables created from GL buffers in order to use them. Ignores variables not created from OpenGL buffer</summary>
+            <param name="CLGLVars">Variables to be acquired</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ReleaseGLElements(OpenCLTemplate.CLCalc.Program.Variable)">
+            <summary>Releases one OpenCL variable created from GL buffers. Ignores variables not created from OpenGL buffer</summary>
+            <param name="CLGLVar">Variable to be released</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ReleaseGLElements(OpenCLTemplate.CLCalc.Program.Variable[])">
+            <summary>Releases OpenCL variables created from GL buffers. Ignores variables not created from OpenGL buffer</summary>
+            <param name="CLGLVars">Variables to be acquired</param>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.Vector">
+            <summary>Vector class with math operations and dot / cross products.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.Vector.x">
+            <summary>Vector X component.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.Vector.y">
+            <summary>Vector Y component.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.Vector.z">
+            <summary>Vector Z component.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.#ctor">
+            <summary>Constructor. Initializes zero vector.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.#ctor(System.Double,System.Double,System.Double)">
+            <summary>Construtor. Initializes given values.</summary>
+            <param name="xComponent">Vector X component.</param>
+            <param name="yComponent">Vector Y component.</param>
+            <param name="zComponent">Vector Z component.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.#ctor(OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Construtor. Copies a given vector.</summary>
+            <param name="v">Vector to copy.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.ToString">
+            <summary>Returns a string that represents this vector.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.op_Addition(OpenCLTemplate.CLGLInterop.Vector,OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Vector sum.</summary>
+            <param name="v1">First vector to sum.</param>
+            <param name="v2">Second vector to sum.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.op_Subtraction(OpenCLTemplate.CLGLInterop.Vector,OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Vector subtraction.</summary>
+            <param name="v1">Vector to subtract from.</param>
+            <param name="v2">Vector to be subtracted.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.op_Multiply(System.Double,OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Vector scalar product.</summary>
+            <param name="num">Scalar to multiply.</param>
+            <param name="v">Vector to multiply.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.op_Multiply(OpenCLTemplate.CLGLInterop.Vector,System.Double)">
+            <summary>Vector scalar product.</summary>
+            <param name="num">Scalar to multiply.</param>
+            <param name="v">Vector to multiply.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.op_Division(System.Double,OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Vector scalar division.</summary>
+            <param name="num">Scalar to divide by.</param>
+            <param name="v">Vector to be divided.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.op_Division(OpenCLTemplate.CLGLInterop.Vector,System.Double)">
+            <summary>Vector scalar division.</summary>
+            <param name="num">Scalar to divide by.</param>
+            <param name="v">Vector to be divided.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.CompareTo(OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Equality comparison.</summary>
+            <param name="v">Vector to compare to.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.DotProduct(OpenCLTemplate.CLGLInterop.Vector,OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Returns vector dot product.</summary>
+            <param name="v1">First vector of Dot Product.</param>
+            <param name="v2">Second vector of Dot Product.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.CrossProduct(OpenCLTemplate.CLGLInterop.Vector,OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Returns vector cross product.</summary>
+            <param name="v1">First vector of Cross Product.</param>
+            <param name="v2">Second vector of Cross Product.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.norm">
+            <summary>Returns vector norm.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.Vector.normalize">
+            <summary>Normalizes this vector.</summary>
         </member>
         <member name="T:Utility.ModifyRegistry.ModifyRegistry">
             <summary>

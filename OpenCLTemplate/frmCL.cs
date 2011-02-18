@@ -184,6 +184,14 @@ namespace OpenCLTemplate
             lstDevDetails.Items.Add("Memory size (Mb): " + d.GlobalMemorySize/(1024*1024));
             lstDevDetails.Items.Add("Maximum allocation size (Mb):" + d.MaxMemoryAllocationSize / (1024 * 1024));
             lstDevDetails.Items.Add("Compiler available? " + d.CompilerAvailable);
+            lstDevDetails.Items.Add("Device available? " + d.Available);
+
+            lstDevDetails.Items.Add("  ");
+            lstDevDetails.Items.Add("Extensions: ");
+            foreach (string s in d.Extensions)
+            {
+                lstDevDetails.Items.Add(s);
+            }
             //lstDevDetails.Items.Add("Device available? " + d.CLDeviceAvailable);
         }
 
