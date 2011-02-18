@@ -62,6 +62,12 @@ namespace OpenCLTemplate
         /// <summary>Initializes OpenCL and reads devices</summary>
         public static void InitCL(ComputeDeviceTypes DevicesToUse)
         {
+            InitCL(DevicesToUse, null, null);
+        }
+
+        /// <summary>Initializes OpenCL and reads devices. Uses previously created context and command queue if supplied. In that case DevicesToUse is ignored.</summary>
+        public static void InitCL(ComputeDeviceTypes DevicesToUse, ComputeContext PrevCtx, ComputeCommandQueue PrevCQ)
+        {
             if (CLAcceleration != CLAccelerationType.UsingCL)
             {
                 try
@@ -75,7 +81,12 @@ namespace OpenCLTemplate
                     foreach (ComputePlatform pp in ComputePlatform.Platforms) CLPlatforms.Add(pp);
 
                     ComputeContextPropertyList Properties = new ComputeContextPropertyList(ComputePlatform.Platforms[0]);
-                    Program.Context = new ComputeContext(DevicesToUse, Properties, null, IntPtr.Zero);
+
+                    if (PrevCtx == null)
+                    {
+                        Program.Context = new ComputeContext(DevicesToUse, Properties, null, IntPtr.Zero);
+                    }
+                    else Program.Context = PrevCtx;
 
                     CLDevices = new List<ComputeDevice>();
                     for (int i = 0; i < Program.Context.Devices.Count; i++)
@@ -88,26 +99,33 @@ namespace OpenCLTemplate
                     Program.AsyncCommQueues = new List<ComputeCommandQueue>();
                     Program.DefaultCQ = -1;
 
-                    for (int i = 0; i < CLDevices.Count; i++)
+                    if (PrevCQ == null)
                     {
-                        //Comandos para os devices
-                        ComputeCommandQueue CQ = new ComputeCommandQueue(Program.Context, CLDevices[i], ComputeCommandQueueFlags.None);
+                        for (int i = 0; i < CLDevices.Count; i++)
+                        {
+                            //Comandos para os devices
+                            ComputeCommandQueue CQ = new ComputeCommandQueue(Program.Context, CLDevices[i], ComputeCommandQueueFlags.None);
 
-                        ComputeCommandQueue AsyncCQ = new ComputeCommandQueue(Program.Context, CLDevices[i], ComputeCommandQueueFlags.OutOfOrderExecution);
+                            ComputeCommandQueue AsyncCQ = new ComputeCommandQueue(Program.Context, CLDevices[i], ComputeCommandQueueFlags.OutOfOrderExecution);
 
 
 
-                        //Comando para a primeira GPU
-                        if ((CLDevices[i].Type == ComputeDeviceTypes.Gpu || CLDevices[i].Type == ComputeDeviceTypes.Accelerator) && Program.DefaultCQ < 0)
-                            Program.DefaultCQ = i;
+                            //Comando para a primeira GPU
+                            if ((CLDevices[i].Type == ComputeDeviceTypes.Gpu || CLDevices[i].Type == ComputeDeviceTypes.Accelerator) && Program.DefaultCQ < 0)
+                                Program.DefaultCQ = i;
 
-                        Program.CommQueues.Add(CQ);
-                        Program.AsyncCommQueues.Add(AsyncCQ);
+                            Program.CommQueues.Add(CQ);
+                            Program.AsyncCommQueues.Add(AsyncCQ);
 
+                        }
+                        //Só tem CPU
+                        if (Program.DefaultCQ < 0 && Program.CommQueues.Count > 0) Program.DefaultCQ = 0;
                     }
-                    //Só tem CPU
-                    if (Program.DefaultCQ < 0 && Program.CommQueues.Count > 0) Program.DefaultCQ = 0;
-
+                    else
+                    {
+                        Program.CommQueues.Add(PrevCQ);
+                        Program.DefaultCQ = 0;
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -277,9 +295,18 @@ namespace OpenCLTemplate
                 /// <param name="Kernel">Kernel to receive argument</param>
                 public void SetAsArgument(int ArgIndex, ComputeKernel Kernel)
                 {
+                    //Is this a buffer object?
+                    if (this is Variable)
+                    {
+                        Variable v = (Variable)this;
+                        if (v.CreatedFromGLBuffer && (!v.AcquiredInOpenCL))
+                        {
+                            throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
+                        }
+                    }
+
                     Kernel.SetMemoryArgument(ArgIndex, VarPointer);
                 }
-
             }
 
             /// <summary>Variables class</summary>
@@ -288,6 +315,79 @@ namespace OpenCLTemplate
 
                 #region Constructor. int[], float[], long[], double[], byte[]
 
+                /// <summary>Was this buffer created from a OpenGL buffer?</summary>
+                private bool _CreatedFromGLBuffer = false;
+
+                /// <summary>Returns true if this Variable was created from an OpenGL buffer</summary>
+                public bool CreatedFromGLBuffer
+                {
+                    get { return _CreatedFromGLBuffer; }
+                }
+
+                /// <summary>Was this buffer acquired in OpenCL?</summary>
+                private bool _AcquiredInOpenCL = false;
+
+                /// <summary>Returns true if this variable has been acquired for use in OpenCL (available for OpenCL)</summary>
+                public bool AcquiredInOpenCL
+                {
+                    get { return _AcquiredInOpenCL; }
+                    set { _AcquiredInOpenCL = value; }
+                }
+
+                /// <summary>Creates variable from OpenGL buffer</summary>
+                /// <param name="GLBuffer">Valid OpenGL Buffer</param>
+                /// <param name="BufferType">Type of OpenGL Buffer: typeof (int, float, double, long)</param>
+                public Variable(int GLBuffer, Type BufferType)
+                {
+                    ComputeMemory ClooBuffer = null;
+                    if (BufferType == typeof(float))
+                    {
+                        //Creates from OpenGL buffer
+                        ClooBuffer = ComputeBuffer<float>.CreateFromGLBuffer<float>(CLCalc.Program.Context,
+                        ComputeMemoryFlags.ReadWrite, GLBuffer);
+
+                        OriginalVarLength = (int)((ComputeBuffer<float>)ClooBuffer).Count;
+                    }
+                    else if (BufferType == typeof(int))
+                    {
+                        //Creates from OpenGL buffer
+                        ClooBuffer = ComputeBuffer<int>.CreateFromGLBuffer<int>(CLCalc.Program.Context,
+                        ComputeMemoryFlags.ReadWrite, GLBuffer);
+
+                        OriginalVarLength = (int)((ComputeBuffer<int>)ClooBuffer).Count;
+                    }
+                    else if (BufferType == typeof(long))
+                    {
+                        //Creates from OpenGL buffer
+                        ClooBuffer = ComputeBuffer<long>.CreateFromGLBuffer<long>(CLCalc.Program.Context,
+                        ComputeMemoryFlags.ReadWrite, GLBuffer);
+
+                        OriginalVarLength = (int)((ComputeBuffer<long>)ClooBuffer).Count;
+                    }
+                    else if (BufferType == typeof(double))
+                    {
+                        //Creates from OpenGL buffer
+                        ClooBuffer = ComputeBuffer<double>.CreateFromGLBuffer<double>(CLCalc.Program.Context,
+                        ComputeMemoryFlags.ReadWrite, GLBuffer);
+
+                        OriginalVarLength = (int)((ComputeBuffer<double>)ClooBuffer).Count;
+                    }
+
+                    this.VarPointer = ClooBuffer;
+                    VarSize = (int)ClooBuffer.Size;
+                    _CreatedFromGLBuffer = true;
+                }
+
+                /// <summary>Creates a OpenCLTemplate variable from a Cloo ComputeBuffer</summary>
+                /// <param name="ClooMemoryObject">Cloo computebuffer to create from</param>
+                /// <param name="Size">ClooMemoryObject.Size</param>
+                /// <param name="Count">ClooMemoryObject.Count</param>
+                public Variable(ComputeMemory ClooMemoryObject, int Size, int Count)
+                {
+                    VarSize = Size;
+                    OriginalVarLength = Count;
+                    this.VarPointer = ClooMemoryObject;
+                }
 
                 /// <summary>Constructor.</summary>
                 /// <param name="Values">Variable whose size will be allocated in device memory.</param>
@@ -398,7 +498,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(float[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
-
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
@@ -451,6 +551,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(long[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
@@ -477,6 +578,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(double[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
@@ -504,6 +606,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(char[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
@@ -531,6 +634,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(byte[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
@@ -573,7 +677,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(float[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
-
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
@@ -601,6 +705,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(int[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
@@ -629,6 +734,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(long[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
@@ -657,6 +763,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(double[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
@@ -684,6 +791,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(char[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)
@@ -712,6 +820,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(byte[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
                     if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     unsafe
                     {
                         fixed (void* ponteiro = Values)

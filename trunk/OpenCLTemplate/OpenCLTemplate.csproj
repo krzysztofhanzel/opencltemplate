@@ -93,9 +93,17 @@
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Cloo, Version=0.8.1.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Cloo, Version=0.8.2.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\Cloo.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\OpenTK.dll</HintPath>
+    </Reference>
+    <Reference Include="OpenTK.GLControl, Version=1.0.0.0, Culture=neutral, PublicKeyToken=bad199fe84eb3df4, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\OpenTK.GLControl.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core">
@@ -115,6 +123,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CLCalc.cs" />
+    <Compile Include="CLGLInterop\CLGLInterop.cs" />
     <Compile Include="ObjectClassifier\CLObjClassifier.cs" />
     <Compile Include="FourierTransform\CLFFT.cs" />
     <Compile Include="IsoSurface\Isosurface.cs" />
