@@ -1416,6 +1416,7 @@ __kernel void DisplaceElems(__global float * VertexCoords,
 
                 GL.Scale(Scale, Scale, Scale);
 
+                //Draws Vertex Buffer Objects onto the screen
                 DrawModelVBOs();
 
                 GL.PopMatrix();
