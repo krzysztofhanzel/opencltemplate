@@ -508,9 +508,6 @@
         <member name="T:OpenCLTemplate.CLCalc.Program">
             <summary>Program related stuff</summary>
         </member>
-        <member name="F:OpenCLTemplate.CLCalc.Program.Event">
-            <summary>Event list</summary>
-        </member>
         <member name="F:OpenCLTemplate.CLCalc.Program.Context">
             <summary>OpenCL context using all devices</summary>
         </member>
@@ -929,6 +926,13 @@
             <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
             <param name="LocalWorkSize">Local work sizes</param>
             <param name="Arguments">Arguments of the kernel function</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.Execute(OpenCLTemplate.CLCalc.Program.MemoryObject[],System.Int32[],System.Int32[],System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
+            <summary>Execute this kernel</summary>
+            <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
+            <param name="LocalWorkSize">Local work sizes</param>
+            <param name="Arguments">Arguments of the kernel function</param>
+            <param name="events">Events list</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.Dispose">
             <summary>Releases kernel from memory</summary>

@@ -227,8 +227,8 @@ namespace OpenCLTemplate.DifferentialEquations
             #region Salva as variaveis iniciais
 
 
-            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<float>((Cloo.ComputeBuffer<float>)x.VarPointer, (Cloo.ComputeBuffer<float>)xsav.VarPointer, CLCalc.Program.Event);
-            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<float>((Cloo.ComputeBuffer<float>)y.VarPointer, (Cloo.ComputeBuffer<float>)ysav.VarPointer, CLCalc.Program.Event);
+            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<float>((Cloo.ComputeBuffer<float>)x.VarPointer, (Cloo.ComputeBuffer<float>)xsav.VarPointer, null);
+            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<float>((Cloo.ComputeBuffer<float>)y.VarPointer, (Cloo.ComputeBuffer<float>)ysav.VarPointer, null);
 
 
             #endregion
@@ -658,8 +658,8 @@ namespace OpenCLTemplate.DifferentialEquations
         {
             #region Salva as variaveis iniciais
 
-            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<double>((Cloo.ComputeBuffer<double>)x.VarPointer, (Cloo.ComputeBuffer<double>)xsav.VarPointer, CLCalc.Program.Event);
-            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<double>((Cloo.ComputeBuffer<double>)y.VarPointer, (Cloo.ComputeBuffer<double>)ysav.VarPointer, CLCalc.Program.Event);
+            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<double>((Cloo.ComputeBuffer<double>)x.VarPointer, (Cloo.ComputeBuffer<double>)xsav.VarPointer, null);
+            CLCalc.Program.CommQueues[CLCalc.Program.DefaultCQ].CopyBuffer<double>((Cloo.ComputeBuffer<double>)y.VarPointer, (Cloo.ComputeBuffer<double>)ysav.VarPointer, null);
 
             #endregion
 

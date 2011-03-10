@@ -75,7 +75,7 @@ namespace OpenCLTemplate
                     if (ComputePlatform.Platforms.Count > 0) CLAccel = CLAccelerationType.UsingCL;
                     else CLAccel = CLAccelerationType.NotUsingCL;
 
-                    Program.Event = new List<ComputeEventBase>();
+                    //Program.Event = new List<ComputeEventBase>();
 
                     CLPlatforms = new List<ComputePlatform>();
                     foreach (ComputePlatform pp in ComputePlatform.Platforms) CLPlatforms.Add(pp);
@@ -155,8 +155,8 @@ namespace OpenCLTemplate
         /// <summary>Program related stuff</summary>
         public static class Program
         {
-            /// <summary>Event list</summary>
-            public static List<ComputeEventBase> Event;
+            ///// <summary>Event list</summary>
+            //public static List<ComputeEventBase> Event;
 
             /// <summary>OpenCL context using all devices</summary>
             public static ComputeContext Context;
@@ -281,7 +281,8 @@ namespace OpenCLTemplate
                 /// <summary>Releases variable from memory.</summary>
                 public void Dispose()
                 {
-                    VarPointer.Dispose();
+                    //Let Cloo handle
+                    //VarPointer.Dispose();
                 }
 
                 /// <summary>Destructor</summary>
@@ -513,7 +514,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(float[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -539,7 +540,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(int[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -566,7 +567,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(long[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -593,7 +594,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(double[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -621,7 +622,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(char[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -649,7 +650,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(byte[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Program.Event);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -692,7 +693,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(float[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -720,7 +721,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(int[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -749,7 +750,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(long[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -778,7 +779,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(double[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -806,7 +807,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(char[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
 
 
                     //OpenCLDriver.clReleaseEvent(Event);
@@ -835,7 +836,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(byte[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1002,7 +1003,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(float[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Event);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -1029,7 +1030,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(int[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Event);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -1056,7 +1057,7 @@ namespace OpenCLTemplate
                 public void WriteToDevice(byte[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteToDevice(Values, CommQueues[DefaultCQ], true, Event);
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -1087,7 +1088,7 @@ namespace OpenCLTemplate
                 public void WriteBitmap(System.Drawing.Bitmap bmp)
                 {
                     //CLEvent Event = new CLEvent();
-                    WriteBitmap(bmp, CommQueues[DefaultCQ],true, Event);
+                    WriteBitmap(bmp, CommQueues[DefaultCQ],true, null);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1125,7 +1126,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(float[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1153,7 +1154,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(int[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1182,7 +1183,7 @@ namespace OpenCLTemplate
                 public void ReadFromDeviceTo(byte[] Values)
                 {
                     //CLEvent Event = new CLEvent();
-                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, Event);
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1215,7 +1216,7 @@ namespace OpenCLTemplate
                 public System.Drawing.Bitmap ReadBitmap()
                 {
                     //CLEvent Event = new CLEvent();
-                    return ReadBitmap(CommQueues[DefaultCQ], true, Event);
+                    return ReadBitmap(CommQueues[DefaultCQ], true, null);
 
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
@@ -1310,7 +1311,7 @@ namespace OpenCLTemplate
                 public void Execute(CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize)
                 {
                     //CLEvent Event=new CLEvent();
-                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, null, Event);
+                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, null, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -1320,7 +1321,7 @@ namespace OpenCLTemplate
                 public void Execute(CLCalc.Program.MemoryObject[] Arguments, int GlobalWorkSize)
                 {
                     //CLEvent Event=new CLEvent();
-                    Execute(CommQueues[DefaultCQ], Arguments, new int[] { GlobalWorkSize }, null, Event);
+                    Execute(CommQueues[DefaultCQ], Arguments, new int[] { GlobalWorkSize }, null, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -1331,7 +1332,19 @@ namespace OpenCLTemplate
                 public void Execute(CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize, int[] LocalWorkSize)
                 {
                     //CLEvent Event=new CLEvent();
-                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, LocalWorkSize, Event);
+                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, LocalWorkSize, null);
+                    //OpenCLDriver.clReleaseEvent(Event);
+                }
+
+                /// <summary>Execute this kernel</summary>
+                /// <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
+                /// <param name="LocalWorkSize">Local work sizes</param>
+                /// <param name="Arguments">Arguments of the kernel function</param>
+                /// <param name="events">Events list</param>
+                public void Execute(CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize, int[] LocalWorkSize, ICollection<ComputeEventBase> events)
+                {
+                    //CLEvent Event=new CLEvent();
+                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, LocalWorkSize, events);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -1339,7 +1352,8 @@ namespace OpenCLTemplate
                 /// <summary>Releases kernel from memory</summary>
                 public void Dispose()
                 {
-                    kernel.Dispose();
+                    //Let Cloo handle
+                    //kernel.Dispose();
                 }
 
                 /// <summary>Destructor</summary>
