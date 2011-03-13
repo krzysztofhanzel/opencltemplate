@@ -2282,7 +2282,7 @@
         <member name="F:OpenCLTemplate.CLGLInterop.GLRender.ParentForm">
             <summary>Parent form</summary>
         </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.sOGL">
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLCtrl">
             <summary>OpenGL control</summary>
         </member>
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.CreateCLGLContext(System.Int32)">
@@ -2460,6 +2460,11 @@
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GetDistance">
             <summary>Gets camera distance from the center</summary>
         </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.ApplyTexture(System.Drawing.Bitmap,System.Int32@)">
+            <summary>Copies bitmap data to a OpenGL texture</summary>
+            <param name="TextureBitmap">Bitmap to be copied to OpenGL memory</param>
+            <param name="ind">A valid OpenGL texture generated with GLGenTexture. If less than zero a new OpenGL texture is created and stored in ind</param>
+        </member>
         <member name="T:OpenCLTemplate.CLGLInterop.GLRender.MouseMoveMode">
             <summary>Mouse action when used to move the 3D Model</summary>
         </member>
@@ -2487,6 +2492,10 @@
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.#ctor(OpenTK.Graphics.OpenGL.BeginMode)">
             <summary>Constructor. Receives draw mode of the model. REMINDER: Vertex, color and element data are necessary for drawing.</summary>
             <param name="DrawMode">OpenGL Draw model</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.#ctor(OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel)">
+            <summary>Constructor. Reuses the same Vertex Buffer Elements of an existing 3D model.</summary>
+            <param name="Source">Source model to reuse buffer elements</param>
         </member>
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Dispose">
             <summary>Disposes buffer objects</summary>
@@ -2573,7 +2582,10 @@
             <summary>Object rotation vector in Euler angles (psi-theta-phi).</summary>
         </member>
         <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Scale">
-            <summary>Model scaling</summary>
+            <summary>Model scaling {ScaleX, ScaleY, ScaleZ}</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.ModelColor">
+            <summary>This can be used to set model color if color buffer is not being used. Order: RGBA</summary>
         </member>
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.DrawModel">
             <summary>Draws this model</summary>
@@ -2615,6 +2627,61 @@
             <param name="vertexEqs">Array containing 3 strings that will define vertex positions. [0] x(u,v), [1] y(u,v), [2] z(u,v)</param>
             <param name="colorEqs">Array containing 4 strings that will define vertex colors R(u,v), G(u,v), B(u,v), A(u,v). May contain only RGB</param>
             <param name="normalsEqs">Array containing strings that will define vertex normals</param>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLFont">
+            <summary>OpenGL 3D font creator</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLFont.GLchars">
+            <summary>Stores 3D character models</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLFont.referenceWidth">
+            <summary>Reference width of letter O</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLFont.WidthInGLScale">
+            <summary>Width of characters in OpenGL scale</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.#ctor(System.Drawing.Font,System.Single)">
+            <summary>Creates a new 3D font from specified font</summary>
+            <param name="f">Font prototype to use in this 3D font</param>
+            <param name="GLNormalizationScale">Character reference width in OpenGL scale</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.#ctor(System.String)">
+            <summary>Loads a 3D font from a file. Does NOT require OpenCL/GL interop</summary>
+            <param name="filename">3D Font file</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.Draw3DString(System.String,OpenCLTemplate.CLGLInterop.GLRender)">
+            <summary>Creates an array of 3D models containing the given string. If target!=null adds them to target`s display list</summary>
+            <param name="s">String to write</param>
+            <param name="target">Target GLWindow to write</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.Draw3DString(System.String)">
+            <summary>Creates an array of 3D models containing the given string</summary>
+            <param name="s">String to write</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.Save(System.String)">
+            <summary>Saves this 3D font to a file. Requires OpenCL/GL interoperation.</summary>
+            <param name="file">File to save to.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.DrawString(System.String,System.Drawing.Font,System.Drawing.Color,System.Drawing.Color,System.Drawing.Color,System.Drawing.Color)">
+            <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
+            <param name="s">String to be written</param>
+            <param name="TextFont">Font to use</param>
+            <param name="TextLeftColor">Left color of Text.</param>
+            <param name="TextRightColor">Right color of Text.</param>
+            <param name="BackgroundLeftColor">Left color of Background.</param>
+            <param name="BackgroundRightColor">Right color of Background.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.DrawString(System.String,System.Drawing.Font,System.Drawing.Color,System.Drawing.Color)">
+            <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
+            <param name="s">String to be written</param>
+            <param name="TextFont">Font to use</param>
+            <param name="TextColor">Text color.</param>
+            <param name="BackgroundColor">Background color.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.DrawString(System.String,System.Drawing.Font)">
+            <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
+            <param name="s">String to be written</param>
+            <param name="TextFont">Font to use</param>
         </member>
         <member name="T:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions">
             <summary>Encapsulates functions needed to acquire and release OpenCL/GL shared objects</summary>
