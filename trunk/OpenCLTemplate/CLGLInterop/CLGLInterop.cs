@@ -24,7 +24,7 @@ namespace OpenCLTemplate.CLGLInterop
         private System.Windows.Forms.Form ParentForm;
 
         /// <summary>OpenGL control</summary>
-        private GLControl sOGL;
+        public GLControl GLCtrl;
 
         /// <summary>Sets CL GL shared variables</summary>
         /// <param name="DeviceNumber">Index of device to use from ComputePlatform.Platforms[0].Devices. Use -1 for default</param>
@@ -86,32 +86,32 @@ namespace OpenCLTemplate.CLGLInterop
             OpenTK.Graphics.GraphicsMode gm =
                 new OpenTK.Graphics.GraphicsMode(32, 24, 8, 4, cf, 4, true);
 
-            this.sOGL = new OpenTK.GLControl(gm);
-            ParentForm.Controls.Add(sOGL);
+            this.GLCtrl = new OpenTK.GLControl(gm);
+            ParentForm.Controls.Add(GLCtrl);
 
             // 
             // sOGL
             // 
-            this.sOGL.BackColor = System.Drawing.Color.Black;
-            this.sOGL.Name = "sOGL";
-            this.sOGL.VSync = false;
-            this.sOGL.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.sOGL_MouseWheel);
-            this.sOGL.Paint += new System.Windows.Forms.PaintEventHandler(this.sOGL_Paint);
-            this.sOGL.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sOGL_MouseMove);
-            this.sOGL.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sOGL_MouseDown);
-            this.sOGL.Resize += new System.EventHandler(this.sOGL_Resize);
-            this.sOGL.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sOGL_MouseUp);
-            this.sOGL.KeyDown += new System.Windows.Forms.KeyEventHandler(this.sOGL_KeyDown);
+            this.GLCtrl.BackColor = System.Drawing.Color.Black;
+            this.GLCtrl.Name = "sOGL";
+            this.GLCtrl.VSync = false;
+            this.GLCtrl.MouseWheel += new System.Windows.Forms.MouseEventHandler(this.sOGL_MouseWheel);
+            this.GLCtrl.Paint += new System.Windows.Forms.PaintEventHandler(this.sOGL_Paint);
+            this.GLCtrl.MouseMove += new System.Windows.Forms.MouseEventHandler(this.sOGL_MouseMove);
+            this.GLCtrl.MouseDown += new System.Windows.Forms.MouseEventHandler(this.sOGL_MouseDown);
+            this.GLCtrl.Resize += new System.EventHandler(this.sOGL_Resize);
+            this.GLCtrl.MouseUp += new System.Windows.Forms.MouseEventHandler(this.sOGL_MouseUp);
+            this.GLCtrl.KeyDown += new System.Windows.Forms.KeyEventHandler(this.sOGL_KeyDown);
 
             ParentForm.Resize += new EventHandler(sOGL_Resize);
 
-            sOGL.Top = 0; sOGL.Left = 0;
-            sOGL.Width = ParentForm.Width; sOGL.Height = ParentForm.Height;
-            sOGL.Cursor = System.Windows.Forms.Cursors.Cross;
+            GLCtrl.Top = 0; GLCtrl.Left = 0;
+            GLCtrl.Width = ParentForm.Width; GLCtrl.Height = ParentForm.Height;
+            GLCtrl.Cursor = System.Windows.Forms.Cursors.Cross;
 
             #endregion
 
-            sOGL.MakeCurrent();
+            GLCtrl.MakeCurrent();
 
             //AntiAliasing e blend
             GL.Enable(EnableCap.LineSmooth);
@@ -185,16 +185,16 @@ namespace OpenCLTemplate.CLGLInterop
 
         private void sOGL_Resize(object sender, EventArgs e)
         {
-            if (sOGL != null)
+            if (GLCtrl != null)
             {
 
-                sOGL.Width = ParentForm.Width; sOGL.Height = ParentForm.Height;
-                if (sOGL.Width < 0) sOGL.Width = 1;
-                if (sOGL.Height < 0) sOGL.Height = 1;
+                GLCtrl.Width = ParentForm.Width; GLCtrl.Height = ParentForm.Height;
+                if (GLCtrl.Width < 0) GLCtrl.Width = 1;
+                if (GLCtrl.Height < 0) GLCtrl.Height = 1;
 
-                sOGL.MakeCurrent();
-                GL.Viewport(0, 0, sOGL.Width, sOGL.Height);
-                sOGL.Invalidate();
+                GLCtrl.MakeCurrent();
+                GL.Viewport(0, 0, GLCtrl.Width, GLCtrl.Height);
+                GLCtrl.Invalidate();
             }
         }
 
@@ -272,7 +272,7 @@ namespace OpenCLTemplate.CLGLInterop
                     if (clicado)
                     {
                         this.RepositionCamera((float)e.X - (float)originalX, (float)e.Y - (float)originalY, MouseMode);
-                        sOGL.Refresh();
+                        GLCtrl.Refresh();
                     }
                 }
                 Mouse3D.ShowModel = false;
@@ -284,10 +284,10 @@ namespace OpenCLTemplate.CLGLInterop
                 MousePosAnt.y = Mouse3D.vetTransl.y;
                 MousePosAnt.z = Mouse3D.vetTransl.z;
 
-                float x = (float)e.X / (float)sOGL.Width;
-                float y = (float)e.Y / (float)sOGL.Height;
+                float x = (float)e.X / (float)GLCtrl.Width;
+                float y = (float)e.Y / (float)GLCtrl.Height;
                 Translate3DMouseXY(x, y, 0);
-                sOGL.Refresh();
+                GLCtrl.Refresh();
                 Mouse3D.ShowModel = true;
 
                 Process3DMouseHit(e);
@@ -304,10 +304,10 @@ namespace OpenCLTemplate.CLGLInterop
             }
             else if (MouseMode == MouseMoveMode.Mouse3D)
             {
-                float x = (float)e.X / (float)sOGL.Width;
-                float y = (float)e.Y / (float)sOGL.Height;
+                float x = (float)e.X / (float)GLCtrl.Width;
+                float y = (float)e.Y / (float)GLCtrl.Height;
                 this.Translate3DMouseXY(x, y, -e.Delta);
-                sOGL.Refresh();
+                GLCtrl.Refresh();
 
                 Process3DMouseHit(e);
             }
@@ -321,7 +321,7 @@ namespace OpenCLTemplate.CLGLInterop
             this.zNear = this.zFar * 1e-3f;
             this.RepositionCamera(0, 0, MouseMode);
             //status("View distance set to " + this.distEye.ToString(), -1);
-            sOGL.Refresh();
+            GLCtrl.Refresh();
         }
 
         private void sOGL_KeyDown(object sender, KeyEventArgs e)
@@ -345,12 +345,16 @@ namespace OpenCLTemplate.CLGLInterop
             }
             else if (e.KeyCode == Keys.Subtract)
             {
-                Mouse3D.Scale *= 0.97f;
+                Mouse3D.Scale[0] *= 0.97f;
+                Mouse3D.Scale[1] *= 0.97f;
+                Mouse3D.Scale[2] *= 0.97f;
                 invalidar = true;
             }
             else if (e.KeyCode == Keys.Add)
             {
-                Mouse3D.Scale *= 1.02f;
+                Mouse3D.Scale[0] *= 1.02f;
+                Mouse3D.Scale[1] *= 1.02f;
+                Mouse3D.Scale[2] *= 1.02f;
                 invalidar = true;
             }
 
@@ -438,7 +442,7 @@ namespace OpenCLTemplate.CLGLInterop
 
             if (invalidar)
             {
-                sOGL.Invalidate();
+                GLCtrl.Invalidate();
             }
         }
 
@@ -462,13 +466,13 @@ namespace OpenCLTemplate.CLGLInterop
         /// <summary>Point where camera is looking at</summary>
         private Vector center = new Vector(0, 0, 0);
         /// <summary>Point where camera is standing</summary>
-        private Vector eye = new Vector(215, 0, 0);
+        private Vector eye = new Vector(0, 0, 215);
         /// <summary>Front vector</summary>
-        private Vector front = new Vector(1, 0, 0);
+        private Vector front = new Vector(0, 0, 1);
         /// <summary>Up vector</summary>
-        private Vector up = new Vector(0, 0, 1);
+        private Vector up = new Vector(0, 1, 0);
         /// <summary>Left vector</summary>
-        private Vector esq = new Vector(0, 1, 0);
+        private Vector esq = new Vector(1, 0, 0);
         /// <summary>Camera eye distance.</summary>
         private double distEye = 215;
         /// <summary>Far distance to clip at.</summary>
@@ -476,9 +480,9 @@ namespace OpenCLTemplate.CLGLInterop
         /// <summary>Near distance to clip at</summary>
         public float zNear = 1.0f;
 
-        Vector frontCpy = new Vector(1, 0, 0);
-        Vector upCpy = new Vector(0, 0, 1);
-        Vector esqCpy = new Vector(0, 1, 0);
+        Vector frontCpy = new Vector(0, 0, 1);
+        Vector upCpy = new Vector(0, 1, 0);
+        Vector esqCpy = new Vector(1, 0, 0);
         Vector centerCpy = new Vector(0, 0, 0);
 
         //vetor angs = new vetor(0,0,0);
@@ -494,8 +498,8 @@ namespace OpenCLTemplate.CLGLInterop
             {
                 //Faz com que pegar o mouse em uma ponta e levar ate a outra
                 //gire a cena 360 graus
-                double ang2 = -3 * Math.PI * mouseDX / (float)sOGL.Width;
-                double ang1 = -3 * Math.PI * mouseDY / (float)sOGL.Height;
+                double ang2 = -3 * Math.PI * mouseDX / (float)GLCtrl.Width;
+                double ang1 = -3 * Math.PI * mouseDY / (float)GLCtrl.Height;
 
                 Console.Write(ang2.ToString());
 
@@ -516,8 +520,8 @@ namespace OpenCLTemplate.CLGLInterop
             }
             else if (modo == MouseMoveMode.TranslateModel)
             {
-                double dx = -distEye * mouseDX / (float)sOGL.Width;
-                double dy = distEye * mouseDY / (float)sOGL.Height;
+                double dx = -distEye * mouseDX / (float)GLCtrl.Width;
+                double dy = distEye * mouseDY / (float)GLCtrl.Height;
 
                 center = centerCpy + esqCpy * dx + upCpy * dy;
 
@@ -629,7 +633,9 @@ namespace OpenCLTemplate.CLGLInterop
         public void Reset3DMousePos()
         {
             Mouse3D.vetTransl.x = center.x; Mouse3D.vetTransl.y = center.y; Mouse3D.vetTransl.z = center.z;
-            Mouse3D.Scale = (float)distEye * 0.1f;
+            Mouse3D.Scale[0] = (float)distEye * 0.1f;
+            Mouse3D.Scale[1] = (float)distEye * 0.1f;
+            Mouse3D.Scale[2] = (float)distEye * 0.1f;
             ReDraw();
         }
 
@@ -750,7 +756,7 @@ namespace OpenCLTemplate.CLGLInterop
 
             CQWrite(CLMousePos, new float[] { (float)Mouse3D.vetTransl.x, (float)Mouse3D.vetTransl.y, (float)Mouse3D.vetTransl.z });
 
-            CQWrite(CLMouseRadius, new float[] { (float)Mouse3D.Scale });
+            CQWrite(CLMouseRadius, new float[] { (float)Mouse3D.Scale[0] });
 
             foreach (GLVBOModel model in this.Models)
             {
@@ -789,7 +795,7 @@ namespace OpenCLTemplate.CLGLInterop
             GL.Finish();
 
             CQWrite(CLMousePos, new float[] { (float)Mouse3D.vetTransl.x, (float)Mouse3D.vetTransl.y, (float)Mouse3D.vetTransl.z });
-            CQWrite(CLMouseRadius, new float[] { (float)Mouse3D.Scale });
+            CQWrite(CLMouseRadius, new float[] { (float)Mouse3D.Scale[0] });
 
             foreach (GLVBOModel model in this.Models)
             {
@@ -842,7 +848,7 @@ namespace OpenCLTemplate.CLGLInterop
 
             CQWrite(CLMousePos, new float[] { (float)Mouse3D.vetTransl.x, (float)Mouse3D.vetTransl.y, (float)Mouse3D.vetTransl.z });
             CQWrite(CLMousePosAnt, new float[] { (float)MousePosAnt.x, (float)MousePosAnt.y, (float)MousePosAnt.z });
-            CQWrite(CLMouseRadius, new float[] { (float)Mouse3D.Scale });
+            CQWrite(CLMouseRadius, new float[] { (float)Mouse3D.Scale[0] });
 
             foreach (GLVBOModel model in this.Models)
             {
@@ -1021,7 +1027,7 @@ __kernel void DisplaceElems(__global float * VertexCoords,
         /// <summary>Forces the control to redraw its contents</summary>
         public void ReDraw()
         {
-            sOGL.Invalidate();
+            GLCtrl.Invalidate();
         }
 
         /// <summary>Void function delegate</summary>
@@ -1050,7 +1056,7 @@ __kernel void DisplaceElems(__global float * VertexCoords,
                 GL.LoadIdentity();
 
                 OpenTK.Matrix4d m1 = OpenTK.Matrix4d.CreatePerspectiveFieldOfView(Math.PI * 0.25f,
-                        (double)sOGL.Width / (double)sOGL.Height, (double)zNear, (double)zFar);
+                        (double)GLCtrl.Width / (double)GLCtrl.Height, (double)zNear, (double)zFar);
                 GL.LoadMatrix(ref m1);
                 OpenTK.Matrix4d m2 = OpenTK.Matrix4d.LookAt(eyeStereo.x, eyeStereo.y, eyeStereo.z, center.x, center.y, center.z,
                     up.x, up.y, up.z);
@@ -1067,7 +1073,7 @@ __kernel void DisplaceElems(__global float * VertexCoords,
 
 
                 OpenTK.Matrix4d m10 = OpenTK.Matrix4d.CreatePerspectiveFieldOfView(Math.PI * 0.25f,
-                        (double)sOGL.Width / (double)sOGL.Height, (double)zNear, (double)zFar);
+                        (double)GLCtrl.Width / (double)GLCtrl.Height, (double)zNear, (double)zFar);
                 GL.LoadMatrix(ref m10);
                 OpenTK.Matrix4d m20 = OpenTK.Matrix4d.LookAt(eyeStereo.x, eyeStereo.y, eyeStereo.z, center.x, center.y, center.z,
                     up.x, up.y, up.z);
@@ -1086,7 +1092,7 @@ __kernel void DisplaceElems(__global float * VertexCoords,
                 GL.LoadIdentity();
 
                 OpenTK.Matrix4d m1 = OpenTK.Matrix4d.CreatePerspectiveFieldOfView(Math.PI * 0.25f,
-                    (double)sOGL.Width / (double)sOGL.Height, (double)zNear, (double)zFar);
+                    (double)GLCtrl.Width / (double)GLCtrl.Height, (double)zNear, (double)zFar);
                 GL.LoadMatrix(ref m1);
                 OpenTK.Matrix4d m2 = OpenTK.Matrix4d.LookAt(eye.x, eye.y, eye.z, center.x, center.y, center.z,
                     up.x, up.y, up.z);
@@ -1100,7 +1106,7 @@ __kernel void DisplaceElems(__global float * VertexCoords,
 
                 GL.Material(MaterialFace.FrontAndBack, MaterialParameter.Shininess, specular);
 
-                sOGL.SwapBuffers();
+                GLCtrl.SwapBuffers();
             }
         }
 
@@ -1203,6 +1209,25 @@ __kernel void DisplaceElems(__global float * VertexCoords,
             public GLVBOModel(BeginMode DrawMode)
             {
                 this.DrawMode = DrawMode;
+            }
+
+            /// <summary>Constructor. Reuses the same Vertex Buffer Elements of an existing 3D model.</summary>
+            /// <param name="Source">Source model to reuse buffer elements</param>
+            public GLVBOModel(GLVBOModel Source)
+            {
+                this.DrawMode = Source.DrawMode;
+                this.CLColorBuffer = Source.CLColorBuffer;
+                this.CLElemBuffer = Source.CLElemBuffer;
+                this.CLNormalBuffer = Source.CLNormalBuffer;
+                this.CLTexCoordBuffer = Source.CLTexCoordBuffer;
+                this.CLVertexBuffer = Source.CLVertexBuffer;
+
+                this.GLColorBuffer = Source.GLColorBuffer;
+                this.GLElemBuffer = Source.GLElemBuffer;
+                this.GLNormalBuffer = Source.GLNormalBuffer;
+                this.GLTexCoordBuffer = Source.GLTexCoordBuffer;
+                this.GLVertexBuffer = Source.GLVertexBuffer;
+                this.ElemLength = Source.ElemLength;
             }
 
             //~GLVBOModel()
@@ -1399,8 +1424,11 @@ __kernel void DisplaceElems(__global float * VertexCoords,
             public Vector vetTransl = new Vector(0, 0, 0);
             /// <summary>Object rotation vector in Euler angles (psi-theta-phi).</summary>
             public Vector vetRot = new Vector(0, 0, 0); //em angulos de Euler psi theta phi
-            /// <summary>Model scaling</summary>
-            public float Scale = 1.0f;
+            /// <summary>Model scaling {ScaleX, ScaleY, ScaleZ}</summary>
+            public float[] Scale = new float [] {1.0f, 1.0f,1.0f};
+
+            /// <summary>This can be used to set model color if color buffer is not being used. Order: RGBA</summary>
+            public float[] ModelColor = new float[] { 1.0f, 1.0f, 1.0f, 1.0f };
 
             /// <summary>Draws this model</summary>
             public void DrawModel()
@@ -1414,7 +1442,9 @@ __kernel void DisplaceElems(__global float * VertexCoords,
                 GL.Rotate((float)vetRot.y * rad2deg, 0.0f, 1.0f, 0.0f);
                 GL.Rotate((float)vetRot.x * rad2deg, 1.0f, 0.0f, 0.0f);
 
-                GL.Scale(Scale, Scale, Scale);
+                GL.Scale(Scale[0], Scale[1], Scale[2]);
+
+                GL.Color4(ModelColor[0], ModelColor[1], ModelColor[2], ModelColor[3]);
 
                 //Draws Vertex Buffer Objects onto the screen
                 DrawModelVBOs();
@@ -1675,7 +1705,457 @@ __kernel void f(__global float* vertex,
                 return model;
             }
             #endregion
+
+
         }
+
+        /// <summary>OpenGL 3D font creator</summary>
+        public class GLFont
+        {
+            /// <summary>Stores 3D character models</summary>
+            public GLRender.GLVBOModel[] GLchars;
+
+            /// <summary>Reference width of letter O</summary>
+            private float referenceWidth;
+
+            /// <summary>Width of characters in OpenGL scale</summary>
+            private float[] WidthInGLScale;
+
+            #region 3D font constructor and loader from file.
+            /// <summary>Creates a new 3D font from specified font</summary>
+            /// <param name="f">Font prototype to use in this 3D font</param>
+            /// <param name="GLNormalizationScale">Character reference width in OpenGL scale</param>
+            public GLFont(Font f, float GLNormalizationScale)
+            {
+                byte[] b = new byte[1];
+                Graphics g = Graphics.FromImage(new Bitmap(1, 1));
+                string s;
+
+                System.Diagnostics.Stopwatch sw = new System.Diagnostics.Stopwatch();
+                System.Diagnostics.Stopwatch sw2 = new System.Diagnostics.Stopwatch();
+
+                //Preliminary size
+                SizeF sizePrelim = g.MeasureString("O", f);
+                this.referenceWidth = sizePrelim.Width;
+                int w = (int)(2.0f * sizePrelim.Width);
+                int h = (int)(sizePrelim.Height);
+
+                float[, ,] bmpVals = new float[w, h, 3];
+                OpenCLTemplate.Isosurface.MarchingCubes mc = new OpenCLTemplate.Isosurface.MarchingCubes(bmpVals);
+
+                //GLchars[i].Scale = size.Width * 0.4f;
+                //Centers in Z
+                float temp = GLNormalizationScale / referenceWidth;
+                mc.Increments = new float[] { temp, temp, GLNormalizationScale * 0.1f };
+                mc.InitValues = new float[] { 0.0f, 0.0f, -GLNormalizationScale * 0.1f };
+
+                //Creates 3D models for each character
+                GLchars = new GLRender.GLVBOModel[256];
+                WidthInGLScale = new float[256];
+                for (int i = 0; i < 256; i++)
+                {
+                    sw.Start();
+                    b[0] = (byte)i;
+                    s = System.Text.ASCIIEncoding.Default.GetString(b);
+                    //Measures string size
+                    SizeF size = g.MeasureString(s, f);
+
+                    //Creates a bitmap to store the letter and draws it onto the bitmap
+                    Bitmap bmp = new Bitmap(1 + (int)size.Width, 1 + (int)size.Height);
+                    Graphics g2 = Graphics.FromImage(bmp);
+
+                    WidthInGLScale[i] = 0.7f * GLNormalizationScale * (float)size.Width / (float)sizePrelim.Width;
+
+                    g2.TextRenderingHint = System.Drawing.Text.TextRenderingHint.AntiAlias;
+                    g2.FillRectangle(Brushes.Black, 0, 0, bmp.Width, bmp.Height);
+                    g2.DrawString(s, f, Brushes.White, 0, 0);
+
+                    //Creates a float array to store bitmap values (input to isoSurface generator)
+
+                    for (int x = 0; x < w; x++)
+                    {
+                        for (int y = 0; y < h; y++)
+                        {
+                            bmpVals[x, y, 0] = 0;
+                            bmpVals[x, y, 1] = 0;
+                            bmpVals[x, y, 2] = 0;
+                        }
+                    }
+
+                    bool intensitiesAdded = false;
+
+                    #region Reads bitmap to float values array
+                    System.Drawing.Imaging.BitmapData bmdbmp = bmp.LockBits(new Rectangle(0, 0, bmp.Width, bmp.Height),
+                               System.Drawing.Imaging.ImageLockMode.ReadOnly, System.Drawing.Imaging.PixelFormat.Format32bppArgb);
+
+                    unsafe
+                    {
+                        for (int y = 0; y < bmdbmp.Height; y++)
+                        {
+                            byte* row = (byte*)bmdbmp.Scan0 + (y * bmdbmp.Stride);
+
+                            for (int x = 0; x < bmdbmp.Width; x++)
+                            {
+                                if (row[x << 2] != 0)
+                                {
+                                    bmpVals[x, h - y - 1, 1] = row[(x << 2)];
+                                    intensitiesAdded = true;
+                                }
+                            }
+                        }
+                    }
+
+
+                    #endregion
+
+                    bmp.UnlockBits(bmdbmp);
+
+                    //p.Image = bmp;
+                    bmp.Dispose();
+
+                    //If there's data to create a 3D model do so
+                    if (intensitiesAdded)
+                    {
+
+                        GLchars[i] = new GLRender.GLVBOModel(BeginMode.Triangles);
+                        mc.SetFuncVals(bmpVals);
+
+                        sw2.Start();
+                        mc.CalcIsoSurface(027.0f);
+                        List<float> Vertex, Normals; List<int> Elems;
+                        mc.GetEdgeInfo(out Vertex, out Normals, out Elems);
+                        sw2.Stop();
+
+                        //float[] Colors = new float[(Vertex.Count / 3) << 2];
+                        //for (int k = 0; k < Colors.Length; k++) Colors[k] = 1.0f;
+
+                        //GLchars[i].vetRot.z = Math.PI / 2;
+                        //GLchars[i].vetRot.x = -Math.PI / 2;
+                        //GLchars[i].Scale = 100.0f;
+
+                        GLchars[i].SetNormalData(Normals.ToArray());
+                        GLchars[i].SetVertexData(Vertex.ToArray());
+                        GLchars[i].SetElemData(Elems.ToArray());
+                        //GLchars[i].SetColorData(Colors);
+                        sw.Stop();
+                    }
+                    else WidthInGLScale[i] = 0.6f * GLNormalizationScale;
+
+                    sw.Stop();
+                }
+
+            }
+
+            /// <summary>Loads a 3D font from a file. Does NOT require OpenCL/GL interop</summary>
+            /// <param name="filename">3D Font file</param>
+            public GLFont(string filename)
+            {
+                //Reads file information
+                byte[] Data;
+                using (System.IO.BinaryReader b = new System.IO.BinaryReader(System.IO.File.Open(filename, System.IO.FileMode.Open)))
+                {
+                    long length = b.BaseStream.Length;
+
+                    Data = new byte[length];
+
+                    long pos = 0;
+                    int bytesToRead = 1000;
+                    while (pos < length)
+                    {
+                        byte[] bt = b.ReadBytes(bytesToRead);
+
+                        for (int i = 0; i < bt.Length; i++) Data[pos + i] = bt[i];
+
+                        pos += bytesToRead;
+                        if (length - pos < bytesToRead) bytesToRead = (int)(length - pos);
+
+                    }
+
+                    b.Close();
+                }
+
+                //Creates 3D models for each character
+                GLchars = new GLRender.GLVBOModel[256];
+                WidthInGLScale = new float[256];
+
+                //Last stored char. So far, it has to be 255
+                byte nChars = Data[0];
+                int DataPos = 1;
+                for (int indChar = 0; indChar <= nChars; indChar++)
+                {
+                    //Current char
+                    byte CurChar = Data[DataPos]; DataPos++;
+
+                    //Width of this char
+                    WidthInGLScale[indChar] = BitConverter.ToSingle(Data, DataPos); DataPos += 4;
+
+                    //number of vertexes/normals
+                    int nVert = BitConverter.ToInt32(Data, DataPos); DataPos += 4;
+
+                    //number of elements
+                    int nElem = BitConverter.ToInt32(Data, DataPos); DataPos += 4;
+
+                    //Only creates character if there are elements
+                    if (nVert > 0)
+                    {
+                        float[] verts = new float[3 * nVert];
+                        float[] normals = new float[3 * nVert];
+                        int[] elems = new int[3 * nElem];
+
+                        for (int p = 0; p < 3 * nVert; p += 3)
+                        {
+                            verts[p] = BitConverter.ToSingle(Data, DataPos); DataPos += 4;
+                            verts[1 + p] = BitConverter.ToSingle(Data, DataPos); DataPos += 4;
+                            verts[2 + p] = BitConverter.ToSingle(Data, DataPos); DataPos += 4;
+                        }
+                        for (int p = 0; p < 3 * nVert; p += 3)
+                        {
+                            normals[p] = BitConverter.ToSingle(Data, DataPos); DataPos += 4;
+                            normals[1 + p] = BitConverter.ToSingle(Data, DataPos); DataPos += 4;
+                            normals[2 + p] = BitConverter.ToSingle(Data, DataPos); DataPos += 4;
+                        }
+                        for (int p = 0; p < 3 * nElem; p += 3)
+                        {
+                            elems[p] = BitConverter.ToInt32(Data, DataPos); DataPos += 4;
+                            elems[1 + p] = BitConverter.ToInt32(Data, DataPos); DataPos += 4;
+                            elems[2 + p] = BitConverter.ToInt32(Data, DataPos); DataPos += 4;
+                        }
+                        //Creates the model
+                        GLchars[indChar] = new GLRender.GLVBOModel(BeginMode.Triangles);
+                        GLchars[indChar].SetNormalData(normals);
+                        GLchars[indChar].SetVertexData(verts);
+                        GLchars[indChar].SetElemData(elems);
+                    }
+                    else
+                    {
+                    }
+
+
+                }
+            }
+            #endregion
+
+            #region Drawing 3D strings
+            /// <summary>Creates an array of 3D models containing the given string. If target!=null adds them to target`s display list</summary>
+            /// <param name="s">String to write</param>
+            /// <param name="target">Target GLWindow to write</param>
+            public List<GLRender.GLVBOModel> Draw3DString(string s, GLRender target)
+            {
+                List<GLRender.GLVBOModel> GLstr = new List<GLRender.GLVBOModel>();
+                byte[] sb = System.Text.ASCIIEncoding.Default.GetBytes(s);
+
+                float curX = 0;
+                for (int i = 0; i < sb.Length; i++)
+                {
+                    if (GLchars[sb[i]] != null)
+                    {
+                        GLRender.GLVBOModel m = new GLRender.GLVBOModel(GLchars[sb[i]]);
+
+                        m.vetTransl.x = curX;
+                        GLstr.Add(m);
+
+                        if (target != null) target.Models.Add(m);
+                    }
+
+                    curX += this.WidthInGLScale[sb[i]];
+                }
+
+                return GLstr;
+            }
+
+
+            /// <summary>Creates an array of 3D models containing the given string</summary>
+            /// <param name="s">String to write</param>
+            public List<GLRender.GLVBOModel> Draw3DString(string s)
+            {
+                return Draw3DString(s, null);
+            }
+            #endregion
+
+            #region 3D font save
+
+            /// <summary>Saves this 3D font to a file. Requires OpenCL/GL interoperation.</summary>
+            /// <param name="file">File to save to.</param>
+            public void Save(string file)
+            {
+                //Stores all font information
+                List<byte> Data = new List<byte>();
+                byte[] b;
+
+                //Stores data for 256 characters. Last is 255
+                Data.Add(255);
+
+                for (int i = 0; i < 256; i++)
+                {
+                    //Dealing with the i-th character
+                    Data.Add((byte)i);
+
+                    //Stores its width
+                    b = BitConverter.GetBytes(WidthInGLScale[i]);
+                    for (int k = 0; k < b.Length; k++) Data.Add(b[k]);
+
+                    if (GLchars[i] != null)
+                    {
+                        //Stores the number of vertexes. Vertex bytes written afterwards will be 3*numVertexes*(4 bytes per float)
+                        b = BitConverter.GetBytes(GLchars[i].numVertexes);
+                        for (int k = 0; k < b.Length; k++) Data.Add(b[k]);
+
+                        //Stores the number of elements. Element bytes written afterwards will be 3*number of elements*(4 bytes per int)
+                        b = BitConverter.GetBytes(GLchars[i].ElemLength / 3);
+                        for (int k = 0; k < b.Length; k++) Data.Add(b[k]);
+
+                        CLCalc.Program.Variable CLvertex = GLchars[i].GetCLVertexBuffer();
+                        CLCalc.Program.Variable CLnormals = GLchars[i].GetCLNormalBuffer();
+                        CLCalc.Program.Variable CLelems = GLchars[i].GetCLElemBuffer();
+                        CLCalc.Program.Variable[] vars = new CLCalc.Program.Variable[] { CLvertex, CLnormals, CLelems };
+
+                        CLGLInteropFunctions.AcquireGLElements(vars);
+                        float[] vertex = new float[CLvertex.OriginalVarLength];
+                        float[] normals = new float[CLnormals.OriginalVarLength];
+                        int[] elems = new int[CLelems.OriginalVarLength];
+
+                        CLvertex.ReadFromDeviceTo(vertex);
+                        CLnormals.ReadFromDeviceTo(normals);
+                        CLelems.ReadFromDeviceTo(elems);
+
+                        CLGLInteropFunctions.ReleaseGLElements(vars);
+
+                        //Stores each vertex
+                        for (int p = 0; p < vertex.Length; p++)
+                        {
+                            b = BitConverter.GetBytes(vertex[p]);
+                            for (int k = 0; k < b.Length; k++) Data.Add(b[k]);
+                        }
+
+                        //Stores each normal
+                        for (int p = 0; p < normals.Length; p++)
+                        {
+                            b = BitConverter.GetBytes(normals[p]);
+                            for (int k = 0; k < b.Length; k++) Data.Add(b[k]);
+                        }
+
+                        //Stores each element
+                        for (int p = 0; p < elems.Length; p++)
+                        {
+                            b = BitConverter.GetBytes(elems[p]);
+                            for (int k = 0; k < b.Length; k++) Data.Add(b[k]);
+                        }
+                    }
+                    else
+                    {
+                        //Stores zero as number of vertexes
+                        b = BitConverter.GetBytes((int)0);
+                        for (int k = 0; k < b.Length; k++) Data.Add(b[k]);
+
+                        //Stores zero as number of elements
+                        b = BitConverter.GetBytes((int)0);
+                        for (int k = 0; k < b.Length; k++) Data.Add(b[k]);
+                    }
+                }
+
+                System.IO.FileStream fs = new System.IO.FileStream(file, System.IO.FileMode.Create);
+
+                using (System.IO.BinaryWriter bw = new System.IO.BinaryWriter(fs))
+                {
+                    bw.Write(Data.ToArray());
+
+                    bw.Close();
+                }
+                fs.Close();
+            }
+
+            #endregion
+
+            #region Generate texture from string
+
+            /// <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
+            /// <param name="s">String to be written</param>
+            /// <param name="TextFont">Font to use</param>
+            /// <param name="TextLeftColor">Left color of Text.</param>
+            /// <param name="TextRightColor">Right color of Text.</param>
+            /// <param name="BackgroundLeftColor">Left color of Background.</param>
+            /// <param name="BackgroundRightColor">Right color of Background.</param>
+            public static Bitmap DrawString(string s, Font TextFont, Color TextLeftColor, Color TextRightColor,
+                Color BackgroundLeftColor, Color BackgroundRightColor)
+            {
+                if (s == "") return null;
+
+                Bitmap dum = new Bitmap(10, 10);
+                Graphics g = Graphics.FromImage(dum);
+
+                SizeF size = g.MeasureString(s, TextFont);
+
+                Bitmap bmp = new Bitmap((int)size.Width, (int)size.Height);
+                Graphics gbmp = Graphics.FromImage(bmp);
+
+                Brush bBckg = new System.Drawing.Drawing2D.LinearGradientBrush(new PointF(0, 0), new PointF(size.Width, size.Height), BackgroundLeftColor, BackgroundRightColor);
+                gbmp.FillRectangle(bBckg, 0, 0, bmp.Width, bmp.Height);
+
+                Brush bTexto = new System.Drawing.Drawing2D.LinearGradientBrush(new PointF(0, 0), new PointF(size.Width, size.Height), TextLeftColor, TextRightColor);
+                gbmp.DrawString(s, TextFont, bTexto, 0, 0);
+
+                dum.Dispose();
+
+                return bmp;
+            }
+
+            /// <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
+            /// <param name="s">String to be written</param>
+            /// <param name="TextFont">Font to use</param>
+            /// <param name="TextColor">Text color.</param>
+            /// <param name="BackgroundColor">Background color.</param>
+            public static Bitmap DrawString(string s, Font TextFont, Color TextColor, Color BackgroundColor)
+            {
+                return DrawString(s, TextFont, TextColor, TextColor, BackgroundColor, BackgroundColor);
+            }
+
+            /// <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
+            /// <param name="s">String to be written</param>
+            /// <param name="TextFont">Font to use</param>
+            public static Bitmap DrawString(string s, Font TextFont)
+            {
+                return DrawString(s, TextFont, Color.Black, Color.Black, Color.White, Color.White);
+            }
+
+            #endregion
+        }
+
+        /// <summary>Copies bitmap data to a OpenGL texture</summary>
+        /// <param name="TextureBitmap">Bitmap to be copied to OpenGL memory</param>
+        /// <param name="ind">A valid OpenGL texture generated with GLGenTexture. If less than zero a new OpenGL texture is created and stored in ind</param>
+        public static void ApplyTexture(Bitmap TextureBitmap, ref int ind)
+        {
+            if (TextureBitmap != null)
+            {
+                if (ind <= 0) ind = GL.GenTexture();
+
+                //texture, if there is one
+                System.Drawing.Bitmap image = new System.Drawing.Bitmap(TextureBitmap);
+                //image.RotateFlip(System.Drawing.RotateFlipType.RotateNoneFlipY); //this takes too long
+                System.Drawing.Imaging.BitmapData bitmapdata;
+                System.Drawing.Rectangle rect = new System.Drawing.Rectangle(0, 0, image.Width, image.Height);
+
+                bitmapdata = image.LockBits(rect, System.Drawing.Imaging.ImageLockMode.ReadOnly,
+                    System.Drawing.Imaging.PixelFormat.Format24bppRgb);
+
+                GL.BindTexture(TextureTarget.Texture2D, ind);
+
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)All.ClampToEdge);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)All.ClampToEdge);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)All.Nearest);
+                GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)All.Nearest);
+
+                GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, image.Width, image.Height,
+                    0, (OpenTK.Graphics.OpenGL.PixelFormat)(int)All.BgrExt, PixelType.UnsignedByte, bitmapdata.Scan0);
+
+                image.UnlockBits(bitmapdata);
+                image.Dispose();
+
+                GL.BindTexture(TextureTarget.Texture2D, ind);
+            }
+        }
+
+
     }
 
     /// <summary>Encapsulates functions needed to acquire and release OpenCL/GL shared objects</summary>
