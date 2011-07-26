@@ -581,6 +581,11 @@ namespace OpenCLTemplate.LinearAlgebra
             //Writes M to device memory
             M.WriteToDevice();
 
+            ////Preconditions M
+            //float[] preC = JacobiPrecondition(M);
+            ////Preconditions b using M
+            //JacobiPrecondition(preC, b);
+
             //Backs up b data
             float[] bbkp = new float[n];
             for (int i = 0; i < n; i++) bbkp[i] = b.VectorData[i];
@@ -600,7 +605,7 @@ namespace OpenCLTemplate.LinearAlgebra
 
                 b.WriteToDevice();
 
-                LinSolveCLStep(M, b, tol);
+                LinSolveCLStep(M, b, tol, ref x);
 
                 //Solution
                 x.ReadFromDevice();
@@ -643,11 +648,14 @@ namespace OpenCLTemplate.LinearAlgebra
             return Solution;
         }
 
+
+
         /// <summary>Solves linear system Mx = b using conjugate gradient method. Doesn't try to improve the solution obtained.</summary>
         /// <param name="M">Matrix M</param>
         /// <param name="b">Vector b</param>
         /// <param name="tol">Error tolerance</param>
-        public void LinSolveCLStep(CLImgSparseMatrix M, CLImgVector b, float tol)
+        /// <param name="x">Initial guess</param>
+        public void LinSolveCLStep(CLImgSparseMatrix M, CLImgVector b, float tol, ref CLImgVector x)
         {
             int n = b.Length;
             int nBy4 = 1 + ((n - 1) >> 2);
@@ -662,11 +670,13 @@ namespace OpenCLTemplate.LinearAlgebra
             {
                 r = new CLImgVector(n);
                 p = new CLImgVector(n);
-                x = new CLImgVector(n);
+                //x = new CLImgVector(n);
                 Ap = new CLImgVector(n);
                 temp = new CLImgVector(n);
             }
             if (temp == null) temp = new CLImgVector(n);
+
+            if (x == null || x.Length != n) x = new CLImgVector(n);
 
             float alpha, beta, RDotROld, RDotR;
 
@@ -681,7 +691,7 @@ namespace OpenCLTemplate.LinearAlgebra
 
             RDotR = DotProduct(r, r);
 
-            while ((RDotR > tol) && (count < n*MAXITER))
+            while (count<1 || ((RDotR > tol) && (count < n*MAXITER)))
             {
                 RDotROld = RDotR;
                 

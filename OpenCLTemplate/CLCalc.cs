@@ -158,7 +158,7 @@ namespace OpenCLTemplate
             ///// <summary>Event list</summary>
             //public static List<ComputeEventBase> Event;
 
-            /// <summary>OpenCL context using all devices</summary>
+            /// <summary>OpenCL context. Devices depend on how InitCL() was used.</summary>
             public static ComputeContext Context;
 
             /// <summary>Synchronous command queues that are executed in call order</summary>
@@ -223,7 +223,7 @@ namespace OpenCLTemplate
                 {
                     try
                     {
-                        Prog.Build(new List<ComputeDevice>() { CLCalc.CLDevices[i] }, "", null, IntPtr.Zero);
+                        Prog.Build(CLCalc.CLDevices, "", null, IntPtr.Zero);
                         funcionou = true;
                     }
                     catch
@@ -308,6 +308,29 @@ namespace OpenCLTemplate
 
                     Kernel.SetMemoryArgument(ArgIndex, VarPointer);
                 }
+
+                #region OpenCL/GL Interop
+
+                /// <summary>Was this memory Object created from a OpenGL buffer?</summary>
+                protected bool _CreatedFromGLBuffer = false;
+
+                /// <summary>Returns true if this Memory Object was created from an OpenGL buffer</summary>
+                public bool CreatedFromGLBuffer
+                {
+                    get { return _CreatedFromGLBuffer; }
+                }
+
+                /// <summary>Was this buffer acquired in OpenCL?</summary>
+                protected bool _AcquiredInOpenCL = false;
+
+                /// <summary>Returns true if this Memory Object has been acquired for use in OpenCL (available for OpenCL)</summary>
+                public bool AcquiredInOpenCL
+                {
+                    get { return _AcquiredInOpenCL; }
+                    set { _AcquiredInOpenCL = value; }
+                }
+
+                #endregion
             }
 
             /// <summary>Variables class</summary>
@@ -316,24 +339,7 @@ namespace OpenCLTemplate
 
                 #region Constructor. int[], float[], long[], double[], byte[]
 
-                /// <summary>Was this buffer created from a OpenGL buffer?</summary>
-                private bool _CreatedFromGLBuffer = false;
 
-                /// <summary>Returns true if this Variable was created from an OpenGL buffer</summary>
-                public bool CreatedFromGLBuffer
-                {
-                    get { return _CreatedFromGLBuffer; }
-                }
-
-                /// <summary>Was this buffer acquired in OpenCL?</summary>
-                private bool _AcquiredInOpenCL = false;
-
-                /// <summary>Returns true if this variable has been acquired for use in OpenCL (available for OpenCL)</summary>
-                public bool AcquiredInOpenCL
-                {
-                    get { return _AcquiredInOpenCL; }
-                    set { _AcquiredInOpenCL = value; }
-                }
 
                 /// <summary>Creates variable from OpenGL buffer</summary>
                 /// <param name="GLBuffer">Valid OpenGL Buffer</param>
@@ -865,7 +871,7 @@ namespace OpenCLTemplate
                     get { return height; }
                 }
 
-                #region Constructor. float[], int[], byte[]
+                #region Constructor. float[], int[], byte[], from Bitmap, from OpenGL Texture
 
                 /// <summary>Unsafe allocation of memory</summary>
                 /// <param name="p">Pointer to data</param>
@@ -879,7 +885,7 @@ namespace OpenCLTemplate
                     VarPointer = new ComputeImage2D(Program.Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, format, width, height, 0, new IntPtr(p));
 
                 }
-
+                
                 /// <summary>Constructor.</summary>
                 /// <param name="Values">Variable whose size will be allocated in device memory.</param>
                 /// <param name="Width">Image width.</param>
@@ -960,7 +966,7 @@ namespace OpenCLTemplate
 
                     width = bmp.Width; height = bmp.Height;
                     OriginalVarLength = 4 * width * height;
-                    VarSize = 4 * OriginalVarLength * sizeof(byte);
+                    VarSize = OriginalVarLength * sizeof(byte);
 
                     unsafe
                     {
@@ -971,6 +977,26 @@ namespace OpenCLTemplate
                     bmp.UnlockBits(bitmapdata);
                 }
 
+                /// <summary>Constructor. Creates an image2d OpenCL object from a valid OpenCL texture. 
+                /// IMPORTANT: The data type of this object from the HOST standpoint is BYTE in the Alpha Blue Green Red order.
+                /// The data type in OpenCL is FLOAT4 (write_imagef) and in OpenGL the display order is BLUE GREEN RED ALPHA when modifying from OpenCL</summary>
+                /// <param name="GLTextureBuffer">Valid OpenCL texture buffer to create image from</param>
+                public Image2D(int GLTextureBuffer)
+                {
+                    if (GLTextureBuffer <= 0) throw new Exception("Invalid OpenGL buffer");
+                    //Mode = TextureTarget.Texture2D
+                    this.VarPointer = ComputeImage2D.CreateFromGLTexture2D(Program.Context, ComputeMemoryFlags.ReadWrite, 
+                        (int)OpenTK.Graphics.OpenGL.TextureTarget.Texture2D, 0, GLTextureBuffer);
+
+                    ComputeImage2D img2d = (ComputeImage2D)this.VarPointer;
+
+                    width = img2d.Width; height = img2d.Height;
+                    OriginalVarLength = 4 * width * height;
+                    VarSize = OriginalVarLength * sizeof(byte);
+
+                    this._CreatedFromGLBuffer = true;
+                }
+
                 #endregion
 
                 #region Write to Device memory. float[], int[], byte[], Bitmap
@@ -978,6 +1004,7 @@ namespace OpenCLTemplate
 
                 private unsafe void WriteToDevice(void* p, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     CQ.Write((ComputeImage)VarPointer, BlockingWrite, new SysIntX3(0, 0, 0), new SysIntX3(width, height, 1), 0, 0, new IntPtr(p), events);
                 }
 
@@ -1099,6 +1126,7 @@ namespace OpenCLTemplate
 
                 private unsafe void ReadFromDeviceTo(void* p, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     CQ.Read((ComputeImage)VarPointer, BlockingRead, new SysIntX3(0, 0, 0), new SysIntX3(width, height, 1), 0, 0, new IntPtr(p), events);
                 }
 
