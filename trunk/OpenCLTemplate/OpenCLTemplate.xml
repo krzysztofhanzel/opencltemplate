@@ -509,7 +509,7 @@
             <summary>Program related stuff</summary>
         </member>
         <member name="F:OpenCLTemplate.CLCalc.Program.Context">
-            <summary>OpenCL context using all devices</summary>
+            <summary>OpenCL context. Devices depend on how InitCL() was used.</summary>
         </member>
         <member name="F:OpenCLTemplate.CLCalc.Program.CommQueues">
             <summary>Synchronous command queues that are executed in call order</summary>
@@ -567,17 +567,23 @@
             <param name="ArgIndex">Index of kernel argument</param>
             <param name="Kernel">Kernel to receive argument</param>
         </member>
+        <member name="F:OpenCLTemplate.CLCalc.Program.MemoryObject._CreatedFromGLBuffer">
+            <summary>Was this memory Object created from a OpenGL buffer?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLCalc.Program.MemoryObject._AcquiredInOpenCL">
+            <summary>Was this buffer acquired in OpenCL?</summary>
+        </member>
         <member name="P:OpenCLTemplate.CLCalc.Program.MemoryObject.Size">
             <summary>Returns the size of the stored variable</summary>
         </member>
+        <member name="P:OpenCLTemplate.CLCalc.Program.MemoryObject.CreatedFromGLBuffer">
+            <summary>Returns true if this Memory Object was created from an OpenGL buffer</summary>
+        </member>
+        <member name="P:OpenCLTemplate.CLCalc.Program.MemoryObject.AcquiredInOpenCL">
+            <summary>Returns true if this Memory Object has been acquired for use in OpenCL (available for OpenCL)</summary>
+        </member>
         <member name="T:OpenCLTemplate.CLCalc.Program.Variable">
             <summary>Variables class</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.Program.Variable._CreatedFromGLBuffer">
-            <summary>Was this buffer created from a OpenGL buffer?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.Program.Variable._AcquiredInOpenCL">
-            <summary>Was this buffer acquired in OpenCL?</summary>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.#ctor(System.Int32,System.Type)">
             <summary>Creates variable from OpenGL buffer</summary>
@@ -746,12 +752,6 @@
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
             <param name="Values">Values to store data coming from device</param>
         </member>
-        <member name="P:OpenCLTemplate.CLCalc.Program.Variable.CreatedFromGLBuffer">
-            <summary>Returns true if this Variable was created from an OpenGL buffer</summary>
-        </member>
-        <member name="P:OpenCLTemplate.CLCalc.Program.Variable.AcquiredInOpenCL">
-            <summary>Returns true if this variable has been acquired for use in OpenCL (available for OpenCL)</summary>
-        </member>
         <member name="T:OpenCLTemplate.CLCalc.Program.Image2D">
             <summary>Image2D class. Uses channel type RGBA.</summary>
         </member>
@@ -787,6 +787,12 @@
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.#ctor(System.Drawing.Bitmap)">
             <summary>Constructor. Remember, Bitmap uses the BGRA byte order.</summary>
             <param name="bmp">Bitmap to create OpenCL image from.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.#ctor(System.Int32)">
+            <summary>Constructor. Creates an image2d OpenCL object from a valid OpenCL texture. 
+            IMPORTANT: The data type of this object from the HOST standpoint is BYTE in the Alpha Blue Green Red order.
+            The data type in OpenCL is FLOAT4 (write_imagef) and in OpenGL the display order is BLUE GREEN RED ALPHA when modifying from OpenCL</summary>
+            <param name="GLTextureBuffer">Valid OpenCL texture buffer to create image from</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteToDevice(System.Single[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes variable to device</summary>
@@ -1433,11 +1439,12 @@
             <param name="b">Vector b</param>
             <param name="tol">Error tolerance</param>
         </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.LinSolveCLStep(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,System.Single)">
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.LinSolveCLStep(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,System.Single,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector@)">
             <summary>Solves linear system Mx = b using conjugate gradient method. Doesn't try to improve the solution obtained.</summary>
             <param name="M">Matrix M</param>
             <param name="b">Vector b</param>
             <param name="tol">Error tolerance</param>
+            <param name="x">Initial guess</param>
         </member>
         <member name="T:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector">
             <summary>Builds a new OpenCL Image2D containing vector data</summary>
@@ -2460,10 +2467,21 @@
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GetDistance">
             <summary>Gets camera distance from the center</summary>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.ApplyTexture(System.Drawing.Bitmap,System.Int32@)">
-            <summary>Copies bitmap data to a OpenGL texture</summary>
-            <param name="TextureBitmap">Bitmap to be copied to OpenGL memory</param>
-            <param name="ind">A valid OpenGL texture generated with GLGenTexture. If less than zero a new OpenGL texture is created and stored in ind</param>
+        <member name="E:OpenCLTemplate.CLGLInterop.GLRender.Mouse3DDown">
+            <summary>Raised when user clicks mouse button in environment using Mouse3D mode</summary>
+        </member>
+        <member name="E:OpenCLTemplate.CLGLInterop.GLRender.Mouse3DUp">
+            <summary>Raised when user releases mouse button in environment using Mouse3D mode</summary>
+        </member>
+        <member name="E:OpenCLTemplate.CLGLInterop.GLRender.Mouse3DMove">
+            <summary>Raised when user moves 3D mouse in environment using Mouse3D mode</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.Mouse3DEvent">
+            <summary>Mouse 3D event</summary>
+            <param name="sender">Sender</param>
+            <param name="e">2D events raised in this instance (picture X, Y and buttons)</param>
+            <param name="Mouse3DPos">Mouse 3D position</param>
+            <param name="Mouse3DRadius">Mouse 3D radius</param>
         </member>
         <member name="T:OpenCLTemplate.CLGLInterop.GLRender.MouseMoveMode">
             <summary>Mouse action when used to move the 3D Model</summary>
@@ -2489,6 +2507,9 @@
         <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Name">
             <summary>Model name</summary>
         </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.UseDrawElements">
+            <summary>Use draw elements? Just for compatibility with Lab3D models</summary>
+        </member>
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.#ctor(OpenTK.Graphics.OpenGL.BeginMode)">
             <summary>Constructor. Receives draw mode of the model. REMINDER: Vertex, color and element data are necessary for drawing.</summary>
             <param name="DrawMode">OpenGL Draw model</param>
@@ -2496,6 +2517,10 @@
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.#ctor(OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel)">
             <summary>Constructor. Reuses the same Vertex Buffer Elements of an existing 3D model.</summary>
             <param name="Source">Source model to reuse buffer elements</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.LoadFile(System.String)">
+            <summary>Creates 3D model from a given file</summary>
+            <param name="FileName">Source file</param>
         </member>
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Dispose">
             <summary>Disposes buffer objects</summary>
@@ -2517,6 +2542,9 @@
         </member>
         <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GLElemBuffer">
             <summary>GL Element buffer VBO (v1 v2 v3)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GLTextureBuffer">
+            <summary>OpenGL texture buffer object</summary>
         </member>
         <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.ElemLength">
             <summary>Length of elements vector (total triangles = ElemLength/3)</summary>
@@ -2569,6 +2597,11 @@
             <param name="ElemData">Element data information. v[3i]  v[3i+1] and v[3i+2] are indexes of vertexes that will be drawn</param>
             <param name="Hint">OpenGL buffer usage hint</param>
         </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetTexture(System.Drawing.Bitmap)">
+            <summary>Creates a texture from a bitmap and associates with this model. Note: texture is flipped in Y axis, needs to correct texture coordinates.
+            Models created from equations are already corrected</summary>
+            <param name="bmp">Bitmap to create texture from</param>
+        </member>
         <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.rad2deg">
             <summary>Radian to degree conversion</summary>
         </member>
@@ -2620,6 +2653,14 @@
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GetCLVertexBuffer">
             <summary>Retrieves an OpenCL float buffer from this object's OpenGL vertex data VBO (3 floats per vertex)</summary>
         </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CLTexture2D">
+            <summary>Local storage of vertex buffer</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GetCLTexture2D">
+            <summary>Retrieves an OpenCL float buffer from this object's OpenGL vertex data VBO (3 floats per vertex)
+            IMPORTANT: The data type of this object from the HOST standpoint is BYTE in the Alpha Blue Green Red order.
+            The data type in OpenCL C99 is FLOAT4 (write_imagef) and in OpenGL the display order is BLUE GREEN RED ALPHA when modifying from OpenCL</summary>
+        </member>
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CreateSurface(System.Single[],System.Single[],System.String[],System.String[],System.String[])">
             <summary>Creates a surface from given equations. Parameters are u and v (strings). Eg: vertexEqs[0] = "u+v"</summary>
             <param name="uParams">U coordinate parameters: [0] - uMin, [1] - uMax, [2] - number of points</param>
@@ -2628,41 +2669,445 @@
             <param name="colorEqs">Array containing 4 strings that will define vertex colors R(u,v), G(u,v), B(u,v), A(u,v). May contain only RGB</param>
             <param name="normalsEqs">Array containing strings that will define vertex normals</param>
         </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLFont">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CreateSurface(System.Single[],System.Single[],System.String[],System.String[])">
+            <summary>Creates a surface from given equations. Parameters are u and v (strings). Eg: vertexEqs[0] = "u+v"</summary>
+            <param name="uParams">U coordinate parameters: [0] - uMin, [1] - uMax, [2] - number of points</param>
+            <param name="vParams">V coordinate parameters: [0] - vMin, [1] - vMax, [2] - number of points</param>
+            <param name="vertexEqs">Array containing 3 strings that will define vertex positions. [0] x(u,v), [1] y(u,v), [2] z(u,v)</param>
+            <param name="normalsEqs">Array containing strings that will define vertex normals</param>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder">
+            <summary>3D Models handler from Lab3D software. Used to create 3D models from .OBJ and .DXF</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.HardwareSupportsBufferObjects">
+            <summary>Checks if hardware supports Buffer Objects</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Name">
+            <summary>3D Model name.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder._partes">
+            <summary>List of parts that construct this 3D Model.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder._vertices">
+            <summary>List of this 3D Model's vertexes.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder._vetNormais">
+            <summary>List of this 3D Model's normal vectors.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder._vetTextureCoords">
+            <summary>List of this 3D Model's texture vectors coordinates.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.TextureBitmap">
+            <summary>Texture bitmap to use</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.GLTexture">
+            <summary>OpenGL texture of this model</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CG">
+            <summary>Vertexes average coordinate (center of gravity).</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Dimens">
+            <summary>Size of rectangle that contains this 3D Model.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.minPoint">
+            <summary>Minimum Z coordinate of this model. Useful for reading terrain.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.#ctor">
+            <summary>Empty constructor.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.#ctor(System.String,OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ,System.Single,System.Single,System.Single,System.Single,System.Int32,System.Int32,OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Constructor. Creates a 3D Model from parameterized 3D equations</summary>
+            <param name="Name">Model name.</param>
+            <param name="F">Coordinate function F. Has to return double[3] {x, y, z} or double[6] {x,y,z,nx,ny,nz}, n? = normals</param>
+            <param name="umin">Minimum value of u coordinate.</param>
+            <param name="umax">Maximum value of u coordinate.</param>
+            <param name="vmin">Minimum value of v coordinate.</param>
+            <param name="vmax">Maximum value of v coordinate.</param>
+            <param name="uPts">Number of points in u partition.</param>
+            <param name="vPts">Number of points in v partition.</param>
+            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.#ctor(System.String,OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ,System.Single,System.Single,System.Single,System.Single,System.Int32,System.Int32,OpenCLTemplate.CLGLInterop.Vector,System.Drawing.Bitmap)">
+            <summary>Constructor. Creates a 3D Model from parameterized 3D equations with texture.</summary>
+            <param name="Name">Model name.</param>
+            <param name="F">Coordinate function F. Has to return double[3] {x, y, z} or double[6] {x,y,z,nx,ny,nz}, n? = normals</param>
+            <param name="umin">Minimum value of u coordinate.</param>
+            <param name="umax">Maximum value of u coordinate.</param>
+            <param name="vmin">Minimum value of v coordinate.</param>
+            <param name="vmax">Maximum value of v coordinate.</param>
+            <param name="uPts">Number of points in u partition.</param>
+            <param name="vPts">Number of points in v partition.</param>
+            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
+            <param name="Texture">Texture bitmap.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.#ctor(System.String,OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ,System.Single,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Constructor. Creates a 3D Model from parameterized 3D line equations.</summary>
+            <param name="Name">Model name.</param>
+            <param name="F">Coordinate function F. Has to return double[3] {x, y, z} or double[6] {x,y,z,nx,ny,nz}, n? = normals.
+            Notice only parameter u is passed (v=0)</param>
+            <param name="umin">Minimum value of u coordinate.</param>
+            <param name="umax">Maximum value of u coordinate.</param>
+            <param name="uPts">Number of points in u partition.</param>
+            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.trataLinha(System.String)">
+            <summary>Removes spaces from line and understands , and . as decimal separators.</summary>
+            <param name="linha">Line to be rewritten.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.#ctor(System.String)">
+            <summary>Constructor. Creates 3D Model from file.</summary>
+            <param name="file">File to read 3D data.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.lerOBJ(System.String)">
+            <summary>Reads 3D model from Wavefront .OBJ</summary>
+            <param name="fileOBJ">File to read</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.FinishReadFile">
+            <summary>Does standard endfile operations (smooth normals, CG calculation)</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.lerDXF(System.String)">
+            <summary>Reads 3D model from Autodesk DXF</summary>
+            <param name="fileDXF">File to read</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ler3DFace(System.IO.StreamReader)">
+            <summary>Reads 3DFACE element</summary>
+            <param name="sr">Stream</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.lerPolyline(System.IO.StreamReader)">
+            <summary>Reads POLYLINE element</summary>
+            <param name="sr">Stream</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.lerCoords(System.IO.StreamReader)">
+            <summary>Reads 4 vertexes from a streamreader (10 20 30, 11 21 31, 12 22 32, 13 23 33)</summary>
+            <param name="sr">Streamreader</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.lerCoord(System.IO.StreamReader)">
+            <summary>Reads a single vertex (10 20 30)</summary>
+            <param name="sr">Streamreader</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.GetTexture(System.String,System.String)">
+            <summary>Attempts to load texture</summary>
+            <param name="TexFile">Picture file containing texture</param>
+            <param name="OBJFile">OBJ file to read path from.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Create3DModel(System.String,OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ,System.Single,System.Single,System.Single,System.Single,System.Int32,System.Int32,OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Recreates 3D Model from parameterized 3D equations</summary>
+            <param name="Name">Model name.</param>
+            <param name="F">Coordinate function F. Has to return double[3] {x, y, z}
+            OR double[6] {x,y,z, normalX, normalY, normalZ}</param>
+            <param name="umin">Minimum value of u coordinate.</param>
+            <param name="umax">Maximum value of u coordinate.</param>
+            <param name="vmin">Minimum value of v coordinate.</param>
+            <param name="vmax">Maximum value of v coordinate.</param>
+            <param name="uPts">Number of points in u partition.</param>
+            <param name="vPts">Number of points in v partition.</param>
+            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Create3DModel(System.String,System.Single[][0:,0:],System.Single[][0:,0:],System.Single[][0:,0:],OpenCLTemplate.CLGLInterop.Vector,System.Boolean)">
+            <summary>Recreates 3D Model from calculated data</summary>
+            <param name="Name">Model name.</param>
+            <param name="VertENormal">Vertexes and normals to use to build model. float[,][3] - Only vertexes. float[6] - vertexes and normals</param>
+            <param name="TexCoords">Texture coordinates. null - don't use. float[,][2] - coords</param>
+            <param name="VertexColors">Vertex colors. null - don't use. float[,][4] - RGBA color</param>
+            <param name="GlobalColor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
+            <param name="LineModel">Is this a curve? (and not a surface)</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Create3DLine(System.String,OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ,System.Single,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Creates a 3D Line from parameterized equations</summary>
+            <param name="Name">Line name</param>
+            <param name="F">Coordinate function F. Has to return double[3] {x, y, z}
+            OR double[6] {x,y,z, normalX, normalY, normalZ}. Notice that only u coordinate is passed (v=0).</param>
+            <param name="umin">Minimum value of u coordinate.</param>
+            <param name="umax">Maximum value of u coordinate.</param>
+            <param name="uPts">Number of points in u partition.</param>
+            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Create3DLine(System.String,System.Single[][],OpenCLTemplate.CLGLInterop.Vector)">
+            <summary>Creates a 3D Line from parameterized equations</summary>
+            <param name="Name">Line name</param>
+            <param name="VertENormal">Vertex and normal coordinates of curve</param>
+            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.calcNormais(OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.area)">
+            <summary>Calculates normal vectors of a given area.</summary>
+            <param name="a">Area to calculate normal vectors</param>
+            <remarks>It is not possible to know for sure the area orientation. 
+            It would be better to give the normal vector.</remarks>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.calcCGBox">
+            <summary>Calculates vertexes average (center of gravity) and lowest Z coordinate.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.suavizaNormais">
+            <summary>Smooths normal vectors in order to get per-pixel normals
+            and allow OpenGL to use Gouraud shading.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ForceRedraw">
+            <summary>Force element redraw?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ShowModel">
+            <summary>Show this model?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.vetTransl">
+            <summary>Object translation vector from origin.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.vetRot">
+            <summary>Object rotation vector in Euler angles (psi-theta-phi).</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.rad2deg">
+            <summary>Radian to degree conversion</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Render(System.Boolean)">
+            <summary>Renders this 3D Model. Returns next OpenGL list number to use
+            if it was necessary to generate new lists.</summary>
+            <param name="DesenharTransparentes">True to draw only transparent object. This is used to draw solid objects last.</param>
+            <returns>Returns next OpenGL list number to use
+            if it was necessary to generate new lists.</returns>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.desenhaPartes(System.Boolean)">
+            <summary>Renders the parts of this 3D model.</summary>
+            <param name="DesenharTransparentes">True to draw only transparent object. This is used to draw solid objects last.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.geraPoligonosParte(OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte,System.Object[]@)">
+            <summary>Generates polygons for a given 3D Model part.</summary>
+            <param name="p">Part to generate models to.</param>
+            <param name="o">Object to hold information content o = new object[] { VertCoordsData, ColorData, TexCoordsData, ElementData, NormalsData }</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ApplyTexture(System.Drawing.Bitmap)">
+            <summary>Changes the texture of this object</summary>
+            <param name="Bmp">New bitmap to apply</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.AplicaTextura">
+            <summary>Applies texture if possible</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ResizeToPowerOf2(System.Drawing.Image)">
+            <summary>Method for resizing an image</summary>
+            <param name="img">Image to resize</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Desloca(System.Int32,System.Double)">
+            <summary>Displaces 3D model in a certain way.</summary>
+            <param name="modo">Displacement model. 0=X axis, 1=Y axis, 2=Z axis,
+            3=X rotation, 4=Y rotation, 5=Z rotation</param>
+            <param name="desl">Displacement value. Distance or angle in radians.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Seleciona(System.Int32)">
+            <summary>Draws desired part as selected.</summary>
+            <param name="indParte">Part to select.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.DesSeleciona(System.Int32)">
+            <summary>Stops drawing desired part as selected.</summary>
+            <param name="indParte">Part to unselect.</param>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.modelMovement">
+            <summary>Model vertexex move with time?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ModelRenderStyle">
+            <summary>Render style</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.area">
+            <summary>Struct to hold a polygon area.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.area.IndVertices">
+            <summary>List of indexes of vertexes that create this area.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.area.IndNormais">
+            <summary>List of indexes of normal vectors of this area's vertexes.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.area.IndTexVertexes">
+            <summary>List of indexes of texture vectors of this area's vertexes.</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex">
+            <summary>Struct to hold a polygon vertex.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex._indAreas">
+            <summary>List of indexes of areas that use this vertex.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex._indParte">
+            <summary>List of indexes of 3D model parts that use this vertex.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex._indNormais">
+            <summary>List of indexes of areas that use this vertex.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex.Coords">
+            <summary>Vertex coordinates.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex.VertexColor">
+            <summary>Vertex color, RGBA</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte">
+            <summary>3D Model parts holder.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.Name">
+            <summary>Part name.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.Areas">
+            <summary>List of areas that belong to this part.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.Cor">
+            <summary>Color of this area.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.Transparencia">
+            <summary>Transparency of this area.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.Selecionar">
+            <summary>Display this part as selected?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.GLListNumber">
+            <summary>OpenGL list number of this part.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.GLBuffers">
+            <summary>Buffer objects to use if the hardware supports buffer objects</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.GLNumElements">
+            <summary>Number of elements to draw using buffer objects</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.#ctor(OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte)">
+            <summary>Constructor. Copies a given part.</summary>
+            <param name="p">Part to copy from.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.#ctor">
+            <summary>Empty constructor.</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ">
+            <summary>Delegate to create coordinates in the new 3D Model.</summary>
+            <param name="u">Independent parameter u.</param>
+            <param name="v">Independent parameter v.</param>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Example3DModels">
+            <summary>Example 3D Models generated from equations.</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Example3DModels.Cylinder(System.String,System.Single,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector,System.Drawing.Bitmap)">
+            <summary>Generates a 3D Model for a cylinder.</summary>
+            <param name="Name">Model name.</param>
+            <param name="Radius">Cylinder radius.</param>
+            <param name="Height">Cylinder height.</param>
+            <param name="numPoints">Number of points for circular section.</param>
+            <param name="Color">Color vector.</param>
+            <param name="Texture">Texture bitmap. Null uses no texture</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Example3DModels.Cone(System.String,System.Single,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector,System.Drawing.Bitmap)">
+            <summary>Generates a 3D Model for a cone.</summary>
+            <param name="Name">Model name.</param>
+            <param name="Radius">Cone outer radius.</param>
+            <param name="Height">Cone height.</param>
+            <param name="numPoints">Number of points for circular section.</param>
+            <param name="Color">Color vector.</param>
+            <param name="Texture">Texture bitmap. Null uses no texture</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Example3DModels.Sphere(System.String,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector,System.Drawing.Bitmap)">
+            <summary>Generates a 3D Model for a sphere.</summary>
+            <param name="Name">Model name.</param>
+            <param name="numPoints">Number of points to use for each coordinate. At least 4.</param>
+            <param name="Radius">Sphere radius.</param>
+            <param name="Color">Color vector.</param>
+            <param name="Texture">Texture bitmap. Null uses no texture</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Example3DModels.Disk(System.String,System.Single,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector,System.Drawing.Bitmap)">
+            <summary>Generates a 3D Model for a disk.</summary>
+            <param name="Name">Model name.</param>
+            <param name="numPoints">Number of points to use in circumference.</param>
+            <param name="InnerRadius">Inner disk radius.</param>
+            <param name="OuterRadius">Outer disk radius.</param>
+            <param name="Color">Color vector.</param>
+            <param name="Texture">Texture bitmap. Null uses no texture</param>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum">
+            <summary>Enumerations for Lab3D file format</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelType">
+            <summary>Model type</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelType.Curve">
+            <summary>Model contains a curve</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelType.Surface">
+            <summary>Model contains a surface</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelMovement">
+            <summary>Model movement type</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelMovement.Static">
+            <summary>Static model</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelMovement.Dynamic">
+            <summary>Vertex coords of the model change with time</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelTextureType">
+            <summary>Lab3D model texture</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelTextureType.None">
+            <summary>No texture</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelTextureType.FromText">
+            <summary>Texture from text</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelTextureType.FromImage">
+            <summary>Texture from image</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality">
+            <summary>Model number of points in u and v direction</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality.Low">
+            <summary>Low 30x30 model</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality.Medium">
+            <summary>Medium 100x100 model</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality.High">
+            <summary>High 200x200 model</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality.VeryHigh">
+            <summary>Very high 400x400 model</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality.Custom">
+            <summary>Custom resolution</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLRenderStyle">
+            <summary>Model render style</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLRenderStyle.Solid">
+            <summary>Renders this model Solid</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLRenderStyle.Wireframe">
+            <summary>Renders this model Wireframe</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLRenderStyle.Point">
+            <summary>Renders this model as Point</summary>
+        </member>
+        <member name="T:OpenCLTemplate.CLGLInterop.GLFont">
             <summary>OpenGL 3D font creator</summary>
         </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLFont.GLchars">
+        <member name="F:OpenCLTemplate.CLGLInterop.GLFont.GLchars">
             <summary>Stores 3D character models</summary>
         </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLFont.referenceWidth">
+        <member name="F:OpenCLTemplate.CLGLInterop.GLFont.referenceWidth">
             <summary>Reference width of letter O</summary>
         </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLFont.WidthInGLScale">
+        <member name="F:OpenCLTemplate.CLGLInterop.GLFont.WidthInGLScale">
             <summary>Width of characters in OpenGL scale</summary>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.#ctor(System.Drawing.Font,System.Single)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.#ctor(System.Drawing.Font,System.Single)">
             <summary>Creates a new 3D font from specified font</summary>
             <param name="f">Font prototype to use in this 3D font</param>
             <param name="GLNormalizationScale">Character reference width in OpenGL scale</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.#ctor(System.String)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.#ctor(System.String)">
             <summary>Loads a 3D font from a file. Does NOT require OpenCL/GL interop</summary>
             <param name="filename">3D Font file</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.Draw3DString(System.String,OpenCLTemplate.CLGLInterop.GLRender)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.Draw3DString(System.String,OpenCLTemplate.CLGLInterop.GLRender)">
             <summary>Creates an array of 3D models containing the given string. If target!=null adds them to target`s display list</summary>
             <param name="s">String to write</param>
             <param name="target">Target GLWindow to write</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.Draw3DString(System.String)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.Draw3DString(System.String)">
             <summary>Creates an array of 3D models containing the given string</summary>
             <param name="s">String to write</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.Save(System.String)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.Save(System.String)">
             <summary>Saves this 3D font to a file. Requires OpenCL/GL interoperation.</summary>
             <param name="file">File to save to.</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.DrawString(System.String,System.Drawing.Font,System.Drawing.Color,System.Drawing.Color,System.Drawing.Color,System.Drawing.Color)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.DrawString(System.String,System.Drawing.Font,System.Drawing.Color,System.Drawing.Color,System.Drawing.Color,System.Drawing.Color)">
             <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
             <param name="s">String to be written</param>
             <param name="TextFont">Font to use</param>
@@ -2671,14 +3116,14 @@
             <param name="BackgroundLeftColor">Left color of Background.</param>
             <param name="BackgroundRightColor">Right color of Background.</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.DrawString(System.String,System.Drawing.Font,System.Drawing.Color,System.Drawing.Color)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.DrawString(System.String,System.Drawing.Font,System.Drawing.Color,System.Drawing.Color)">
             <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
             <param name="s">String to be written</param>
             <param name="TextFont">Font to use</param>
             <param name="TextColor">Text color.</param>
             <param name="BackgroundColor">Background color.</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.DrawString(System.String,System.Drawing.Font)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.DrawString(System.String,System.Drawing.Font)">
             <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
             <param name="s">String to be written</param>
             <param name="TextFont">Font to use</param>
@@ -2686,21 +3131,26 @@
         <member name="T:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions">
             <summary>Encapsulates functions needed to acquire and release OpenCL/GL shared objects</summary>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.AcquireGLElements(OpenCLTemplate.CLCalc.Program.Variable)">
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.AcquireGLElements(OpenCLTemplate.CLCalc.Program.MemoryObject)">
             <summary>Acquires one OpenCL variable created from GL buffers in order to use it. Ignores variables not created from OpenGL buffer</summary>
             <param name="CLGLVar">Variable to be acquired</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.AcquireGLElements(OpenCLTemplate.CLCalc.Program.Variable[])">
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.AcquireGLElements(OpenCLTemplate.CLCalc.Program.MemoryObject[])">
             <summary>Acquires OpenCL variables created from GL buffers in order to use them. Ignores variables not created from OpenGL buffer</summary>
             <param name="CLGLVars">Variables to be acquired</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ReleaseGLElements(OpenCLTemplate.CLCalc.Program.Variable)">
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ReleaseGLElements(OpenCLTemplate.CLCalc.Program.MemoryObject)">
             <summary>Releases one OpenCL variable created from GL buffers. Ignores variables not created from OpenGL buffer</summary>
             <param name="CLGLVar">Variable to be released</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ReleaseGLElements(OpenCLTemplate.CLCalc.Program.Variable[])">
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ReleaseGLElements(OpenCLTemplate.CLCalc.Program.MemoryObject[])">
             <summary>Releases OpenCL variables created from GL buffers. Ignores variables not created from OpenGL buffer</summary>
             <param name="CLGLVars">Variables to be acquired</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ApplyTexture(System.Drawing.Bitmap,System.Int32@)">
+            <summary>Copies bitmap data to a OpenGL texture. Note: texture is flipped in Y axis, needs to correct texture coordinates</summary>
+            <param name="TextureBitmap">Bitmap to be copied to OpenGL memory</param>
+            <param name="ind">A valid OpenGL texture generated with GLGenTexture. If less than zero a new OpenGL texture is created and stored in ind</param>
         </member>
         <member name="T:OpenCLTemplate.CLGLInterop.Vector">
             <summary>Vector class with math operations and dot / cross products.</summary>

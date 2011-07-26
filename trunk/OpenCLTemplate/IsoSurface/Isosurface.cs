@@ -664,11 +664,11 @@ __constant int triTable[256][16] =
 
 //global_work_size = [maxX, maxY, maxZ]
 
-__kernel void interpPts(__global float * fVals,
-                        __global float * isoLevel,
-                        __global float * edgeCoords,
-                        __global float * initVals,
-                        __global float * steps)
+__kernel void interpPts(__global const float * fVals,
+                        __constant     float * isoLevel,
+                        __global       float * edgeCoords,
+                        __constant     float * initVals,
+                        __constant     float * steps)
 
 {
   int maxX = get_global_size(0);
@@ -766,11 +766,11 @@ int GetPrelimNormalSumIndex(int edgeInd)
 }
 
 //global_work_size = [maxX-1, maxY-1, maxZ-1]
-__kernel void Polygonize(__global float * fVals,
-                         __global float * isoLevel,
-                         __global float * edgeCoords,
-                         __global float * edgePrelimNormals,
-                         __global int   * indexArray)
+__kernel void Polygonize(__global const float * fVals,
+                         __global       float * isoLevel,
+                         __global       float * edgeCoords,
+                         __global       float * edgePrelimNormals,
+                         __global       int   * indexArray)
 {
   int maxX = get_global_size(0)+1;
   int maxY = get_global_size(1)+1;
