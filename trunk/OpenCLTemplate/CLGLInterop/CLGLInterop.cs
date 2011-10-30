@@ -35,9 +35,9 @@ namespace OpenCLTemplate.CLGLInterop
         {
             IntPtr curDC = wglGetCurrentDC();
 
-            //OpenTK.Graphics.IGraphicsContextInternal ctx = (OpenTK.Graphics.IGraphicsContextInternal)OpenTK.Graphics.GraphicsContext.CurrentContext;
+            OpenTK.Graphics.IGraphicsContextInternal ctx = (OpenTK.Graphics.IGraphicsContextInternal)OpenTK.Graphics.GraphicsContext.CurrentContext;
 
-            IntPtr raw_context_handle = wglGetCurrentContext();//ctx.Context.Handle;
+            IntPtr raw_context_handle = ctx.Context.Handle; //wglGetCurrentContext();
 
             ComputeContextProperty p1 = new ComputeContextProperty(ComputeContextPropertyName.CL_GL_CONTEXT_KHR, raw_context_handle);
             ComputeContextProperty p2 = new ComputeContextProperty(ComputeContextPropertyName.CL_WGL_HDC_KHR, curDC);
@@ -71,18 +71,14 @@ namespace OpenCLTemplate.CLGLInterop
         {
             this.ParentForm = ParentForm;
 
-            InitGL();
+            InitGL(CreateCLGLCtx, DeviceNumber);
 
-            if (CreateCLGLCtx)
-            {
-                CreateCLGLContext(DeviceNumber);
-                CLCalc.InitCL(ComputeDeviceTypes.Gpu, CLGLCtx, CQ);
-            }
         }
 
         /// <summary>Typical OpenGL initialization</summary>
-        private void InitGL()
+        private void InitGL(bool CreateCLGLCtx, int deviceNumber)
         {
+            
             #region OpenGL Control creation with stereo capabilities
 
             OpenTK.Graphics.ColorFormat cf = new OpenTK.Graphics.ColorFormat();
@@ -113,6 +109,13 @@ namespace OpenCLTemplate.CLGLInterop
             GLCtrl.Cursor = System.Windows.Forms.Cursors.Cross;
 
             #endregion
+
+            if (CreateCLGLCtx)
+            {
+                CreateCLGLContext(deviceNumber);
+                CLCalc.InitCL(ComputeDeviceTypes.Gpu, CLGLCtx, CQ);
+            }
+
 
             GLCtrl.MakeCurrent();
 
