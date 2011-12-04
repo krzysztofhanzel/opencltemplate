@@ -18,23 +18,21 @@ namespace OpenCLTemplate.MachineLearning
         public MultiClassSVM(TrainingSet TSet)
         {
             ProblemConfig cfg = new ProblemConfig(2.529822E-8f * (float)Math.Sqrt(TSet.getN), 127.922182f, 1e-3f, 1, ProblemConfig.KernelType.RBF);
-            initMultiSVM(TSet, cfg, true);
+            initMultiSVM(TSet, cfg);
         }
 
         /// <summary>Creates a new multiclass SVM using desired outputs from training set. Classifications -1.0f are negative for all sets</summary>
         /// <param name="TSet">Training set</param>
         /// <param name="SVMCfg">Configuration parameters</param>
-        /// <param name="PreCalibrate">Precalibrate RBF parameter lambda? This will ignore the given value</param>
-        public MultiClassSVM(TrainingSet TSet, ProblemConfig SVMCfg, bool PreCalibrate)
+        public MultiClassSVM(TrainingSet TSet, ProblemConfig SVMCfg)
         {
-            initMultiSVM(TSet, SVMCfg, PreCalibrate);
+            initMultiSVM(TSet, SVMCfg);
         }
 
         /// <summary>Creates a new multiclass SVM using desired outputs from training set. Classifications -1.0f are negative for all sets</summary>
         /// <param name="TSet">Training set</param>
         /// <param name="SVMCfg">Configuration parameters</param>
-        /// <param name="PreCalibrate">Precalibrate RBF parameter lambda? This will ignore the given value</param>
-        private void initMultiSVM(TrainingSet TSet, ProblemConfig SVMCfg, bool PreCalibrate)
+        private void initMultiSVM(TrainingSet TSet, ProblemConfig SVMCfg)
         {
             //Determines how many different classifications are there
             Classifications = new List<float>();
@@ -60,7 +58,7 @@ namespace OpenCLTemplate.MachineLearning
                 }
 
                 //Train svm
-                if (PreCalibrate) svm.PreCalibrateCfg(0.8f / (float)Math.Sqrt(svm.TrainingSet.getN), 0.3f / (float)Math.Sqrt(svm.TrainingSet.getN));
+                svm.PreCalibrateCfg(0.8f / (float)Math.Sqrt(svm.TrainingSet.getN), 0.3f / (float)Math.Sqrt(svm.TrainingSet.getN));
                 svm.Train();
                 svm.RemoveNonSupportVectors();
             }

@@ -158,7 +158,7 @@ namespace OpenCLTemplate
             ///// <summary>Event list</summary>
             //public static List<ComputeEventBase> Event;
 
-            /// <summary>OpenCL context. Devices depend on how InitCL() was used.</summary>
+            /// <summary>OpenCL context using all devices</summary>
             public static ComputeContext Context;
 
             /// <summary>Synchronous command queues that are executed in call order</summary>
@@ -223,7 +223,7 @@ namespace OpenCLTemplate
                 {
                     try
                     {
-                        Prog.Build(CLCalc.CLDevices, "", null, IntPtr.Zero);
+                        Prog.Build(new List<ComputeDevice>() { CLCalc.CLDevices[i] }, "", null, IntPtr.Zero);
                         funcionou = true;
                     }
                     catch
@@ -308,29 +308,6 @@ namespace OpenCLTemplate
 
                     Kernel.SetMemoryArgument(ArgIndex, VarPointer);
                 }
-
-                #region OpenCL/GL Interop
-
-                /// <summary>Was this memory Object created from a OpenGL buffer?</summary>
-                protected bool _CreatedFromGLBuffer = false;
-
-                /// <summary>Returns true if this Memory Object was created from an OpenGL buffer</summary>
-                public bool CreatedFromGLBuffer
-                {
-                    get { return _CreatedFromGLBuffer; }
-                }
-
-                /// <summary>Was this buffer acquired in OpenCL?</summary>
-                protected bool _AcquiredInOpenCL = false;
-
-                /// <summary>Returns true if this Memory Object has been acquired for use in OpenCL (available for OpenCL)</summary>
-                public bool AcquiredInOpenCL
-                {
-                    get { return _AcquiredInOpenCL; }
-                    set { _AcquiredInOpenCL = value; }
-                }
-
-                #endregion
             }
 
             /// <summary>Variables class</summary>
@@ -339,7 +316,24 @@ namespace OpenCLTemplate
 
                 #region Constructor. int[], float[], long[], double[], byte[]
 
+                /// <summary>Was this buffer created from a OpenGL buffer?</summary>
+                private bool _CreatedFromGLBuffer = false;
 
+                /// <summary>Returns true if this Variable was created from an OpenGL buffer</summary>
+                public bool CreatedFromGLBuffer
+                {
+                    get { return _CreatedFromGLBuffer; }
+                }
+
+                /// <summary>Was this buffer acquired in OpenCL?</summary>
+                private bool _AcquiredInOpenCL = false;
+
+                /// <summary>Returns true if this variable has been acquired for use in OpenCL (available for OpenCL)</summary>
+                public bool AcquiredInOpenCL
+                {
+                    get { return _AcquiredInOpenCL; }
+                    set { _AcquiredInOpenCL = value; }
+                }
 
                 /// <summary>Creates variable from OpenGL buffer</summary>
                 /// <param name="GLBuffer">Valid OpenGL Buffer</param>
@@ -871,7 +865,7 @@ namespace OpenCLTemplate
                     get { return height; }
                 }
 
-                #region Constructor. float[], int[], byte[], from Bitmap, from OpenGL Texture
+                #region Constructor. float[], int[], byte[]
 
                 /// <summary>Unsafe allocation of memory</summary>
                 /// <param name="p">Pointer to data</param>
@@ -885,7 +879,7 @@ namespace OpenCLTemplate
                     VarPointer = new ComputeImage2D(Program.Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, format, width, height, 0, new IntPtr(p));
 
                 }
-                
+
                 /// <summary>Constructor.</summary>
                 /// <param name="Values">Variable whose size will be allocated in device memory.</param>
                 /// <param name="Width">Image width.</param>
@@ -966,7 +960,7 @@ namespace OpenCLTemplate
 
                     width = bmp.Width; height = bmp.Height;
                     OriginalVarLength = 4 * width * height;
-                    VarSize = OriginalVarLength * sizeof(byte);
+                    VarSize = 4 * OriginalVarLength * sizeof(byte);
 
                     unsafe
                     {
@@ -977,26 +971,6 @@ namespace OpenCLTemplate
                     bmp.UnlockBits(bitmapdata);
                 }
 
-                /// <summary>Constructor. Creates an image2d OpenCL object from a valid OpenCL texture. 
-                /// IMPORTANT: The data type of this object from the HOST standpoint is BYTE in the Alpha Blue Green Red order.
-                /// The data type in OpenCL is FLOAT4 (write_imagef) and in OpenGL the display order is BLUE GREEN RED ALPHA when modifying from OpenCL</summary>
-                /// <param name="GLTextureBuffer">Valid OpenCL texture buffer to create image from</param>
-                public Image2D(int GLTextureBuffer)
-                {
-                    if (GLTextureBuffer <= 0) throw new Exception("Invalid OpenGL buffer");
-                    //Mode = TextureTarget.Texture2D
-                    this.VarPointer = ComputeImage2D.CreateFromGLTexture2D(Program.Context, ComputeMemoryFlags.ReadWrite, 
-                        (int)OpenTK.Graphics.OpenGL.TextureTarget.Texture2D, 0, GLTextureBuffer);
-
-                    ComputeImage2D img2d = (ComputeImage2D)this.VarPointer;
-
-                    width = img2d.Width; height = img2d.Height;
-                    OriginalVarLength = 4 * width * height;
-                    VarSize = OriginalVarLength * sizeof(byte);
-
-                    this._CreatedFromGLBuffer = true;
-                }
-
                 #endregion
 
                 #region Write to Device memory. float[], int[], byte[], Bitmap
@@ -1004,7 +978,6 @@ namespace OpenCLTemplate
 
                 private unsafe void WriteToDevice(void* p, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
                 {
-                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     CQ.Write((ComputeImage)VarPointer, BlockingWrite, new SysIntX3(0, 0, 0), new SysIntX3(width, height, 1), 0, 0, new IntPtr(p), events);
                 }
 
@@ -1126,7 +1099,6 @@ namespace OpenCLTemplate
 
                 private unsafe void ReadFromDeviceTo(void* p, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
                 {
-                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
                     CQ.Read((ComputeImage)VarPointer, BlockingRead, new SysIntX3(0, 0, 0), new SysIntX3(width, height, 1), 0, 0, new IntPtr(p), events);
                 }
 
@@ -1315,19 +1287,6 @@ namespace OpenCLTemplate
                 /// <param name="events">Event of this command</param>
                 public void Execute(ComputeCommandQueue CQ, CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize, int[] LocalWorkSize, ICollection<ComputeEventBase> events)
                 {
-                    Execute(CQ, Arguments, GlobalWorkSize, LocalWorkSize, null, events);
-
-                }
-
-                /// <summary>Execute this kernel</summary>
-                /// <param name="CQ">Command queue to use</param>
-                /// <param name="Arguments">Arguments of the kernel function</param>
-                /// <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
-                /// <param name="LocalWorkSize">Local work sizes</param>
-                /// <param name="WorkOffSet">Global offset</param>
-                /// <param name="events">Event of this command</param>
-                public void Execute(ComputeCommandQueue CQ, CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize, int[] LocalWorkSize, int[] WorkOffSet, ICollection<ComputeEventBase> events)
-                {
                     SetArguments(Arguments);
                     if (LocalWorkSize != null && GlobalWorkSize.Length != LocalWorkSize.Length) throw new Exception("Global and local work size must have same dimension");
 
@@ -1342,25 +1301,7 @@ namespace OpenCLTemplate
                         for (int i = 0; i < locWSize.Length; i++) locWSize[i] = LocalWorkSize[i];
                     }
 
-                    long[] wOffSet = null;
-                    if (WorkOffSet != null)
-                    {
-                        wOffSet = new long[WorkOffSet.Length];
-                        for (int i = 0; i < wOffSet.Length; i++) wOffSet[i] = WorkOffSet[i];
-                    }
-
-                    CQ.Execute(kernel, wOffSet, globWSize, locWSize, events);
-
-                }
-
-                /// <summary>Execute this kernel</summary>
-                /// <param name="Arguments">Arguments of the kernel function</param>
-                /// <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
-                /// <param name="LocalWorkSize">Local work sizes</param>
-                /// <param name="WorkOffSet">Global offset</param>
-                public void Execute(CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize, int[] LocalWorkSize, int[] WorkOffSet)
-                {
-                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, LocalWorkSize, WorkOffSet, null);
+                    CQ.Execute(kernel, null, globWSize, locWSize, events);
 
                 }
 
@@ -1370,7 +1311,7 @@ namespace OpenCLTemplate
                 public void Execute(CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize)
                 {
                     //CLEvent Event=new CLEvent();
-                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, null, null, null);
+                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, null, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -1380,7 +1321,7 @@ namespace OpenCLTemplate
                 public void Execute(CLCalc.Program.MemoryObject[] Arguments, int GlobalWorkSize)
                 {
                     //CLEvent Event=new CLEvent();
-                    Execute(CommQueues[DefaultCQ], Arguments, new int[] { GlobalWorkSize }, null, null, null);
+                    Execute(CommQueues[DefaultCQ], Arguments, new int[] { GlobalWorkSize }, null, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
@@ -1391,7 +1332,7 @@ namespace OpenCLTemplate
                 public void Execute(CLCalc.Program.MemoryObject[] Arguments, int[] GlobalWorkSize, int[] LocalWorkSize)
                 {
                     //CLEvent Event=new CLEvent();
-                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, LocalWorkSize, null, null);
+                    Execute(CommQueues[DefaultCQ], Arguments, GlobalWorkSize, LocalWorkSize, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
 
