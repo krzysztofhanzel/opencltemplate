@@ -509,7 +509,7 @@
             <summary>Program related stuff</summary>
         </member>
         <member name="F:OpenCLTemplate.CLCalc.Program.Context">
-            <summary>OpenCL context. Devices depend on how InitCL() was used.</summary>
+            <summary>OpenCL context using all devices</summary>
         </member>
         <member name="F:OpenCLTemplate.CLCalc.Program.CommQueues">
             <summary>Synchronous command queues that are executed in call order</summary>
@@ -567,23 +567,17 @@
             <param name="ArgIndex">Index of kernel argument</param>
             <param name="Kernel">Kernel to receive argument</param>
         </member>
-        <member name="F:OpenCLTemplate.CLCalc.Program.MemoryObject._CreatedFromGLBuffer">
-            <summary>Was this memory Object created from a OpenGL buffer?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLCalc.Program.MemoryObject._AcquiredInOpenCL">
-            <summary>Was this buffer acquired in OpenCL?</summary>
-        </member>
         <member name="P:OpenCLTemplate.CLCalc.Program.MemoryObject.Size">
             <summary>Returns the size of the stored variable</summary>
         </member>
-        <member name="P:OpenCLTemplate.CLCalc.Program.MemoryObject.CreatedFromGLBuffer">
-            <summary>Returns true if this Memory Object was created from an OpenGL buffer</summary>
-        </member>
-        <member name="P:OpenCLTemplate.CLCalc.Program.MemoryObject.AcquiredInOpenCL">
-            <summary>Returns true if this Memory Object has been acquired for use in OpenCL (available for OpenCL)</summary>
-        </member>
         <member name="T:OpenCLTemplate.CLCalc.Program.Variable">
             <summary>Variables class</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLCalc.Program.Variable._CreatedFromGLBuffer">
+            <summary>Was this buffer created from a OpenGL buffer?</summary>
+        </member>
+        <member name="F:OpenCLTemplate.CLCalc.Program.Variable._AcquiredInOpenCL">
+            <summary>Was this buffer acquired in OpenCL?</summary>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.#ctor(System.Int32,System.Type)">
             <summary>Creates variable from OpenGL buffer</summary>
@@ -752,6 +746,12 @@
             <summary>Reads variable from device. Does not return until data has been copied.</summary>
             <param name="Values">Values to store data coming from device</param>
         </member>
+        <member name="P:OpenCLTemplate.CLCalc.Program.Variable.CreatedFromGLBuffer">
+            <summary>Returns true if this Variable was created from an OpenGL buffer</summary>
+        </member>
+        <member name="P:OpenCLTemplate.CLCalc.Program.Variable.AcquiredInOpenCL">
+            <summary>Returns true if this variable has been acquired for use in OpenCL (available for OpenCL)</summary>
+        </member>
         <member name="T:OpenCLTemplate.CLCalc.Program.Image2D">
             <summary>Image2D class. Uses channel type RGBA.</summary>
         </member>
@@ -787,12 +787,6 @@
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.#ctor(System.Drawing.Bitmap)">
             <summary>Constructor. Remember, Bitmap uses the BGRA byte order.</summary>
             <param name="bmp">Bitmap to create OpenCL image from.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.#ctor(System.Int32)">
-            <summary>Constructor. Creates an image2d OpenCL object from a valid OpenCL texture. 
-            IMPORTANT: The data type of this object from the HOST standpoint is BYTE in the Alpha Blue Green Red order.
-            The data type in OpenCL is FLOAT4 (write_imagef) and in OpenGL the display order is BLUE GREEN RED ALPHA when modifying from OpenCL</summary>
-            <param name="GLTextureBuffer">Valid OpenCL texture buffer to create image from</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.WriteToDevice(System.Single[],Cloo.ComputeCommandQueue,System.Boolean,System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
             <summary>Writes variable to device</summary>
@@ -916,22 +910,6 @@
             <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
             <param name="LocalWorkSize">Local work sizes</param>
             <param name="events">Event of this command</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.Execute(Cloo.ComputeCommandQueue,OpenCLTemplate.CLCalc.Program.MemoryObject[],System.Int32[],System.Int32[],System.Int32[],System.Collections.Generic.ICollection{Cloo.ComputeEventBase})">
-            <summary>Execute this kernel</summary>
-            <param name="CQ">Command queue to use</param>
-            <param name="Arguments">Arguments of the kernel function</param>
-            <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
-            <param name="LocalWorkSize">Local work sizes</param>
-            <param name="WorkOffSet">Global offset</param>
-            <param name="events">Event of this command</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.Execute(OpenCLTemplate.CLCalc.Program.MemoryObject[],System.Int32[],System.Int32[],System.Int32[])">
-            <summary>Execute this kernel</summary>
-            <param name="Arguments">Arguments of the kernel function</param>
-            <param name="GlobalWorkSize">Array of maximum index arrays. Total work-items = product(max[i],i+0..n-1), n=max.Length</param>
-            <param name="LocalWorkSize">Local work sizes</param>
-            <param name="WorkOffSet">Global offset</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Kernel.Execute(OpenCLTemplate.CLCalc.Program.MemoryObject[],System.Int32[])">
             <summary>Execute this kernel</summary>
@@ -1337,6 +1315,217 @@
         <member name="F:OpenCLTemplate.CLCalc.CLPrograms.floatBodyPhysics.resetCloseNeighborsArgs">
             <summary>Apply self collision arguments</summary>
         </member>
+        <member name="T:OpenCLTemplate.LinearAlgebra.SparseLinalg">
+            <summary>OpenCL linear algebra functions</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.IMGWIDTH">
+            <summary>Width to be used in float4's</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.GLOBALWORKSIZE">
+            <summary>Total number of workers</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.#cctor">
+            <summary>Static Constructor. Builds kernels</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.#ctor">
+            <summary>Constructor.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.vLenBy4">
+            <summary>Vector length divided by 4 (plus 1)</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.dotProd">
+            <summary>OpenCL memory Dot product</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.dprod">
+            <summary>Dot product, host memory</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.dotProdSum">
+            <summary>OpenCL memory Dot product final summation</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelDotProduct">
+            <summary>OpenCL dot product Kernel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelSum">
+            <summary>OpenCL dot product sum elements kernel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelGetDotSum">
+            <summary>OpenCL get final answer</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.DotProduct(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
+            <summary>Computes dot product of 2 vectors using their OpenCL images. Assumes data has been inserted to VectorData and WriteToDevice() has been called</summary>
+            <param name="v1">First vector</param>
+            <param name="v2">Second vector</param>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLDotProd(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
+            <summary>Computes dot product of two vectors and stores result in
+            dotProdSum</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.DotProductNoCL(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
+            <summary>Computes dot product of 2 vectors without OpenCL</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.ExactDotProductNoCL(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
+            <summary>Computes dot product of 2 vectors without OpenCL, in double precision</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelSparseMatrixVecMult">
+            <summary>OpenCL sparse matrix vector product</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLNonZeroElemsPerRow">
+            <summary>Non-zero elements per row</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.Multiply(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
+            <summary>Computes M*x and stores the result in y. Does not automatically read result from device memory</summary>
+            <param name="M">Sparse matrix</param>
+            <param name="x">Vector to be multiplied</param>
+            <param name="y">Result</param>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.ExactMultiply(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
+            <summary>Computes exact double-precision product of sparse matrix M and vector x</summary>
+            <param name="M">Sparse matrix</param>
+            <param name="x">Vector to be multiplied</param>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.MultiplyNoCL(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
+            <summary>Computes product of sparse matrix M and vector x</summary>
+            <param name="M">Sparse matrix</param>
+            <param name="x">Vector to be multiplied</param>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.r">
+            <summary>Residues</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.p">
+            <summary>Gradient direction</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.x">
+            <summary>Initial guess/answer holder</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.Ap">
+            <summary>A times p vector</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.temp">
+            <summary>Temporary storage vector</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.lambda">
+            <summary>Value to store some vector</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLlambda">
+            <summary>Value to use to multiply some vector</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelInitRP">
+            <summary>Initialize r and p values</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelMultiplyAdd">
+            <summary>Mad kernel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelCopyToTemp">
+            <summary>Copy to temporary image kernel</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.MAXITER">
+            <summary>Maximum number of iterations</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.LinSolveNoCL(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,System.Single)">
+            <summary>Solves linear system Mx = b using conjugate gradient method</summary>
+            <param name="M">Matrix M</param>
+            <param name="b">Vector b</param>
+            <param name="tol">Error tolerance</param>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.LinSolveCL(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,System.Single)">
+            <summary>Solves linear system Mx = b using conjugate gradient method. Writes variables to Device memory. Improves solution if accuracy is low.</summary>
+            <param name="M">Matrix M</param>
+            <param name="b">Vector b</param>
+            <param name="tol">Error tolerance</param>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.LinSolveCLStep(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,System.Single)">
+            <summary>Solves linear system Mx = b using conjugate gradient method. Doesn't try to improve the solution obtained.</summary>
+            <param name="M">Matrix M</param>
+            <param name="b">Vector b</param>
+            <param name="tol">Error tolerance</param>
+        </member>
+        <member name="T:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector">
+            <summary>Builds a new OpenCL Image2D containing vector data</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.n">
+            <summary>Vector length. Allocated length is multiple of 4096 = 2^12</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.nRows">
+            <summary>Number of rows to accomodate the size. Number of columns is 4096 float4's, so up to 4096*4 it will be
+            only 1 row.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.CLVector">
+            <summary>Image2D representing vector contents</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.VectorData">
+            <summary>Vector to be written/read from Device memory. Call WriteToDevice to effectively copy to Device memory</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.#ctor(System.Int32)">
+            <summary>Creates a new vector allocated in OpenCL Image2D object.</summary>
+            <param name="Length">Vector length. For convenience some extra memory is allocated but calculations only go up to vector dimensions</param>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.WriteToDevice">
+            <summary>Effectively writes contents of VectorData to Device memory</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.ReadFromDevice">
+            <summary>Reads contents of CLVector image2d to VectorData</summary>
+        </member>
+        <member name="P:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.Length">
+            <summary>Gets the length of this vector</summary>
+        </member>
+        <member name="T:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix">
+            <summary>Builds a new OpenCL Image2D containig a sparse matrix</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.MatrixData">
+            <summary>Matrix data arranged in format numRows*nonZeroElemsPerRow.</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.Columns">
+            <summary>True column of element</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.CLMatrixData">
+            <summary>Image2D representing vector contents</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.CLColumns">
+            <summary>Image2D containing column indexes</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.nElems">
+            <summary>Total number of elements, N*nonZeroElemsPerRow</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.numRows">
+            <summary>Number of rows of matrix</summary>
+        </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.elemsPerRow">
+            <summary>Number of elements stored per row</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.SetValue(System.Single,System.Int32,System.Int32)">
+            <summary>Stores a matrix value at a particular row and column</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.GetValue(System.Int32,System.Int32)">
+            <summary>Gets the value of a matrix element</summary>
+            <param name="row">Row index</param>
+            <param name="column">Column index</param>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.WriteToDevice">
+            <summary>Effectively writes contents of Matrix to Device memory</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.ReadFromDevice">
+            <summary>Reads contents of CLMatrix image2d to Matrix Host memory</summary>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.#ctor(System.Int32,System.Int32)">
+            <summary>Constructor.</summary>
+            <param name="N">NxN dimension of the matrix</param>
+            <param name="nonZeroElemsPerRow">Maximum number of non-zero elements per row</param>
+        </member>
+        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.ToString">
+            <summary>String representation of complete matrix. Returns at most 10000 elements</summary>
+        </member>
+        <member name="P:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.NonZeroElemsPerRow">
+            <summary>Gets number of elements stored per row</summary>
+        </member>
+        <member name="P:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.MatrixDimension">
+            <summary>Gets matrix dimension (M[NxN])</summary>
+        </member>
+        <member name="P:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.Item(System.Int32,System.Int32)">
+            <summary>Gets or sets value for matrix elements</summary>
+        </member>
+        <member name="T:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLLinalgSrc">
+            <summary>OpenCL dot product source</summary>
+        </member>
         <member name="T:OpenCLTemplate.Properties.Resources">
             <summary>
               A strongly-typed resource class, for looking up localized strings, etc.
@@ -1519,17 +1708,15 @@
             <summary>Creates a new multiclass SVM using desired outputs from training set. Classifications -1.0f are negative for all sets</summary>
             <param name="TSet">Training set</param>
         </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.#ctor(OpenCLTemplate.MachineLearning.TrainingSet,OpenCLTemplate.MachineLearning.ProblemConfig,System.Boolean)">
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.#ctor(OpenCLTemplate.MachineLearning.TrainingSet,OpenCLTemplate.MachineLearning.ProblemConfig)">
             <summary>Creates a new multiclass SVM using desired outputs from training set. Classifications -1.0f are negative for all sets</summary>
             <param name="TSet">Training set</param>
             <param name="SVMCfg">Configuration parameters</param>
-            <param name="PreCalibrate">Precalibrate RBF parameter lambda? This will ignore the given value</param>
         </member>
-        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.initMultiSVM(OpenCLTemplate.MachineLearning.TrainingSet,OpenCLTemplate.MachineLearning.ProblemConfig,System.Boolean)">
+        <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.initMultiSVM(OpenCLTemplate.MachineLearning.TrainingSet,OpenCLTemplate.MachineLearning.ProblemConfig)">
             <summary>Creates a new multiclass SVM using desired outputs from training set. Classifications -1.0f are negative for all sets</summary>
             <param name="TSet">Training set</param>
             <param name="SVMCfg">Configuration parameters</param>
-            <param name="PreCalibrate">Precalibrate RBF parameter lambda? This will ignore the given value</param>
         </member>
         <member name="M:OpenCLTemplate.MachineLearning.MultiClassSVM.Train">
             <summary>Trains all SVMs in this multiclass SVM</summary>
@@ -2108,7 +2295,7 @@
             <param name="CreateCLGLCtx">Create OpenGL/OpenCL shared context?</param>
             <param name="DeviceNumber">Index of device to use from ComputePlatform.Platforms[0].Devices. Use -1 for default</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.InitGL(System.Boolean,System.Int32)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.InitGL">
             <summary>Typical OpenGL initialization</summary>
         </member>
         <member name="F:OpenCLTemplate.CLGLInterop.GLRender.MouseMode">
@@ -2273,21 +2460,10 @@
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GetDistance">
             <summary>Gets camera distance from the center</summary>
         </member>
-        <member name="E:OpenCLTemplate.CLGLInterop.GLRender.Mouse3DDown">
-            <summary>Raised when user clicks mouse button in environment using Mouse3D mode</summary>
-        </member>
-        <member name="E:OpenCLTemplate.CLGLInterop.GLRender.Mouse3DUp">
-            <summary>Raised when user releases mouse button in environment using Mouse3D mode</summary>
-        </member>
-        <member name="E:OpenCLTemplate.CLGLInterop.GLRender.Mouse3DMove">
-            <summary>Raised when user moves 3D mouse in environment using Mouse3D mode</summary>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.Mouse3DEvent">
-            <summary>Mouse 3D event</summary>
-            <param name="sender">Sender</param>
-            <param name="e">2D events raised in this instance (picture X, Y and buttons)</param>
-            <param name="Mouse3DPos">Mouse 3D position</param>
-            <param name="Mouse3DRadius">Mouse 3D radius</param>
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.ApplyTexture(System.Drawing.Bitmap,System.Int32@)">
+            <summary>Copies bitmap data to a OpenGL texture</summary>
+            <param name="TextureBitmap">Bitmap to be copied to OpenGL memory</param>
+            <param name="ind">A valid OpenGL texture generated with GLGenTexture. If less than zero a new OpenGL texture is created and stored in ind</param>
         </member>
         <member name="T:OpenCLTemplate.CLGLInterop.GLRender.MouseMoveMode">
             <summary>Mouse action when used to move the 3D Model</summary>
@@ -2313,9 +2489,6 @@
         <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Name">
             <summary>Model name</summary>
         </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.UseDrawElements">
-            <summary>Use draw elements? Just for compatibility with Lab3D models</summary>
-        </member>
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.#ctor(OpenTK.Graphics.OpenGL.BeginMode)">
             <summary>Constructor. Receives draw mode of the model. REMINDER: Vertex, color and element data are necessary for drawing.</summary>
             <param name="DrawMode">OpenGL Draw model</param>
@@ -2323,10 +2496,6 @@
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.#ctor(OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel)">
             <summary>Constructor. Reuses the same Vertex Buffer Elements of an existing 3D model.</summary>
             <param name="Source">Source model to reuse buffer elements</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.LoadFile(System.String)">
-            <summary>Creates 3D model from a given file</summary>
-            <param name="FileName">Source file</param>
         </member>
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Dispose">
             <summary>Disposes buffer objects</summary>
@@ -2348,9 +2517,6 @@
         </member>
         <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GLElemBuffer">
             <summary>GL Element buffer VBO (v1 v2 v3)</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GLTextureBuffer">
-            <summary>OpenGL texture buffer object</summary>
         </member>
         <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.ElemLength">
             <summary>Length of elements vector (total triangles = ElemLength/3)</summary>
@@ -2403,11 +2569,6 @@
             <param name="ElemData">Element data information. v[3i]  v[3i+1] and v[3i+2] are indexes of vertexes that will be drawn</param>
             <param name="Hint">OpenGL buffer usage hint</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.SetTexture(System.Drawing.Bitmap)">
-            <summary>Creates a texture from a bitmap and associates with this model. Note: texture is flipped in Y axis, needs to correct texture coordinates.
-            Models created from equations are already corrected</summary>
-            <param name="bmp">Bitmap to create texture from</param>
-        </member>
         <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.rad2deg">
             <summary>Radian to degree conversion</summary>
         </member>
@@ -2459,14 +2620,6 @@
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GetCLVertexBuffer">
             <summary>Retrieves an OpenCL float buffer from this object's OpenGL vertex data VBO (3 floats per vertex)</summary>
         </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CLTexture2D">
-            <summary>Local storage of vertex buffer</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.GetCLTexture2D">
-            <summary>Retrieves an OpenCL float buffer from this object's OpenGL vertex data VBO (3 floats per vertex)
-            IMPORTANT: The data type of this object from the HOST standpoint is BYTE in the Alpha Blue Green Red order.
-            The data type in OpenCL C99 is FLOAT4 (write_imagef) and in OpenGL the display order is BLUE GREEN RED ALPHA when modifying from OpenCL</summary>
-        </member>
         <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CreateSurface(System.Single[],System.Single[],System.String[],System.String[],System.String[])">
             <summary>Creates a surface from given equations. Parameters are u and v (strings). Eg: vertexEqs[0] = "u+v"</summary>
             <param name="uParams">U coordinate parameters: [0] - uMin, [1] - uMax, [2] - number of points</param>
@@ -2475,445 +2628,41 @@
             <param name="colorEqs">Array containing 4 strings that will define vertex colors R(u,v), G(u,v), B(u,v), A(u,v). May contain only RGB</param>
             <param name="normalsEqs">Array containing strings that will define vertex normals</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.CreateSurface(System.Single[],System.Single[],System.String[],System.String[])">
-            <summary>Creates a surface from given equations. Parameters are u and v (strings). Eg: vertexEqs[0] = "u+v"</summary>
-            <param name="uParams">U coordinate parameters: [0] - uMin, [1] - uMax, [2] - number of points</param>
-            <param name="vParams">V coordinate parameters: [0] - vMin, [1] - vMax, [2] - number of points</param>
-            <param name="vertexEqs">Array containing 3 strings that will define vertex positions. [0] x(u,v), [1] y(u,v), [2] z(u,v)</param>
-            <param name="normalsEqs">Array containing strings that will define vertex normals</param>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder">
-            <summary>3D Models handler from Lab3D software. Used to create 3D models from .OBJ and .DXF</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.HardwareSupportsBufferObjects">
-            <summary>Checks if hardware supports Buffer Objects</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Name">
-            <summary>3D Model name.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder._partes">
-            <summary>List of parts that construct this 3D Model.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder._vertices">
-            <summary>List of this 3D Model's vertexes.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder._vetNormais">
-            <summary>List of this 3D Model's normal vectors.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder._vetTextureCoords">
-            <summary>List of this 3D Model's texture vectors coordinates.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.TextureBitmap">
-            <summary>Texture bitmap to use</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.GLTexture">
-            <summary>OpenGL texture of this model</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CG">
-            <summary>Vertexes average coordinate (center of gravity).</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Dimens">
-            <summary>Size of rectangle that contains this 3D Model.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.minPoint">
-            <summary>Minimum Z coordinate of this model. Useful for reading terrain.</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.#ctor">
-            <summary>Empty constructor.</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.#ctor(System.String,OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ,System.Single,System.Single,System.Single,System.Single,System.Int32,System.Int32,OpenCLTemplate.CLGLInterop.Vector)">
-            <summary>Constructor. Creates a 3D Model from parameterized 3D equations</summary>
-            <param name="Name">Model name.</param>
-            <param name="F">Coordinate function F. Has to return double[3] {x, y, z} or double[6] {x,y,z,nx,ny,nz}, n? = normals</param>
-            <param name="umin">Minimum value of u coordinate.</param>
-            <param name="umax">Maximum value of u coordinate.</param>
-            <param name="vmin">Minimum value of v coordinate.</param>
-            <param name="vmax">Maximum value of v coordinate.</param>
-            <param name="uPts">Number of points in u partition.</param>
-            <param name="vPts">Number of points in v partition.</param>
-            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.#ctor(System.String,OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ,System.Single,System.Single,System.Single,System.Single,System.Int32,System.Int32,OpenCLTemplate.CLGLInterop.Vector,System.Drawing.Bitmap)">
-            <summary>Constructor. Creates a 3D Model from parameterized 3D equations with texture.</summary>
-            <param name="Name">Model name.</param>
-            <param name="F">Coordinate function F. Has to return double[3] {x, y, z} or double[6] {x,y,z,nx,ny,nz}, n? = normals</param>
-            <param name="umin">Minimum value of u coordinate.</param>
-            <param name="umax">Maximum value of u coordinate.</param>
-            <param name="vmin">Minimum value of v coordinate.</param>
-            <param name="vmax">Maximum value of v coordinate.</param>
-            <param name="uPts">Number of points in u partition.</param>
-            <param name="vPts">Number of points in v partition.</param>
-            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
-            <param name="Texture">Texture bitmap.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.#ctor(System.String,OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ,System.Single,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector)">
-            <summary>Constructor. Creates a 3D Model from parameterized 3D line equations.</summary>
-            <param name="Name">Model name.</param>
-            <param name="F">Coordinate function F. Has to return double[3] {x, y, z} or double[6] {x,y,z,nx,ny,nz}, n? = normals.
-            Notice only parameter u is passed (v=0)</param>
-            <param name="umin">Minimum value of u coordinate.</param>
-            <param name="umax">Maximum value of u coordinate.</param>
-            <param name="uPts">Number of points in u partition.</param>
-            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.trataLinha(System.String)">
-            <summary>Removes spaces from line and understands , and . as decimal separators.</summary>
-            <param name="linha">Line to be rewritten.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.#ctor(System.String)">
-            <summary>Constructor. Creates 3D Model from file.</summary>
-            <param name="file">File to read 3D data.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.lerOBJ(System.String)">
-            <summary>Reads 3D model from Wavefront .OBJ</summary>
-            <param name="fileOBJ">File to read</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.FinishReadFile">
-            <summary>Does standard endfile operations (smooth normals, CG calculation)</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.lerDXF(System.String)">
-            <summary>Reads 3D model from Autodesk DXF</summary>
-            <param name="fileDXF">File to read</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ler3DFace(System.IO.StreamReader)">
-            <summary>Reads 3DFACE element</summary>
-            <param name="sr">Stream</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.lerPolyline(System.IO.StreamReader)">
-            <summary>Reads POLYLINE element</summary>
-            <param name="sr">Stream</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.lerCoords(System.IO.StreamReader)">
-            <summary>Reads 4 vertexes from a streamreader (10 20 30, 11 21 31, 12 22 32, 13 23 33)</summary>
-            <param name="sr">Streamreader</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.lerCoord(System.IO.StreamReader)">
-            <summary>Reads a single vertex (10 20 30)</summary>
-            <param name="sr">Streamreader</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.GetTexture(System.String,System.String)">
-            <summary>Attempts to load texture</summary>
-            <param name="TexFile">Picture file containing texture</param>
-            <param name="OBJFile">OBJ file to read path from.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Create3DModel(System.String,OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ,System.Single,System.Single,System.Single,System.Single,System.Int32,System.Int32,OpenCLTemplate.CLGLInterop.Vector)">
-            <summary>Recreates 3D Model from parameterized 3D equations</summary>
-            <param name="Name">Model name.</param>
-            <param name="F">Coordinate function F. Has to return double[3] {x, y, z}
-            OR double[6] {x,y,z, normalX, normalY, normalZ}</param>
-            <param name="umin">Minimum value of u coordinate.</param>
-            <param name="umax">Maximum value of u coordinate.</param>
-            <param name="vmin">Minimum value of v coordinate.</param>
-            <param name="vmax">Maximum value of v coordinate.</param>
-            <param name="uPts">Number of points in u partition.</param>
-            <param name="vPts">Number of points in v partition.</param>
-            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Create3DModel(System.String,System.Single[][0:,0:],System.Single[][0:,0:],System.Single[][0:,0:],OpenCLTemplate.CLGLInterop.Vector,System.Boolean)">
-            <summary>Recreates 3D Model from calculated data</summary>
-            <param name="Name">Model name.</param>
-            <param name="VertENormal">Vertexes and normals to use to build model. float[,][3] - Only vertexes. float[6] - vertexes and normals</param>
-            <param name="TexCoords">Texture coordinates. null - don't use. float[,][2] - coords</param>
-            <param name="VertexColors">Vertex colors. null - don't use. float[,][4] - RGBA color</param>
-            <param name="GlobalColor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
-            <param name="LineModel">Is this a curve? (and not a surface)</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Create3DLine(System.String,OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ,System.Single,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector)">
-            <summary>Creates a 3D Line from parameterized equations</summary>
-            <param name="Name">Line name</param>
-            <param name="F">Coordinate function F. Has to return double[3] {x, y, z}
-            OR double[6] {x,y,z, normalX, normalY, normalZ}. Notice that only u coordinate is passed (v=0).</param>
-            <param name="umin">Minimum value of u coordinate.</param>
-            <param name="umax">Maximum value of u coordinate.</param>
-            <param name="uPts">Number of points in u partition.</param>
-            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Create3DLine(System.String,System.Single[][],OpenCLTemplate.CLGLInterop.Vector)">
-            <summary>Creates a 3D Line from parameterized equations</summary>
-            <param name="Name">Line name</param>
-            <param name="VertENormal">Vertex and normal coordinates of curve</param>
-            <param name="cor">Color vector. x=red, y=green, z=blue. Goes from 0 to 1.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.calcNormais(OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.area)">
-            <summary>Calculates normal vectors of a given area.</summary>
-            <param name="a">Area to calculate normal vectors</param>
-            <remarks>It is not possible to know for sure the area orientation. 
-            It would be better to give the normal vector.</remarks>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.calcCGBox">
-            <summary>Calculates vertexes average (center of gravity) and lowest Z coordinate.</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.suavizaNormais">
-            <summary>Smooths normal vectors in order to get per-pixel normals
-            and allow OpenGL to use Gouraud shading.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ForceRedraw">
-            <summary>Force element redraw?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ShowModel">
-            <summary>Show this model?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.vetTransl">
-            <summary>Object translation vector from origin.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.vetRot">
-            <summary>Object rotation vector in Euler angles (psi-theta-phi).</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.rad2deg">
-            <summary>Radian to degree conversion</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Render(System.Boolean)">
-            <summary>Renders this 3D Model. Returns next OpenGL list number to use
-            if it was necessary to generate new lists.</summary>
-            <param name="DesenharTransparentes">True to draw only transparent object. This is used to draw solid objects last.</param>
-            <returns>Returns next OpenGL list number to use
-            if it was necessary to generate new lists.</returns>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.desenhaPartes(System.Boolean)">
-            <summary>Renders the parts of this 3D model.</summary>
-            <param name="DesenharTransparentes">True to draw only transparent object. This is used to draw solid objects last.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.geraPoligonosParte(OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte,System.Object[]@)">
-            <summary>Generates polygons for a given 3D Model part.</summary>
-            <param name="p">Part to generate models to.</param>
-            <param name="o">Object to hold information content o = new object[] { VertCoordsData, ColorData, TexCoordsData, ElementData, NormalsData }</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ApplyTexture(System.Drawing.Bitmap)">
-            <summary>Changes the texture of this object</summary>
-            <param name="Bmp">New bitmap to apply</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.AplicaTextura">
-            <summary>Applies texture if possible</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ResizeToPowerOf2(System.Drawing.Image)">
-            <summary>Method for resizing an image</summary>
-            <param name="img">Image to resize</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Desloca(System.Int32,System.Double)">
-            <summary>Displaces 3D model in a certain way.</summary>
-            <param name="modo">Displacement model. 0=X axis, 1=Y axis, 2=Z axis,
-            3=X rotation, 4=Y rotation, 5=Z rotation</param>
-            <param name="desl">Displacement value. Distance or angle in radians.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Seleciona(System.Int32)">
-            <summary>Draws desired part as selected.</summary>
-            <param name="indParte">Part to select.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.DesSeleciona(System.Int32)">
-            <summary>Stops drawing desired part as selected.</summary>
-            <param name="indParte">Part to unselect.</param>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.modelMovement">
-            <summary>Model vertexex move with time?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.ModelRenderStyle">
-            <summary>Render style</summary>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.area">
-            <summary>Struct to hold a polygon area.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.area.IndVertices">
-            <summary>List of indexes of vertexes that create this area.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.area.IndNormais">
-            <summary>List of indexes of normal vectors of this area's vertexes.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.area.IndTexVertexes">
-            <summary>List of indexes of texture vectors of this area's vertexes.</summary>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex">
-            <summary>Struct to hold a polygon vertex.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex._indAreas">
-            <summary>List of indexes of areas that use this vertex.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex._indParte">
-            <summary>List of indexes of 3D model parts that use this vertex.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex._indNormais">
-            <summary>List of indexes of areas that use this vertex.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex.Coords">
-            <summary>Vertex coordinates.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Vertex.VertexColor">
-            <summary>Vertex color, RGBA</summary>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte">
-            <summary>3D Model parts holder.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.Name">
-            <summary>Part name.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.Areas">
-            <summary>List of areas that belong to this part.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.Cor">
-            <summary>Color of this area.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.Transparencia">
-            <summary>Transparency of this area.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.Selecionar">
-            <summary>Display this part as selected?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.GLListNumber">
-            <summary>OpenGL list number of this part.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.GLBuffers">
-            <summary>Buffer objects to use if the hardware supports buffer objects</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.GLNumElements">
-            <summary>Number of elements to draw using buffer objects</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.#ctor(OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte)">
-            <summary>Constructor. Copies a given part.</summary>
-            <param name="p">Part to copy from.</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Parte.#ctor">
-            <summary>Empty constructor.</summary>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CoordFuncXYZ">
-            <summary>Delegate to create coordinates in the new 3D Model.</summary>
-            <param name="u">Independent parameter u.</param>
-            <param name="v">Independent parameter v.</param>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Example3DModels">
-            <summary>Example 3D Models generated from equations.</summary>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Example3DModels.Cylinder(System.String,System.Single,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector,System.Drawing.Bitmap)">
-            <summary>Generates a 3D Model for a cylinder.</summary>
-            <param name="Name">Model name.</param>
-            <param name="Radius">Cylinder radius.</param>
-            <param name="Height">Cylinder height.</param>
-            <param name="numPoints">Number of points for circular section.</param>
-            <param name="Color">Color vector.</param>
-            <param name="Texture">Texture bitmap. Null uses no texture</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Example3DModels.Cone(System.String,System.Single,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector,System.Drawing.Bitmap)">
-            <summary>Generates a 3D Model for a cone.</summary>
-            <param name="Name">Model name.</param>
-            <param name="Radius">Cone outer radius.</param>
-            <param name="Height">Cone height.</param>
-            <param name="numPoints">Number of points for circular section.</param>
-            <param name="Color">Color vector.</param>
-            <param name="Texture">Texture bitmap. Null uses no texture</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Example3DModels.Sphere(System.String,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector,System.Drawing.Bitmap)">
-            <summary>Generates a 3D Model for a sphere.</summary>
-            <param name="Name">Model name.</param>
-            <param name="numPoints">Number of points to use for each coordinate. At least 4.</param>
-            <param name="Radius">Sphere radius.</param>
-            <param name="Color">Color vector.</param>
-            <param name="Texture">Texture bitmap. Null uses no texture</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.Example3DModels.Disk(System.String,System.Single,System.Single,System.Int32,OpenCLTemplate.CLGLInterop.Vector,System.Drawing.Bitmap)">
-            <summary>Generates a 3D Model for a disk.</summary>
-            <param name="Name">Model name.</param>
-            <param name="numPoints">Number of points to use in circumference.</param>
-            <param name="InnerRadius">Inner disk radius.</param>
-            <param name="OuterRadius">Outer disk radius.</param>
-            <param name="Color">Color vector.</param>
-            <param name="Texture">Texture bitmap. Null uses no texture</param>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum">
-            <summary>Enumerations for Lab3D file format</summary>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelType">
-            <summary>Model type</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelType.Curve">
-            <summary>Model contains a curve</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelType.Surface">
-            <summary>Model contains a surface</summary>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelMovement">
-            <summary>Model movement type</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelMovement.Static">
-            <summary>Static model</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelMovement.Dynamic">
-            <summary>Vertex coords of the model change with time</summary>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelTextureType">
-            <summary>Lab3D model texture</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelTextureType.None">
-            <summary>No texture</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelTextureType.FromText">
-            <summary>Texture from text</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelTextureType.FromImage">
-            <summary>Texture from image</summary>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality">
-            <summary>Model number of points in u and v direction</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality.Low">
-            <summary>Low 30x30 model</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality.Medium">
-            <summary>Medium 100x100 model</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality.High">
-            <summary>High 200x200 model</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality.VeryHigh">
-            <summary>Very high 400x400 model</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLModelQuality.Custom">
-            <summary>Custom resolution</summary>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLRenderStyle">
-            <summary>Model render style</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLRenderStyle.Solid">
-            <summary>Renders this model Solid</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLRenderStyle.Wireframe">
-            <summary>Renders this model Wireframe</summary>
-        </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLVBOModel.Lab3DModelHolder.CLEnum.CLRenderStyle.Point">
-            <summary>Renders this model as Point</summary>
-        </member>
-        <member name="T:OpenCLTemplate.CLGLInterop.GLFont">
+        <member name="T:OpenCLTemplate.CLGLInterop.GLRender.GLFont">
             <summary>OpenGL 3D font creator</summary>
         </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLFont.GLchars">
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLFont.GLchars">
             <summary>Stores 3D character models</summary>
         </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLFont.referenceWidth">
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLFont.referenceWidth">
             <summary>Reference width of letter O</summary>
         </member>
-        <member name="F:OpenCLTemplate.CLGLInterop.GLFont.WidthInGLScale">
+        <member name="F:OpenCLTemplate.CLGLInterop.GLRender.GLFont.WidthInGLScale">
             <summary>Width of characters in OpenGL scale</summary>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.#ctor(System.Drawing.Font,System.Single)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.#ctor(System.Drawing.Font,System.Single)">
             <summary>Creates a new 3D font from specified font</summary>
             <param name="f">Font prototype to use in this 3D font</param>
             <param name="GLNormalizationScale">Character reference width in OpenGL scale</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.#ctor(System.String)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.#ctor(System.String)">
             <summary>Loads a 3D font from a file. Does NOT require OpenCL/GL interop</summary>
             <param name="filename">3D Font file</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.Draw3DString(System.String,OpenCLTemplate.CLGLInterop.GLRender)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.Draw3DString(System.String,OpenCLTemplate.CLGLInterop.GLRender)">
             <summary>Creates an array of 3D models containing the given string. If target!=null adds them to target`s display list</summary>
             <param name="s">String to write</param>
             <param name="target">Target GLWindow to write</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.Draw3DString(System.String)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.Draw3DString(System.String)">
             <summary>Creates an array of 3D models containing the given string</summary>
             <param name="s">String to write</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.Save(System.String)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.Save(System.String)">
             <summary>Saves this 3D font to a file. Requires OpenCL/GL interoperation.</summary>
             <param name="file">File to save to.</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.DrawString(System.String,System.Drawing.Font,System.Drawing.Color,System.Drawing.Color,System.Drawing.Color,System.Drawing.Color)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.DrawString(System.String,System.Drawing.Font,System.Drawing.Color,System.Drawing.Color,System.Drawing.Color,System.Drawing.Color)">
             <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
             <param name="s">String to be written</param>
             <param name="TextFont">Font to use</param>
@@ -2922,14 +2671,14 @@
             <param name="BackgroundLeftColor">Left color of Background.</param>
             <param name="BackgroundRightColor">Right color of Background.</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.DrawString(System.String,System.Drawing.Font,System.Drawing.Color,System.Drawing.Color)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.DrawString(System.String,System.Drawing.Font,System.Drawing.Color,System.Drawing.Color)">
             <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
             <param name="s">String to be written</param>
             <param name="TextFont">Font to use</param>
             <param name="TextColor">Text color.</param>
             <param name="BackgroundColor">Background color.</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.GLFont.DrawString(System.String,System.Drawing.Font)">
+        <member name="M:OpenCLTemplate.CLGLInterop.GLRender.GLFont.DrawString(System.String,System.Drawing.Font)">
             <summary>Returns a Bitmap containing a text drawn. Useful to set as texture.</summary>
             <param name="s">String to be written</param>
             <param name="TextFont">Font to use</param>
@@ -2937,26 +2686,21 @@
         <member name="T:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions">
             <summary>Encapsulates functions needed to acquire and release OpenCL/GL shared objects</summary>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.AcquireGLElements(OpenCLTemplate.CLCalc.Program.MemoryObject)">
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.AcquireGLElements(OpenCLTemplate.CLCalc.Program.Variable)">
             <summary>Acquires one OpenCL variable created from GL buffers in order to use it. Ignores variables not created from OpenGL buffer</summary>
             <param name="CLGLVar">Variable to be acquired</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.AcquireGLElements(OpenCLTemplate.CLCalc.Program.MemoryObject[])">
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.AcquireGLElements(OpenCLTemplate.CLCalc.Program.Variable[])">
             <summary>Acquires OpenCL variables created from GL buffers in order to use them. Ignores variables not created from OpenGL buffer</summary>
             <param name="CLGLVars">Variables to be acquired</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ReleaseGLElements(OpenCLTemplate.CLCalc.Program.MemoryObject)">
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ReleaseGLElements(OpenCLTemplate.CLCalc.Program.Variable)">
             <summary>Releases one OpenCL variable created from GL buffers. Ignores variables not created from OpenGL buffer</summary>
             <param name="CLGLVar">Variable to be released</param>
         </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ReleaseGLElements(OpenCLTemplate.CLCalc.Program.MemoryObject[])">
+        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ReleaseGLElements(OpenCLTemplate.CLCalc.Program.Variable[])">
             <summary>Releases OpenCL variables created from GL buffers. Ignores variables not created from OpenGL buffer</summary>
             <param name="CLGLVars">Variables to be acquired</param>
-        </member>
-        <member name="M:OpenCLTemplate.CLGLInterop.CLGLInteropFunctions.ApplyTexture(System.Drawing.Bitmap,System.Int32@)">
-            <summary>Copies bitmap data to a OpenGL texture. Note: texture is flipped in Y axis, needs to correct texture coordinates</summary>
-            <param name="TextureBitmap">Bitmap to be copied to OpenGL memory</param>
-            <param name="ind">A valid OpenGL texture generated with GLGenTexture. If less than zero a new OpenGL texture is created and stored in ind</param>
         </member>
         <member name="T:OpenCLTemplate.CLGLInterop.Vector">
             <summary>Vector class with math operations and dot / cross products.</summary>
@@ -3035,218 +2779,6 @@
         </member>
         <member name="M:OpenCLTemplate.CLGLInterop.Vector.normalize">
             <summary>Normalizes this vector.</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.SparseLinalg">
-            <summary>OpenCL linear algebra functions</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.IMGWIDTH">
-            <summary>Width to be used in float4's</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.GLOBALWORKSIZE">
-            <summary>Total number of workers</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.#cctor">
-            <summary>Static Constructor. Builds kernels</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.#ctor">
-            <summary>Constructor.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.vLenBy4">
-            <summary>Vector length divided by 4 (plus 1)</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.dotProd">
-            <summary>OpenCL memory Dot product</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.dprod">
-            <summary>Dot product, host memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.dotProdSum">
-            <summary>OpenCL memory Dot product final summation</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelDotProduct">
-            <summary>OpenCL dot product Kernel</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelSum">
-            <summary>OpenCL dot product sum elements kernel</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelGetDotSum">
-            <summary>OpenCL get final answer</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.DotProduct(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
-            <summary>Computes dot product of 2 vectors using their OpenCL images. Assumes data has been inserted to VectorData and WriteToDevice() has been called</summary>
-            <param name="v1">First vector</param>
-            <param name="v2">Second vector</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLDotProd(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
-            <summary>Computes dot product of two vectors and stores result in
-            dotProdSum</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.DotProductNoCL(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
-            <summary>Computes dot product of 2 vectors without OpenCL</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.ExactDotProductNoCL(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
-            <summary>Computes dot product of 2 vectors without OpenCL, in double precision</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelSparseMatrixVecMult">
-            <summary>OpenCL sparse matrix vector product</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLNonZeroElemsPerRow">
-            <summary>Non-zero elements per row</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.Multiply(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
-            <summary>Computes M*x and stores the result in y. Does not automatically read result from device memory</summary>
-            <param name="M">Sparse matrix</param>
-            <param name="x">Vector to be multiplied</param>
-            <param name="y">Result</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.ExactMultiply(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
-            <summary>Computes exact double-precision product of sparse matrix M and vector x</summary>
-            <param name="M">Sparse matrix</param>
-            <param name="x">Vector to be multiplied</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.MultiplyNoCL(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector)">
-            <summary>Computes product of sparse matrix M and vector x</summary>
-            <param name="M">Sparse matrix</param>
-            <param name="x">Vector to be multiplied</param>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.r">
-            <summary>Residues</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.p">
-            <summary>Gradient direction</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.x">
-            <summary>Initial guess/answer holder</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.Ap">
-            <summary>A times p vector</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.temp">
-            <summary>Temporary storage vector</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.lambda">
-            <summary>Value to store some vector</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLlambda">
-            <summary>Value to use to multiply some vector</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelInitRP">
-            <summary>Initialize r and p values</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelMultiplyAdd">
-            <summary>Mad kernel</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.kernelCopyToTemp">
-            <summary>Copy to temporary image kernel</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.MAXITER">
-            <summary>Maximum number of iterations</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.LinSolveNoCL(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,System.Single)">
-            <summary>Solves linear system Mx = b using conjugate gradient method</summary>
-            <param name="M">Matrix M</param>
-            <param name="b">Vector b</param>
-            <param name="tol">Error tolerance</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.LinSolveCL(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,System.Single)">
-            <summary>Solves linear system Mx = b using conjugate gradient method. Writes variables to Device memory. Improves solution if accuracy is low.</summary>
-            <param name="M">Matrix M</param>
-            <param name="b">Vector b</param>
-            <param name="tol">Error tolerance</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.LinSolveCLStep(OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector,System.Single,OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector@)">
-            <summary>Solves linear system Mx = b using conjugate gradient method. Doesn't try to improve the solution obtained.</summary>
-            <param name="M">Matrix M</param>
-            <param name="b">Vector b</param>
-            <param name="tol">Error tolerance</param>
-            <param name="x">Initial guess</param>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector">
-            <summary>Builds a new OpenCL Image2D containing vector data</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.n">
-            <summary>Vector length. Allocated length is multiple of 4096 = 2^12</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.nRows">
-            <summary>Number of rows to accomodate the size. Number of columns is 4096 float4's, so up to 4096*4 it will be
-            only 1 row.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.CLVector">
-            <summary>Image2D representing vector contents</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.VectorData">
-            <summary>Vector to be written/read from Device memory. Call WriteToDevice to effectively copy to Device memory</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.#ctor(System.Int32)">
-            <summary>Creates a new vector allocated in OpenCL Image2D object.</summary>
-            <param name="Length">Vector length. For convenience some extra memory is allocated but calculations only go up to vector dimensions</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.WriteToDevice">
-            <summary>Effectively writes contents of VectorData to Device memory</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.ReadFromDevice">
-            <summary>Reads contents of CLVector image2d to VectorData</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgVector.Length">
-            <summary>Gets the length of this vector</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix">
-            <summary>Builds a new OpenCL Image2D containig a sparse matrix</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.MatrixData">
-            <summary>Matrix data arranged in format numRows*nonZeroElemsPerRow.</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.Columns">
-            <summary>True column of element</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.CLMatrixData">
-            <summary>Image2D representing vector contents</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.CLColumns">
-            <summary>Image2D containing column indexes</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.nElems">
-            <summary>Total number of elements, N*nonZeroElemsPerRow</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.numRows">
-            <summary>Number of rows of matrix</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.elemsPerRow">
-            <summary>Number of elements stored per row</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.SetValue(System.Single,System.Int32,System.Int32)">
-            <summary>Stores a matrix value at a particular row and column</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.GetValue(System.Int32,System.Int32)">
-            <summary>Gets the value of a matrix element</summary>
-            <param name="row">Row index</param>
-            <param name="column">Column index</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.WriteToDevice">
-            <summary>Effectively writes contents of Matrix to Device memory</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.ReadFromDevice">
-            <summary>Reads contents of CLMatrix image2d to Matrix Host memory</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.#ctor(System.Int32,System.Int32)">
-            <summary>Constructor.</summary>
-            <param name="N">NxN dimension of the matrix</param>
-            <param name="nonZeroElemsPerRow">Maximum number of non-zero elements per row</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.ToString">
-            <summary>String representation of complete matrix. Returns at most 10000 elements</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.NonZeroElemsPerRow">
-            <summary>Gets number of elements stored per row</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.MatrixDimension">
-            <summary>Gets matrix dimension (M[NxN])</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLImgSparseMatrix.Item(System.Int32,System.Int32)">
-            <summary>Gets or sets value for matrix elements</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.SparseLinalg.CLLinalgSrc">
-            <summary>OpenCL dot product source</summary>
         </member>
         <member name="T:Utility.ModifyRegistry.ModifyRegistry">
             <summary>
@@ -3487,825 +3019,6 @@
             <summary>
             Gets the number of elements in the training set (equivalent to trainingArray.Count)
             </summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatLinalg">
-            <summary>Encapsulates Linear Algebra functions, especially symmetric positive definite matrices.
-            WARNING: Do not exceed linear systems of size 23000</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.SUBMATRIXSIZE">
-            <summary>Submatrix size, based on maximum amount of workitems per workgroup</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelCholeskyDiagBlock">
-            <summary>Cholesky factorization and inversion of a block</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelCholeskyComputePanel">
-            <summary>Updates lower panel of Cholesky decomp</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelCholeskyForwardProp">
-            <summary>Forwards updates to rest of the matrix</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelFwdUpperBackSubs">
-            <summary>First part of forward substitution</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelBkLowerBackSubs">
-            <summary>First part of backsubstitution</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelFwdPropag">
-            <summary>Forward propagation of values</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelFwdPropag2">
-            <summary>Forward propagation of values</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelBackPropag">
-            <summary>Backwards propagation of values</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelBackPropag2">
-            <summary>Backwards propagation of values (without __local)</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelSymMatrVecMultiply">
-            <summary>Matrix - vector product</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelComputeAtWA">
-            <summary>Computes AtWA + lambda</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelComputeAinvHAt">
-            <summary>Kernel to compute the last multiplication in the computation of A*inv(H)*A'</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelCopyBuffer">
-            <summary>Copy buffer contents</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelLinearComb">
-            <summary>Linear combination of vectors kernel</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelMatrVecProd">
-            <summary>Matrix vector product M*(alpha*v)</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelTranspMatrVecProdW">
-            <summary>Weighted matrix vector product transpose(M)*W*v</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelSymMatrMatrMultiply">
-            <summary>Symmetric matrix matrix transpose multiply</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelInnerProd">
-            <summary>Vector inner product</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelInPlaceSubtract">
-            <summary>Performs in-place vector subtraction u = u-v</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelElemWiseAbs">
-            <summary>In-place element wise absolute value</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelMatrVecProdSumVec">
-            <summary>Matrix vector product M*(alpha*v) + beta*u</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelDiagVecProd">
-            <summary>Diagonal vector product D*(alpha*v)</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelElemWiseProd">
-            <summary>Element wise multiplication u .* u</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelElemWiseInv">
-            <summary>Element wise inversion 1 ./ u</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelElemWiseInv2">
-            <summary>Element wise square inversion 1 ./ (u.*u)</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelClear">
-            <summary>Kernel to set components of a vector to zero</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelPreSum">
-            <summary>Pre-sum elements to prepare for coalescence</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelCoalLocalSum">
-            <summary>Local reduced sum of vector components</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.kernelHasPositiveEntry">
-            <summary>Checks if a vector has any positive entries</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.Init">
-            <summary>Initializes CL kernels</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS">
-            <summary>BLAS functions</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.LinearCombination(System.Single,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,System.Single,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Computer a linear combination alpha*u+beta*v. Puts answer in ans. Creates ans if it is null</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.LinearCombination(System.Single,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,System.Single,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix@)">
-            <summary>Computer a linear combination alpha*u+beta*v. Puts answer in ans. Creates ans if it is null</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.Dot(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Computes vector dot product</summary>
-            <param name="u">First vector</param>
-            <param name="v">Second vector</param>
-            <param name="temp">Temporary vector to store inner product</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.ElemWiseSquare(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Element-wise multiplication u .* u</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.ElemWiseInv(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Element-wise inversion 1 ./ u</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.ElemWiseInv2(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Element-wise inversion 1 ./ (u.*u)</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.SumVectorElements(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector)">
-            <summary>Sums the components of a vector using __local memory and coalesced access</summary>
-            <param name="CLv">Vector whose components should be summed</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.SumMatrixElements(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix)">
-            <summary>Sums the components of a vector using __local memory and coalesced access</summary>
-            <param name="CLv">Matrix whose components should be summed</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.CopyVector(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector)">
-            <summary>Copies src vector contents to dst</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.HasPositiveEntries(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector)">
-            <summary>Returns true if v has any positive entries</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.MatrVecProd(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,System.Single,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Computes M*(alpha*v). Creates ans if it is null</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.MatrVecProdSumVec(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,System.Single,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,System.Single,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Computes M*(alpha*v) + beta*u. Creates ans if it is null</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.DiagVecProd(OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,System.Single,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Computes the Matrix-vector product alpha*D*u</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.MultiplyNoCL(OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Symmetric positive definite product with vector, Msym*v. resp gets constructed if ==null </summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.SymPosDefSymMatrVecMultiply(OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Symmetric positive definite product with vector, Msym*v. resp gets constructed if ==null </summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.ComputeAinvHTranspA(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix@,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix@,System.Boolean)">
-            <summary>Computes A*inv(H)*A' and stores result in ans</summary>
-            <param name="A">A matrix, mxn</param>
-            <param name="H">H matrix, nxn</param>
-            <param name="ans">answer, mxm</param>
-            <param name="temp">Temporary matrix for the operation, size nxm</param>
-            <param name="refine">Refine linear system solution?</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.MatrTranspMatrProd(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix@)">
-            <summary>Computes transpose(A)*A</summary>
-            <param name="A">Original matrix</param>
-            <param name="lambda">Regularization term</param>
-            <param name="AtA">Answer, A transpose times A</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.SymPosDefMatrMatrMultiply(OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix@)">
-            <summary>Symmetric positive definite product with matrix transpose, Msym*At. ans gets constructed if ==null </summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.MatrTranspMatrProd(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix@)">
-            <summary>Computes transpose(A)*A using weights W</summary>
-            <param name="A">Original matrix</param>
-            <param name="W">Measurement weight vector</param>
-            <param name="lambda">Regularization term</param>
-            <param name="AtA">Answer, A transpose times A</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.AuxLeastSquaresAtAnoCL(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix@)">
-            <summary>Computes transpose(A)*A and transpose(A)*b weighted by W</summary>
-            <param name="A">Original matrix</param>
-            <param name="W">Measurement weight vector</param>
-            <param name="lambda">Regularization term</param>
-            <param name="AtA">Answer, A transpose times A</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.AuxLSAtACL(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix@)">
-            <summary>Computes transpose(A)*A and transpose(A)*b weighted by W using OpenCL. Lambda is regularization term</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.MatrTraspVecMult(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Computes transpose(A)*diag(W)*b*alpha</summary>
-            <param name="A">Original matrix</param>
-            <param name="b">Vector to multiply</param>
-            <param name="W">Measurement weight vector</param>
-            <param name="ans">Answer. If null, gets created</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.BLAS.MatrTraspVecMult(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,System.Single,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Computes transpose(A)*diag(W)*b*alpha</summary>
-            <param name="A">Original matrix</param>
-            <param name="b">Vector to multiply</param>
-            <param name="W">Measurement weight vector</param>
-            <param name="alpha">Multiplication constant</param>
-            <param name="ans">Answer. If null, gets created</param>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix">
-            <summary>Encapsulates functions to create a symmetric, positive definite matrix</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.#ctor(System.Int32)">
-            <summary>Constructor.</summary>
-            <param name="n">Number of matrix rows (n x n)</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.#ctor(System.Single[])">
-            <summary>Constructor.</summary>
-            <param name="vals">Matrix elements. Length should be n*(n+1)/2 where matrix is nxn</param>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.N">
-            <summary>Matrix dimension</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.Values">
-            <summary>Matrix values</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.ToString">
-            <summary>Returns a string representing this instance</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.IsCholeskyFactorized">
-            <summary>Was the matrix cholesky factorized since last update?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.cholDec">
-            <summary>Cholesky factorization</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.ComputeCholesky">
-            <summary>Computes Cholesky factorization of a matrix</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NoCLCholesky">
-            <summary>Naive computation of the Cholesky factorization for very small systems or systems without OpenCL</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.CheckDecomposition">
-            <summary>DEBUG function. Returns true if Cholesky decomposition succeeded to 10*float.Epsilon precision</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.invL11">
-            <summary>Submatrix inverse</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.CLinvl11">
-            <summary>Submatrix inverse</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.CLcholDec">
-            <summary>Cholesky decomposition in Device memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.CLValues">
-            <summary>Copy of values of this matrix</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.IsMatrixInClMemoryUpdated">
-            <summary>Is matrix in OpenCL memory updated?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.CLprevVals">
-            <summary>Cholesky elements computed in previous step</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.CLoffSet">
-            <summary>Offsets to perform calculations</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.CLb">
-            <summary>B variable during back/forward subst</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.CLy">
-            <summary>Y variable during back/forward subst</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.CLn">
-            <summary>Size of matrix in CL memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.vecMx">
-            <summary>Vector to hold M*current solution</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.vecResidues">
-            <summary>Vector to hold residues</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.vecResiduesAbs">
-            <summary>Vector to hold residues absolute values</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.vecDeltax">
-            <summary>Vector to hold refinement</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.matMx">
-            <summary>Vector to hold M*current solution</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.matResidues">
-            <summary>Vector to hold residues</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.matResiduesAbs">
-            <summary>Vector to hold residues absolute values</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.matDeltax">
-            <summary>Vector to hold refinement</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.CLBlockCholesky">
-            <summary>Cholesky decomposition using OpenCL with Blocks</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.LinearSolve(System.Single[])">
-            <summary>Solves system Ax = b and returns x</summary>
-            <param name="b">b vector</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.LinearSolve(System.Single[],System.Boolean)">
-            <summary>Solves system Ax = b and returns x</summary>
-            <param name="b">b vector</param>
-            <param name="refine">Refine solution? Recommended: true</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.LinearSolve(System.Single[0:,0:],System.Boolean)">
-            <summary>Solves system Ax = b and returns x, where b is a right hand side matrix</summary>
-            <param name="b">b vector</param>
-            <param name="refine">Refine solution? Recommended: true</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.LinearSolve(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,System.Boolean,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix@)">
-            <summary>Solves system A*invHAt = Mt and returns invHAt solving system per column. Refine may considerably slow the method.</summary>
-            <param name="M">Right-hand-size of linear system</param>
-            <param name="refine">Refine solution? Recommended: true</param>
-            <param name="invHAt">Answer A*invHAt</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.LinearSolve(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,System.Boolean,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Solves system Ax = b and returns x</summary>
-            <param name="CLbb">b vector</param>
-            <param name="refine">Refine solution? Recommended: true</param>
-            <param name="resp">Holds answer</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.linsolve(System.Single[],OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Solves system Ax = b and returns x</summary>
-            <param name="bb">b vector</param>
-            <param name="resp">Solution</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.LinsolveCLMatrix(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix@)">
-            <summary>Backsubstitutes to solve a linear system with a matrix right hand size</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.linsolveMatrix(OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix@)">
-            <summary>Solves system Ax = b' and returns x</summary>
-            <param name="bb">b Matrix</param>
-            <param name="resp">Answer</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.Determinant">
-            <summary>Retrieves the Determinant of this matrix</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.Dot(System.Single[],System.Single[])">
-            <summary>Dot product</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.MultiplyCL(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Symmetric positive definite product with vector, Msym*v. resp gets constructed if ==null </summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.Write(System.String)">
-            <summary>Writes this matrix to file in Octave format</summary>
-            <param name="file">File to write to</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.Identity(System.Int32)">
-            <summary>Returns the identity matrix</summary>
-            <param name="n">Matrix dimension nxn</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonLinearLS(OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.ComputeResidueGrad,System.Single[],System.Int32,System.Int32,System.Double@)">
-            <summary>Computes nonlinear least squares using user functions to evaluate residues and their gradients</summary>
-            <param name="f">Function that computes residues [m] and their gradients [grad r1; grad r2] m x n (each gradient in one line) [i,j] = gradR[i,j]</param>
-            <param name="x">Intial guess</param>
-            <param name="m">Number of residue equations</param>
-            <param name="maxiter">Maximum number of iterations</param>
-            <param name="err">Adjustment error</param>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.getN">
-            <summary>Gets matrix dimension</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.Rows">
-            <summary>Nuumber of rows</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.Cols">
-            <summary>Number of columns</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.Item(System.Int32,System.Int32)">
-            <summary>Access matrix elements</summary>
-            <param name="i">Row index of element to access</param>
-            <param name="j">Column index of element to access</param>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.ComputeResidueGrad">
-            <summary>Delegate to compute residues and gradients based on current estimate x [n]. Returns residues r [m] and gradients gradR [m , n], j-th component
-            of gradient of residue r[i] = [i,j] = gradR[i,j] </summary>
-            <param name="x">Current estimate</param>
-            <param name="r">Residues</param>
-            <param name="gradR">Gradient of residue functions</param>
-            <param name="ComputeGrads">Compute gradients?</param>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem">
-            <summary>Nonlinear optimization problem</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.ResidueFunctions">
-            <summary>List of residue functions of this nonlinear optimization problem</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.ComputeResidueGrad(System.Single[],System.Single[]@,System.Single[0:,0:]@,System.Boolean)">
-            <summary>Computes residues and gradients of residue functions of this nonlinear optimization problem</summary>
-            <param name="x">Global optimization vector</param>
-            <param name="r">Residues</param>
-            <param name="gradR">Gradient</param>
-            <param name="ComputeGrads">Compute gradients?</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.Solve(System.Single[],System.Int32)">
-            <summary>Solves this nonlinear optimization problem</summary>
-            <param name="x">Global optimization vector, initial guess</param>
-            <param name="MAXITER">Maximum number of iterations</param>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.ResidueFunction">
-            <summary>Generic residue function of type F(x) - y</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.ResidueFunction.y">
-            <summary>Desired value of this function</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.ResidueFunction.X">
-            <summary>Current values of local variables</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.ResidueFunction.GlobalIndex">
-            <summary>Mapping of local indexes to global indexes</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.ResidueFunction.ComputeResidueGradient(System.Single[],System.Boolean,System.Single[]@)">
-            <summary>Computes residue and gradient of this Residue function</summary>
-            <param name="x">Global optimization variable</param>
-            <param name="ComputeGrad">Compute gradient?</param>
-            <param name="Gradient">Global gradient of this function</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.ResidueFunction.InitY(System.Single[])">
-            <summary>For simulation purposes, compute local Y as a function of a global optimization variable</summary>
-            <param name="x">Optimization variable</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.ResidueFunction.F(System.Boolean,System.Single[]@)">
-            <summary>Computes function value and gradient using local information</summary>
-            <param name="ComputeGrad">Compute gradient?</param>
-            <param name="Gradient">Local gradient output</param>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.SampleResidueFunctions">
-            <summary>Example residue functions</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.SampleResidueFunctions.ResidueExp">
-            <summary>Sample residues</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.SampleResidueFunctions.ResidueExp.#ctor(System.Single)">
-            <summary>Constructor</summary>
-            <param name="T">Desired function value</param>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.SampleResidueFunctions.ResidueExp.t">
-            <summary>Desired function value</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix.NonlinearOptimizProblem.SampleResidueFunctions.ResidueExp.F(System.Boolean,System.Single[]@)">
-            <summary>Function F</summary>
-            <param name="ComputeGrad">Compute gradient?</param>
-            <param name="Gradient">Returns gradient</param>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector">
-            <summary>Functions to create and manipulate vectors</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.Values">
-            <summary>Vetor values</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.CLValues">
-            <summary>Vetor values in CL memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.CLCoef">
-            <summary>Vetor coefficient for combinations</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.CLn">
-            <summary>Vector dimension in CL memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.CLresps">
-            <summary>Partial sums in CL memory</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.#ctor(System.Single[])">
-            <summary>OpenCL vector constructor</summary>
-            <param name="Vals">Vector elements</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.#ctor(OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix)">
-            <summary>Creates vector from M elements sequentially</summary>
-            <param name="symM">Symmetric matrix to use</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.Sum">
-            <summary>Returns the sum of components of this vector</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.Norm(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Computes the Euclidean norm of this  vector</summary>
-            <param name="temp">Holds temporary operations</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.NormSquared(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@)">
-            <summary>Computes square of the Euclidean norm of this  vector</summary>
-            <param name="temp">Holds temporary operations</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.HasPositiveEntries">
-            <summary>Returns true if this vector has any positive entries</summary>
-            <returns></returns>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.ReadFromDevice">
-            <summary>Reads from OpenCL if using OpenCL</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.Write(System.String)">
-            <summary>Writes contents of this vector to disk</summary>
-            <param name="file"></param>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector.Length">
-            <summary>Vector dimension</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix">
-            <summary>Generic matrix</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.Values">
-            <summary>Vector representation of the matrix values</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.CLValues">
-            <summary>Matrix values in CL memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.CLCoef">
-            <summary>Coefficient for combinations</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.CLDim">
-            <summary>Matrix dimensions in CL memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.CLn">
-            <summary>Vector dimension in CL memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.CLresps">
-            <summary>Partial sums in CL memory</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.nRows">
-            <summary>Number of rows</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.nCols">
-            <summary>Number of columns</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.#ctor(System.Single[0:,0:])">
-            <summary>New matrix constructor</summary>
-            <param name="Vals">Matrix values</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.SetValues(System.Single[0:,0:])">
-            <summary>Sets values for this matrix</summary>
-            <param name="Vals">New values</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.Sum">
-            <summary>Returns the sum of components of this matrix</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.Write(System.String)">
-            <summary>Writes this matrix to file in Octave format</summary>
-            <param name="file">File to write to</param>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.Rows">
-            <summary>Matrix dimension</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.Cols">
-            <summary>Matrix dimension</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix.Item(System.Int32,System.Int32)">
-            <summary>Retrieve matrix elements</summary>
-            <param name="i">Row</param>
-            <param name="j">Column</param>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag">
-            <summary>Diagonal matrix</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag.Values">
-            <summary>Values of diagonal elements</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag.CLValues">
-            <summary>Values of diagonal elements in OpenCL memory</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag.#ctor(System.Single[])">
-            <summary>OpenCL diagonal matrix constructor</summary>
-            <param name="Vals">Main diagonal elements</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag.#ctor(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector)">
-            <summary>Creates the diagonal matrix D(v) with elements associated to those of vector v. Uses the same objects.</summary>
-            <param name="v">Reference vector</param>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag.Rows">
-            <summary>Matrix dimension</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatLinalg.floatDiag.Cols">
-            <summary>Matrix dimension</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.LinalgSrc.srcVecSum">
-            <summary>Coalesced vector sum kernels</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatOptimization">
-            <summary>Encapsulates optimization techniques based on Newton methods</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization">
-            <summary>Unconstrained minimization driver</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.Solve(System.Single[],OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.C2Function,System.Int32@)">
-            <summary>Computes the unconstrained minimum of function F in x0.Length dimensions</summary>
-            <param name="x0">Start point. Problem dimension is assumed to be x0.Length</param>
-            <param name="F">Function to minimize</param>
-            <param name="iters">Number of iterations used to solve the problem</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.Solve(System.Single[],OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.C2Function,System.Single[0:,0:],System.Single[],System.Int32@)">
-            <summary>Computes the unconstrained minimum of function F in x0.Length dimensions subject to equality constraint Ax=b</summary>
-            <param name="x0">Start point. Problem dimension is assumed to be x0.Length</param>
-            <param name="F">Function to minimize</param>
-            <param name="A">Equality constraint matrix</param>
-            <param name="b">Equality constraint rhs</param>            
-            <param name="iters">Number of iterations used to solve the problem</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.Solve(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.C2Function,System.Int32@,OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector)">
-            <summary>Computes the unconstrained minimum of function F in x0.Length dimensions</summary>
-            <param name="CLx">Solution x and initial guess</param>
-            <param name="F">Function to be minimized</param>
-            <param name="iters">Number of iterations</param>
-            <param name="HessF">Holder of hessian of F</param>
-            <param name="gradF">Holder of gradient of F</param>
-            <param name="temp">Temporary vector of dimension n</param>
-            <param name="deltaX">X search direction</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.Solve(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.C2Function,System.Int32@,OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector)">
-            <summary>Computes the unconstrained minimum of function F in x0.Length dimensions</summary>
-            <param name="CLx">Solution x and initial guess</param>
-            <param name="F">Function to be minimized</param>
-            <param name="iters">Number of iterations</param>
-            <param name="HessF">Holder of hessian of F</param>
-            <param name="gradF">Holder of gradient of F</param>
-            <param name="temp">Temporary vector of dimension n</param>
-            <param name="deltaX">X search direction</param>
-            <param name="A">Equality constraint matrix</param>
-            <param name="b">Equality constraint rhs</param>
-            <param name="AinvHAt">Holder of A*inv(H)*A'</param>
-            <param name="tempAinvMatrix">Temporary matrix for computation of inv(H)*A'</param>
-            <param name="temp2">Temporary vector of length n</param>
-            <param name="AinvHrhs">Temporary vector</param>
-            <param name="rPri">Primal residual</param>
-            <param name="tempC">Temporary vector of length C</param>
-            <param name="CLDeltaNu">Search direction in Nu</param>
-            <param name="Atnu">A times nu</param>
-            <param name="onesC">Vector of ones of dimension C</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.BackTrack(OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.C2Function,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@,OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix@)">
-            <summary>Line search algorithm</summary>
-            <param name="f">Function to be searched</param>
-            <param name="x">Current point</param>
-            <param name="deltaX">Search direction</param>
-            <param name="gradF">Gradient of F</param>
-            <param name="temp">Temporary vector to store current direction</param>
-            <param name="HessF">Hessian of F</param>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.Config">
-            <summary>Configuration parameters (v. Boyd's Convex Optimization)</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.Config.alpha">
-            <summary>Backtrack line search alpha parameter</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.Config.beta">
-            <summary>Backtrack line search beta parameter</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.Config.eps">
-            <summary>Unconstrained minimization precision</summary>
-        </member>
-        <member name="P:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.Config.MaxIterations">
-            <summary>Maximum number of iterations</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatOptimization.UnconstrainedMinimization.C2Function">
-            <summary>Function to be used in unconstrained minimization method. Should compute function value and search direction if requested
-            (i.e., probably solve a Newton system)</summary>
-            <param name="CLx">Current function point</param>
-            <param name="ComputeGradHess">Compute gradient and hessian?</param>
-            <param name="Grad">Gradientof F, if requested. Should not be computed if not requested</param>
-            <param name="Hess">Hessian of F, if requested. Should not be computed if not requested</param>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatOptimization.CurveFitting">
-            <summary>Curve fitting applications</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.CurveFitting.LeastSquares(System.Single[0:,0:],System.Single[],System.Single[],System.Single)">
-            <summary>Computes least squares fitting of Ax = b weighted by W and returns x</summary>
-            <param name="A">Dependent variables measurements</param>
-            <param name="b">Independent variables measurements</param>
-            <param name="W">Weights</param>
-            <param name="lambda">Regularization term</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.CurveFitting.LeastSquares(System.Single[0:,0:],System.Single[])">
-            <summary>Computes least squares fitting of Ax = b and returns x</summary>
-            <param name="A">Dependent variables measurements</param>
-            <param name="b">Independent variables measurements</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.CurveFitting.LeastSquares(System.Single[0:,0:],System.Single[],System.Single)">
-            <summary>Computes least squares fitting of Ax = b and returns x</summary>
-            <param name="A">Dependent variables measurements</param>
-            <param name="b">Independent variables measurements</param>
-            <param name="lambda">Regularization term</param>            
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.CurveFitting.PNormMinimization(System.Single[],System.Single[0:,0:],System.Single[],System.Single[],System.Single[],System.Single,System.Single)">
-            <summary>Computes the p-norm minimization of Ax - b with weights w, using q-norm regularization with weights lambda on x</summary>
-            <param name="x0">Start point</param>
-            <param name="A">Dependent variables</param>
-            <param name="b">Independent variables measurements</param>
-            <param name="W">Weights of each equation</param>
-            <param name="lambda">Regularization term of each component of x</param>
-            <param name="p">Ax - b minimization exponent</param>
-            <param name="q">x regularization exponent</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.CurveFitting.PNormMinimization(System.Single[],System.Single[0:,0:],System.Single[],System.Single[],System.Single[],System.Single,System.Single,System.Single[0:,0:],System.Single[])">
-            <summary>Computes the p-norm minimization of Ax - b with weights w, using q-norm regularization with weights lambda on x</summary>
-            <param name="x0">Start point</param>
-            <param name="A">Dependent variables</param>
-            <param name="b">Independent variables measurements</param>
-            <param name="W">Weights of each equation</param>
-            <param name="lambda">Regularization term of each component of x</param>
-            <param name="p">Ax - b minimization exponent</param>
-            <param name="q">x regularization exponent</param>
-            <param name="AeqConstr">Equality constraint matrix AeqConstr * x = bConstr</param>
-            <param name="bEqConstr">Equality constraint right hand side</param>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.CurveFitting.kernelpNorm">
-            <summary>Computes p-norm of a vector, sum(|xi|^p)</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.CurveFitting.kerneldpNorm">
-            <summary>Computes gradients of p-norm</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.CurveFitting.PNormMinClass.F(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,System.Boolean,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector@,OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix@)">
-            <summary>Computes objective function, gradient and Hessian for p-norm minimization with q-norm regularization</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming">
-            <summary>Quadratic problem solving</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.CheckFeasibility(System.Single[],System.Single[0:,0:],System.Single[],System.Single[0:,0:],System.Single[])">
-            <summary>Checks if it's possible to satisfy Mx less than d and Ax = b. Returns a feasible point if so</summary>
-            <param name="x0">Initial guess</param>
-            <param name="M">Inequality constraint matrix</param>
-            <param name="d">Inequality rhs</param>
-            <param name="A">Equality constr matrix</param>
-            <param name="b">Equality rhs</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.CheckFeasibility(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatMatrix,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector)">
-            <summary>Checks if it's possible to satisfy Mx less than d and Ax = b. Returns a feasible point in x0 if so</summary>
-            <param name="x0">Initial guess</param>
-            <param name="M">Inequality constraint matrix</param>
-            <param name="d">Inequality rhs</param>
-            <param name="A">Equality constr matrix</param>
-            <param name="b">Equality rhs</param>
-            <param name="Mxd">Temporary vector to hold M*x - d</param>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.kernelgetLast">
-            <summary>Kernel to compute last element of a vector</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.Hpd">
-            <summary>Primal dual Hessian n x n</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.rPri">
-            <summary>Primal residual, c x 1</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.rCent">
-            <summary>Centralization residual, m x 1</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.rDual">
-            <summary>Dual residual, n x 1</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.ReadAll">
-            <summary>DEBUG. Reads all vars from device</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolvePrimalDual(System.Single[],System.Single[],System.Single[],OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix,System.Single[],System.Single[0:,0:],System.Single[],System.Single[0:,0:],System.Single[],OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.StopFunc)">
-            <summary>Solves a quadratic programming problem 1/2 x'Px + q'x subject to Mx less or equal d and Ax = b</summary>
-            <param name="x0">Start point x0</param>
-            <param name="lambda0">Start dual point lambda0</param>
-            <param name="nu0">Start nus (equality constraints)</param>
-            <param name="P">Positive semidefinite quadratic objective matrix P</param>
-            <param name="q">Linear objective q</param>
-            <param name="M">Ineq constraint matrix M</param>
-            <param name="d">Ineq constraint right hand side d</param>
-            <param name="A">Constraint matrix A</param>
-            <param name="b">Constraint right hand side b</param>
-            <param name="sf">Stop function. The system won't check feasibility if this function is not null. Return true when you want the optimization to stop based on x, lambda and nu</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.ComputePrimalDualSearchDir(System.Single)">
-            <summary>Computes primal dual search direction</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.PDResidual(OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,OpenCLTemplate.LinearAlgebra.floatLinalg.floatVector,System.Single)">
-            <summary>Computes the norm of the residuals in a given point</summary>
-            <param name="x">Primal vars</param>
-            <param name="lambda">Dual vars</param>
-            <param name="nu">Equality constraint vars</param>
-            <param name="t">Solution quuality parameter t</param>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolveBarrier(System.Single[],OpenCLTemplate.LinearAlgebra.floatLinalg.floatSymPosDefMatrix,System.Single[],System.Single[0:,0:],System.Single[],System.Single[0:,0:],System.Single[],OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.StopFunc)">
-            <summary>Solves a quadratic programming problem 1/2 x'Px + q'x subject to Mx less or equal d and Ax = b</summary>
-            <param name="x0">Start point x0</param>
-            <param name="P">Positive semidefinite quadratic objective matrix P</param>
-            <param name="q">Linear objective q</param>
-            <param name="M">Ineq constraint matrix M</param>
-            <param name="d">Ineq constraint right hand side d</param>
-            <param name="A">Constraint matrix A</param>
-            <param name="b">Constraint right hand side b</param>
-            <param name="sf">Stop function. The system won't check feasibility if this function is not null. Return true when you want the optimization to stop based on x, lambda and nu</param>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolutionLog">
-            <summary>Log of various parameters of solution</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolutionLog.KeepLog">
-            <summary>Keep log of operations?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolutionLog.LogResiduals">
-            <summary>Internal variable to keep track if needs to log residuals</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolutionLog.Iterations">
-            <summary>How many Newton directions were computed?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolutionLog.SurrDualityGaps">
-            <summary>How did the duality gaps evolve?</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolutionLog.EvolutionOfT">
-            <summary>Evolution of last variable in the computation of feasibility. Problem becomes feasible when the var is less than zero</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolutionLog.PtSequence">
-            <summary>Sequence of points in problem solution</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolutionLog.StepSizes">
-            <summary>Primal dual step sizes</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolutionLog.DualResiduals">
-            <summary>Evolution of dual residuals</summary>
-        </member>
-        <member name="F:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolutionLog.CentResiduals">
-            <summary>Evolution of centralization residuals</summary>
-        </member>
-        <member name="M:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.SolutionLog.Clear">
-            <summary>Clears log</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.StopFunc">
-            <summary>Delegate to stop execution if that's thhe case (as in the feasibility problem, when we can quit if t less than zero)</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.ComputeRestrictions">
-            <summary>Computes values of the restrictions</summary>
-        </member>
-        <member name="T:OpenCLTemplate.LinearAlgebra.floatOptimization.QuadraticProgramming.ComputePDResidualNorm">
-            <summary>Computes norm of primal dual residuals vector</summary>
         </member>
     </members>
 </doc>

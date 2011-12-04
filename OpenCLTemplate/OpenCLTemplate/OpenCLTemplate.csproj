@@ -124,13 +124,11 @@
   <ItemGroup>
     <Compile Include="CLCalc.cs" />
     <Compile Include="CLGLInterop\CLGLInterop.cs" />
-    <Compile Include="Linear Algebra\CLOptimiz.cs" />
-    <Compile Include="Linear Algebra\CLOptimizSrc.cs" />
     <Compile Include="ObjectClassifier\CLObjClassifier.cs" />
     <Compile Include="FourierTransform\CLFFT.cs" />
     <Compile Include="IsoSurface\Isosurface.cs" />
     <Compile Include="ODEs\ODEs.cs" />
-    <Compile Include="Linear Algebra\SparseLinalg.cs" />
+    <Compile Include="SparseLinalg\SparseLinalg.cs" />
     <Compile Include="SVM\CLSVM.cs" />
     <Compile Include="frmCL.cs">
       <SubType>Form</SubType>
