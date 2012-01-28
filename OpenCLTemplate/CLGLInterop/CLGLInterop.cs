@@ -1058,7 +1058,7 @@ __kernel void DisplaceElems(__global float * VertexCoords,
         public bool StereoscopicDraw = false;
 
         /// <summary>Stereographic distance.</summary>
-        public float StereoDistance = 0.005f;
+        public float StereoDistance = -0.005f;
 
         /// <summary>Background color</summary>
         public float[] ClearColor = new float[3] { 0.0f, 0.0f, 0.0f };
@@ -1121,6 +1121,8 @@ __kernel void DisplaceElems(__global float * VertexCoords,
 
                 DoDraw();
                 #endregion
+
+                GLCtrl.SwapBuffers();
             }
             else
             {
