@@ -281,6 +281,19 @@ namespace OpenCLTemplate.LinearAlgebra
                 }
             }
 
+            /// <summary>Copies src vector contents to dst</summary>
+            public static void CopyMatrix(floatMatrix Src, floatMatrix Dst)
+            {
+                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                {
+                    kernelCopyBuffer.Execute(new CLCalc.Program.MemoryObject[] { Src.CLValues, Dst.CLValues }, Src.CLValues.OriginalVarLength);
+                }
+                else
+                {
+                    for (int i = 0; i < Src.Values.Length; i++) Dst.Values[i] = Src.Values[i];
+                }
+            }
+
             /// <summary>Returns true if v has any positive entries</summary>
             public static bool HasPositiveEntries(floatVector v)
             {
@@ -367,7 +380,7 @@ namespace OpenCLTemplate.LinearAlgebra
             {
                 if (ans != null && ans.Length != D.Rows) throw new Exception("ans length should match D dimension");
                 if (u.Length != D.Rows) throw new Exception("u length should match D dimension");
-                if (ans == null) ans = new floatVector(new float[] { D.Rows });
+                if (ans == null) ans = new floatVector(new float[D.Rows]);
 
                 if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
@@ -379,6 +392,34 @@ namespace OpenCLTemplate.LinearAlgebra
                     for (int i = 0; i < D.Rows; i++)
                     {
                         ans.Values[i] = alpha * D.Values[i] * u.Values[i];
+                    }
+                }
+
+                return ans;
+            }
+
+            /// <summary>Computes the Matrix-matrix transpose product alpha*D*transpose(V)</summary>
+            public static floatMatrix DiagTranspMatProd(floatDiag D, floatMatrix u, float alpha, ref floatMatrix ans)
+            {
+                if (ans != null && (ans.Rows != u.Cols || ans.Cols != u.Rows)) throw new Exception("ans length should match transpose(u)");
+                if (u.Cols != D.Rows) throw new Exception("u Cols should match D dimension");
+                if (ans == null) ans = new floatMatrix(new float[u.Cols, u.Rows]);
+
+                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                {
+                    u.CLCoef.WriteToDevice(new float[] { alpha });
+                    kernelDiagTranspMatProd.Execute(new CLCalc.Program.MemoryObject[] { D.CLValues, u.CLValues, u.CLCoef, ans.CLValues }, new int[] { u.Cols, u.Rows });
+                }
+                else
+                {
+                    int NN = u.Cols;
+                    int MM = u.Rows;
+                    for (int j = 0; j < u.Rows; j++)
+                    {
+                        for (int i = 0; i < D.Rows; i++)
+                        {
+                            ans.Values[j + MM * i] = alpha * D.Values[i] * u.Values[i + NN * j];
+                        }
                     }
                 }
 
@@ -525,6 +566,44 @@ namespace OpenCLTemplate.LinearAlgebra
                 else
                 {
                     return AuxLeastSquaresAtAnoCL(A, W, lambda, ref AtA);
+                }
+            }
+
+            /// <summary>Computes A*B' = A*transpose(B) and stores result in ans</summary>
+            /// <param name="A">Matrix A</param>
+            /// <param name="B">Matrix B</param>
+            /// <param name="ans">Answer. If null, gets created.</param>
+            public static void MatrTranspMatrProd(floatMatrix A, floatMatrix B, ref floatMatrix ans)
+            {
+                if (A.Cols != B.Cols) throw new Exception("Incompatible dimensions");
+                if (ans == null) ans = new floatMatrix(new float[A.Rows, B.Rows]);
+                if (ans.Rows != A.Rows || ans.Cols != B.Rows) throw new Exception("Invalid ans dimensions");
+
+                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                {
+                    kernelRegularMatrTranspMatrProd.Execute(new CLCalc.Program.MemoryObject[] { A.CLValues, B.CLValues, ans.CLValues, A.CLDim }, new int[] { A.Rows, B.Rows });
+                }
+                else
+                {
+                    int n = A.Cols;
+                    int p = B.Rows;
+                    for (int i = 0; i < A.Rows; i++)
+                    {
+                        for (int j = 0; j < B.Rows; j++)
+                        {
+                            int ni = n * i;
+                            int nj = n * j;
+
+                            float temp = 0.0f;
+                            for (int k = 0; k < n; k++)
+                            {
+                                temp += A.Values[k + ni] * B.Values[k + nj];
+                            }
+
+                            ans.Values[j + p * i] = temp;
+
+                        }
+                    }
                 }
             }
 
@@ -3553,6 +3632,421 @@ namespace OpenCLTemplate.LinearAlgebra
 
                 return null;
             }
+            #endregion
+        }
+
+        #endregion
+
+        #region Logistic regression
+
+        /// <summary>Creates a one-vs-all classification system using Logistic Regression</summary>
+        public class LogisticRegression
+        {
+            /// <summary>Kernel to compute Logistic Regression cost function and gradient/Hessian parameters</summary>
+            public static CLCalc.Program.Kernel kernelComputeLogistRegParams;
+            /// <summary>Computes p-norm of a vector, sum(|xi|^p)</summary>
+            public static CLCalc.Program.Kernel kernelpNorm;
+            /// <summary>Computes gradients of p-norm</summary>
+            public static CLCalc.Program.Kernel kerneldpNorm;
+
+            #region Variables and linear algebra variables
+            /// <summary>Total of categories</summary>
+            private List<float> Categories = new List<float>();
+
+            //Creates samples matrix and vectors
+
+            /// <summary>Samples matrix</summary>
+            public floatLinalg.floatMatrix CLX;
+            /// <summary>Classifications vector to use in training</summary>
+            public floatLinalg.floatVector y;
+            /// <summary>Regularization parameter</summary>
+            public floatLinalg.floatVector lambda;
+            /// <summary>Classifications of each example</summary>
+            public float[] _classifs;
+
+            //Regularization
+            floatLinalg.floatVector CLq;
+            floatLinalg.floatVector tempX;
+            floatLinalg.floatVector tempdX;
+            floatLinalg.floatVector tempd2X;
+
+
+            //Temporary buffers
+            floatLinalg.floatVector CLTheta;
+            floatLinalg.floatVector CLGrad;
+            floatLinalg.floatVector CLtempGrad;
+            floatLinalg.floatVector temp;
+            floatLinalg.floatVector CLDeltaTheta;
+            floatLinalg.floatSymPosDefMatrix Hess;
+
+            //Temporary vectors
+            floatLinalg.floatVector XTheta;
+            floatLinalg.floatVector z1;
+            floatLinalg.floatVector z2;
+            floatLinalg.floatVector cost;
+            floatLinalg.floatVector ones;
+
+
+            //To output the classification
+
+            /// <summary>Matrix containing classification coefficients [numCategories, Sample dimension + 1] (because of interceptor)</summary>
+            public floatLinalg.floatMatrix CLM;
+            floatLinalg.floatVector CLv;
+
+            #endregion
+
+            /// <summary>Constructor. Receives samples and trains classifier. Includes the intercept term automatically. Classifications that are equal to or
+            /// less than zero are negative examples. Any non-zero classification will get its own logistic regression classifier</summary>
+            /// <param name="Samples">Matrix containing one sample per line and n samples, [n, p]</param>
+            /// <param name="Classifications">Vector of classifications, [n]</param>
+            public LogisticRegression(float[,] Samples, float[] Classifications)
+            {
+                float[] regWeights = new float[Samples.GetLength(1)];
+                Init(Samples, Classifications, regWeights, 2);
+            }
+
+            /// <summary>Constructor. Receives samples and trains classifier. Includes the intercept term automatically. Classifications that are equal to or
+            /// less than zero are negative examples. Any non-zero classification will get its own logistic regression classifier</summary>
+            /// <param name="Samples">Matrix containing one sample per line and n samples, [n, p]</param>
+            /// <param name="Classifications">Vector of classifications, [n]</param>
+            /// <param name="RegularizationWeights">Regularization weights, [p]</param>
+            /// <param name="regularizationQ">Exponent of regularization term, sum (|beta|^q). Should be greater than 1</param>
+            public LogisticRegression(float[,] Samples, float[] Classifications, float[] RegularizationWeights, float regularizationQ)
+            {
+                Init(Samples, Classifications, RegularizationWeights, regularizationQ);
+            }
+
+            /// <summary>Creates a new logistic regression classifier from already trained coefficients. 
+            /// Note: GetInternalHitRate will not work! (because there are no internal samples)</summary>
+            /// <param name="CLM">Coefficients, including interceptor coefficient</param>
+            /// <param name="Categories">Classification categories</param>
+            public LogisticRegression(floatLinalg.floatMatrix CLM, List<float> Categories)
+            {
+                int p = CLM.Cols - 1;
+                int nCategs = CLM.Rows;
+
+                if (Categories.Count != nCategs) throw new Exception("Number of categories and classification coefficients dimension not compatible");
+
+                this.CLM = CLM;
+                this.Categories = Categories;
+            }
+
+            private void Init(float[,] Samples, float[] Classifications, float[] RegularizationWeights, float regularizationQ)
+            {
+                int n = Samples.GetLength(0);
+                int p = Samples.GetLength(1);
+
+                if (Classifications.Length != n) throw new Exception("Incompatible Classifications vector dimension");
+                if (RegularizationWeights.Length != p) throw new Exception("Incompatible RegularizationWeights vector dimension");
+                if (regularizationQ <= 1) throw new Exception("Regularization term Q should be > 1");
+
+                //Includes intercept term
+                float[,] X = new float[n, p + 1];
+                for (int i = 0; i < n; i++)
+                {
+                    X[i, 0] = 1;
+                    for (int j = 0; j < p; j++)
+                    {
+                        X[i, j + 1] = Samples[i, j];
+                    }
+                }
+
+                //Regularization terms
+                float[] regTerms = new float[p + 1];
+                regTerms[0] = 0;
+                for (int i = 0; i < RegularizationWeights.Length; i++) regTerms[i + 1] = RegularizationWeights[i];
+
+                //Retrieves categories
+                for (int i = 0; i < Classifications.Length; i++)
+                {
+                    if (Classifications[i] > 0 && Categories.IndexOf(Classifications[i]) < 0)
+                        Categories.Add(Classifications[i]);
+                }
+                if (Categories.Count == 0) throw new Exception("At least one category should be given");
+
+
+                //Creates samples matrix and vectors
+                CLX = new floatLinalg.floatMatrix(X);
+                y = new floatLinalg.floatVector(Classifications);
+
+                //Don't regularize first term
+                float[] newLambs = new float[p + 1];
+                newLambs[0] = 0;
+                for (int i = 0; i < p; i++) newLambs[i + 1] = RegularizationWeights[i];
+                lambda = new floatLinalg.floatVector(newLambs);
+
+
+                //Initial guess
+                float[] t0 = new float[p + 1];
+                for (int i = 0; i < t0.Length; i++) t0[i] = 1E-3f;
+                //t0[0] = 1; t0[1] = 0.2f; t0[2] = 0.3f;
+                CLTheta = new floatLinalg.floatVector(t0);
+
+
+                CLGrad = new floatLinalg.floatVector(new float[p + 1]);
+                CLtempGrad = new floatLinalg.floatVector(new float[p + 1]);
+
+                CLq = new floatLinalg.floatVector(new float[] { regularizationQ });
+                tempX = new floatLinalg.floatVector(new float[p + 1]);
+                tempdX = new floatLinalg.floatVector(new float[p + 1]);
+                tempd2X = new floatLinalg.floatVector(new float[p + 1]);
+
+                temp = new floatLinalg.floatVector(new float[p + 1]);
+                CLDeltaTheta = new floatLinalg.floatVector(new float[p + 1]);
+                Hess = new floatLinalg.floatSymPosDefMatrix(p + 1);
+
+
+
+                XTheta = new floatLinalg.floatVector(new float[n]);
+                z1 = new floatLinalg.floatVector(new float[n]);
+                z2 = new floatLinalg.floatVector(new float[n]);
+                cost = new floatLinalg.floatVector(new float[n]);
+
+                float[] vones = new float[n];
+                for (int i = 0; i < n; i++) vones[i] = 1;
+                ones = new floatLinalg.floatVector(vones);
+
+
+                _classifs = Classifications;
+
+                //Trains classifier
+                Train();
+            }
+
+            /// <summary>Trains this classifier using the samples Matrix and classifications vector</summary>
+            public void Train()
+            {
+                int n = CLX.Rows;
+                int p = CLX.Cols - 1;
+
+                //Builds the matrix M that will be used in the classification, M[Categories.Count, p+1]
+                float[,] M = new float[Categories.Count, p + 1];
+
+                float[] x0 = new float[p + 1];
+                for (int i = 0; i < p + 1; i++) x0[i] = 0.1f;
+
+                //Classification part
+                for (int i = 0; i < Categories.Count; i++)
+                {
+                    //Composes y for this classifier
+                    for (int j = 0; j < n; j++)
+                    {
+                        y.Values[j] = _classifs[j] == Categories[i] ? 1 : 0;
+                    }
+                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) y.CLValues.WriteToDevice(y.Values);
+
+                    int iters;
+                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLTheta.CLValues.WriteToDevice(x0);
+                    else for (int k = 0; k < CLTheta.Length; k++) CLTheta.Values[k] = x0[k];
+                    float[] beta = floatOptimization.UnconstrainedMinimization.Solve(CLTheta, RegularizedLogistReg, out iters, Hess, CLGrad, temp, CLDeltaTheta);
+
+                    //Copies result to classification matrix M
+                    for (int j = 0; j < beta.Length; j++) M[i, j] = beta[j];
+                }
+
+                //Creates classification matrix
+                if (CLM == null || CLM.Rows != M.GetLength(0) || CLM.Cols != M.GetLength(1)) CLM = new floatLinalg.floatMatrix(M);
+                else CLM.SetValues(M);
+            }
+
+
+            #region Cost function, gradient, hessian, regularization
+            /// <summary>Computes cost function for logistic regression at a given x</summary>
+            /// <param name="CLTheta">Current function point</param>
+            /// <param name="ComputeGradHess">Compute gradient and hessian?</param>
+            /// <param name="Grad">Gradientof F, if requested. Should not be computed if not requested</param>
+            /// <param name="Hess">Hessian of F, if requested. Should not be computed if not requested</param>
+            public float RegularizedLogistReg(floatLinalg.floatVector CLTheta, bool ComputeGradHess, ref floatLinalg.floatVector Grad, ref floatLinalg.floatSymPosDefMatrix Hess)
+            {
+                //Computes x*Theta
+                floatLinalg.BLAS.MatrVecProd(CLX, CLTheta, 1, ref XTheta);
+
+                floatLinalg.BLAS.CopyVector(CLTheta, tempX);
+
+                //Computes cost and gradient/hessian terms
+                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                {
+                    kernelComputeLogistRegParams.Execute(new CLCalc.Program.Variable[] { XTheta.CLValues, y.CLValues, z1.CLValues, z2.CLValues, cost.CLValues }, XTheta.Length);
+
+                    //Regularization
+                    kernelpNorm.Execute(new CLCalc.Program.Variable[] { tempX.CLValues, CLq.CLValues, lambda.CLValues }, tempX.Length);
+                }
+                else
+                {
+                    for (int i = 0; i < z1.Length; i++)
+                    {
+                        float eMz = (float)Math.Exp(-XTheta.Values[i]);
+
+                        float hTheta = 1.0f / (1.0f + eMz);
+                        z1.Values[i] = hTheta - y.Values[i];
+                        z2.Values[i] = eMz * hTheta * hTheta;
+
+                        cost.Values[i] = y.Values[i] == 0 ? -(float)Math.Log(1 - hTheta) : -(float)Math.Log(hTheta);
+                    }
+
+                    //Regularization cost
+                    for (int i = 0; i < CLTheta.Length; i++)
+                    {
+                        tempX.Values[i] = (float)Math.Pow(Math.Abs(tempX.Values[i]), CLq.Values[0]) * lambda.Values[i];
+                    }
+                }
+
+                if (ComputeGradHess)
+                {
+                    //Regularization
+                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                    {
+                        kerneldpNorm.Execute(new CLCalc.Program.Variable[] { CLTheta.CLValues, CLq.CLValues, lambda.CLValues, tempdX.CLValues, tempd2X.CLValues }, CLTheta.Length);
+                    }
+                    else
+                    {
+                        for (int i = 0; i < CLTheta.Values.Length; i++)
+                        {
+                            float temp = CLTheta.Values[i];
+
+                            tempdX.Values[i] = (float)Math.Pow(Math.Abs(temp), CLq.Values[0] - 1.0f) * lambda.Values[i] * Math.Sign(temp) * CLq.Values[0];
+                            tempd2X.Values[i] = (float)Math.Pow(Math.Abs(temp), CLq.Values[0] - 2.0f) * lambda.Values[i] * CLq.Values[0] * (CLq.Values[0] - 1.0f);
+                        }
+                    }
+
+
+                    floatLinalg.BLAS.MatrTraspVecMult(CLX, new floatLinalg.floatDiag(ones), z1, ref CLtempGrad);
+                    floatLinalg.BLAS.LinearCombination(1, CLtempGrad, 1, tempdX, ref CLGrad);
+
+                    floatLinalg.BLAS.MatrTranspMatrProd(CLX, new floatLinalg.floatDiag(z2), tempd2X, ref Hess);
+
+                }
+
+                return cost.Sum() + tempX.Sum();
+            }
+            #endregion
+
+            #region Classification output
+            /// <summary>Classifies a sample and returns classification values (the bigger, the most certain)
+            /// Note: in the classical approach one would need to compute the 1/(1+exp(-Values[i])) to get the logistic rating</summary>
+            /// <param name="Sample">Sample to be classified</param>
+            /// <param name="Values">Classification values</param>
+            public float Classify(float[] Sample, out float[] Values)
+            {
+                if (CLTheta.Length != Sample.Length + 1) throw new Exception("Incompatible Sample length");
+                if (CLv == null || CLv.Length != Categories.Count) CLv = new floatLinalg.floatVector(new float[Categories.Count]);
+
+                Values = CLv.Values;
+
+                CLTheta.Values[0] = 1;
+                for (int i = 0; i < Sample.Length; i++) CLTheta.Values[i + 1] = Sample[i];
+
+                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLTheta.CLValues.WriteToDevice(CLTheta.Values);
+
+                floatLinalg.BLAS.MatrVecProd(CLM, CLTheta, 1, ref CLv);
+
+                CLv.ReadFromDevice();
+                float max = CLv.Values[0];
+                int indMax = 0;
+                for (int i = 1; i < CLv.Length; i++)
+                {
+                    if (CLv.Values[i] > max)
+                    {
+                        max = CLv.Values[i];
+                        indMax = i;
+                    }
+                }
+
+                return Categories[indMax];
+            }
+
+            /// <summary>Classifies a Samples matrix, one sample per row. Note: the interceptor x[0] = 1 has to be included</summary>
+            /// <param name="Samples">Samples matrix, [n x p+1], where p = original x dimension</param>
+            /// <param name="Values">Classification values</param>
+            /// <param name="maxVals">Maximum classification values. 
+            /// Note: in the classical approach one would need to compute the 1/(1+exp(-Values[i])) to get the logistic rating</param>
+            public float[] Classify(floatLinalg.floatMatrix Samples, ref floatLinalg.floatMatrix Values, out float[] maxVals)
+            {
+                int n = Samples.Rows;
+                int p = CLM.Cols - 1;
+
+                if (Samples.Cols != p + 1) throw new Exception("Incompatible Samples dimensions");
+
+                floatLinalg.BLAS.MatrTranspMatrProd(CLM, Samples, ref Values);
+
+                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) Values.CLValues.ReadFromDeviceTo(Values.Values);
+
+                //Values dimensions: nSamples x nCategories
+                maxVals = new float[n];
+                int[] indMax = new int[n];
+                for (int j = 0; j < n; j++) maxVals[j] = Values.Values[j];
+
+                for (int i = 1; i < Categories.Count; i++)
+                {
+                    for (int j = 0; j < n; j++)
+                    {
+                        if (maxVals[j] < Values.Values[j + n * i])
+                        {
+                            maxVals[j] = Values.Values[j + n * i];
+                            indMax[j] = i;
+                        }
+                    }
+                }
+
+
+                float[] categories = new float[n];
+                for (int i = 0; i < categories.Length; i++) categories[i] = Categories[indMax[i]];
+
+                return categories;
+            }
+
+            /// <summary>Gets hit rate of a given set</summary>
+            /// <param name="Samples">Samples to rate. One sample per row</param>
+            /// <param name="Labels">Correct labels</param>
+            public float GetHitRate(floatLinalg.floatMatrix Samples, float[] Labels)
+            {
+                floatLinalg.floatMatrix Values = null;
+                float[] MaxVals;
+                float[] TestLbls = Classify(Samples, ref Values, out MaxVals);
+
+                float total = 0;
+                float correct = 0;
+
+                for (int i = 0; i < Samples.Rows; i++)
+                {
+                    total += 1;
+                    if ((Labels[i] == TestLbls[i] && MaxVals[i] > 0) || (Labels[i] == 0 && MaxVals[i] <= 0))
+                    {
+                        correct += 1;
+                    }
+                }
+                return correct / total;
+            }
+
+            /// <summary>Gets hit rate of a given set</summary>
+            /// <param name="Samples">Samples to rate. One sample per row</param>
+            /// <param name="Labels">Correct labels</param>
+            public float GetHitRate(float[,] Samples, float[] Labels)
+            {
+                int n = Samples.GetLength(0);
+                int p = Samples.GetLength(1);
+
+                //Includes intercept term
+                float[,] X = new float[n, p + 1];
+                for (int i = 0; i < n; i++)
+                {
+                    X[i, 0] = 1;
+                    for (int j = 0; j < p; j++)
+                    {
+                        X[i, j + 1] = Samples[i, j];
+                    }
+                }
+
+                return GetHitRate(new floatLinalg.floatMatrix(X), Labels);
+            }
+
+
+            /// <summary>Retrieves hit rate in training set</summary>
+            public float GetInternalHitRate()
+            {
+                return GetHitRate(CLX, _classifs);
+            }
+
             #endregion
         }
 

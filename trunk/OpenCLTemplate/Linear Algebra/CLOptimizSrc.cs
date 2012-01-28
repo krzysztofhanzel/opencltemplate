@@ -636,6 +636,32 @@ __kernel void SymMatrMatrMultiply(__global const float * SymM,
    x[p+j] = val;
 }
 
+//Computes A x B'
+//A [m x n]  B [p x n] ans [m x p]
+__kernel void RegularMatrTranspMatrProd
+              (__global const float * A,
+               __global const float * B,
+               __global       float * ans,
+               __constant     int   * ADim)
+               
+{
+   int m = get_global_size(0);
+   int p = get_global_size(1);
+   int n = ADim[1];
+   
+   int i = get_global_id(0);
+   int j = get_global_id(1);
+   int ni = n*i;
+   int nj = n*j;
+   
+   float temp = 0.0f;
+   for (int k = 0; k < n; k++)
+   {
+      temp += A[k + ni]*B[k + nj];
+   }
+
+   ans[j + p*i] = temp;
+}
 
 __kernel void TestSquareIdx(__global int * row,
                             __global int * col)
@@ -828,6 +854,21 @@ __kernel void MatrVecProdSumVec(
    ans[i] = temp + u[i]*beta[0];
 }
 
+__kernel void DiagTranspMatProd(
+                          __global const float * D,
+                          __global const float * v,
+                          __constant     float * alpha,
+                          __global       float * ans)
+{
+   int i = get_global_id(0);
+   int j = get_global_id(1);
+   int M = get_global_size(1);
+   int N = get_global_size(0);
+
+   //ans[i] = alpha[0]*D[i]*v[i];
+   ans[j+M*i] = alpha[0]*D[i]*v[i+N*j];
+}
+
 __kernel void DiagVecProd(
                           __global const float * D,
                           __global const float * v,
@@ -1014,10 +1055,32 @@ __kernel void getLast(__global const float * v,
 
 ";
             #endregion
+
+            #region Logistic regression
+
+            public string srcLogistReg = @"
+
+__kernel void ComputeLogistRegParams
+              (__global const float * XTheta,
+               __global const float * y,
+               __global       float * z1,
+               __global       float * z2,
+               __global       float * cost)
+
+{
+    int i = get_global_id(0);
+    float eMz = native_exp(-XTheta[i]);
+
+    float hTheta = native_recip(1.0f + eMz);
+    z1[i] = hTheta - y[i];
+    z2[i] = eMz * hTheta * hTheta;
+
+    cost[i] = y[i] == 0 ? -native_log(1.0f - hTheta) : -native_log(hTheta);
+}";
+
+            #endregion
         }
         #endregion
-
-
 
         #region Block Cholesky kernels
         /// <summary>Submatrix size, based on maximum amount of workitems per workgroup</summary>
@@ -1067,6 +1130,8 @@ __kernel void getLast(__global const float * v,
         private static CLCalc.Program.Kernel kernelTranspMatrVecProdW;
         /// <summary>Symmetric matrix matrix transpose multiply</summary>
         private static CLCalc.Program.Kernel kernelSymMatrMatrMultiply;
+        /// <summary>Regular A * B' matrix product</summary>
+        private static CLCalc.Program.Kernel kernelRegularMatrTranspMatrProd;
 
         /// <summary>Vector inner product</summary>
         private static CLCalc.Program.Kernel kernelInnerProd;
@@ -1080,6 +1145,8 @@ __kernel void getLast(__global const float * v,
         private static CLCalc.Program.Kernel kernelMatrVecProdSumVec;
         /// <summary>Diagonal vector product D*(alpha*v)</summary>
         private static CLCalc.Program.Kernel kernelDiagVecProd;
+        /// <summary>Diagonal matrix product D*(alpha*V)</summary>
+        private static CLCalc.Program.Kernel kernelDiagTranspMatProd;
         /// <summary>Element wise multiplication u .* u</summary>
         private static CLCalc.Program.Kernel kernelElemWiseProd;
         /// <summary>Element wise inversion 1 ./ u</summary>
@@ -1128,7 +1195,8 @@ __kernel void getLast(__global const float * v,
 
                         LinalgSrc src = new LinalgSrc();
                         string srcBlockChol = src.srcBlockCholesky.Replace("CONSTSUBMATRIXSIZE", strSubSize).Replace("CONSTGLOBALSIZE", strTotSize);
-                        CLCalc.Program.Compile(new string[] { srcBlockChol, src.srcBkSubs, src.srcOperations, src.srcVecSum, src.srcpNorm, src.strFeasibFunc });
+                        CLCalc.Program.Compile(new string[] { srcBlockChol, src.srcBkSubs, src.srcOperations, src.srcVecSum, 
+                            src.srcpNorm, src.strFeasibFunc, src.srcLogistReg });
 
                         kernelCholeskyDiagBlock = new CLCalc.Program.Kernel("CholeskyDiagBlock");
                         kernelCholeskyComputePanel = new CLCalc.Program.Kernel("CholeskyComputePanel");
@@ -1151,6 +1219,7 @@ __kernel void getLast(__global const float * v,
                         kernelSymMatrMatrMultiply = new CLCalc.Program.Kernel("SymMatrMatrMultiply");
                         kernelComputeAtWA = new CLCalc.Program.Kernel("ComputeAtWA");
                         kernelComputeAinvHAt = new CLCalc.Program.Kernel("ComputeAinvHAt");
+                        kernelRegularMatrTranspMatrProd = new CLCalc.Program.Kernel("RegularMatrTranspMatrProd");
 
                         kernelCopyBuffer = new CLCalc.Program.Kernel("CopyBuffer");
                         kernelLinearComb = new CLCalc.Program.Kernel("LinearComb");
@@ -1158,6 +1227,7 @@ __kernel void getLast(__global const float * v,
                         kernelTranspMatrVecProdW = new CLCalc.Program.Kernel("TranspMatrVecProdW");
                         kernelMatrVecProdSumVec = new CLCalc.Program.Kernel("MatrVecProdSumVec");
                         kernelDiagVecProd = new CLCalc.Program.Kernel("DiagVecProd");
+                        kernelDiagTranspMatProd = new CLCalc.Program.Kernel("DiagTranspMatProd");
                         kernelElemWiseProd = new CLCalc.Program.Kernel("ElemWiseProd");
                         kernelElemWiseInv = new CLCalc.Program.Kernel("ElemWiseInv");
                         kernelElemWiseInv2 = new CLCalc.Program.Kernel("ElemWiseInv2");
@@ -1172,6 +1242,12 @@ __kernel void getLast(__global const float * v,
                         //pNorm minimization
                         floatOptimization.CurveFitting.kernelpNorm = new CLCalc.Program.Kernel("pNorm");
                         floatOptimization.CurveFitting.kerneldpNorm = new CLCalc.Program.Kernel("dpNorm");
+
+                        //Logistic regression
+                        floatOptimization.LogisticRegression.kernelComputeLogistRegParams = new CLCalc.Program.Kernel("ComputeLogistRegParams");
+                        floatOptimization.LogisticRegression.kernelpNorm = floatOptimization.CurveFitting.kernelpNorm;
+                        floatOptimization.LogisticRegression.kerneldpNorm = floatOptimization.CurveFitting.kerneldpNorm;
+
 
                         //Feasibility
                         floatOptimization.QuadraticProgramming.kernelgetLast = new CLCalc.Program.Kernel("getLast");
