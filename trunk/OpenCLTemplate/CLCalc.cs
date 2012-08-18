@@ -337,7 +337,7 @@ namespace OpenCLTemplate
             public class Variable : MemoryObject
             {
 
-                #region Constructor. int[], float[], long[], double[], byte[]
+                #region Constructor. int[], uint[], float[], long[], double[], byte[], short[]
 
 
 
@@ -409,6 +409,8 @@ namespace OpenCLTemplate
                         VarPointer = new ComputeBuffer<float>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, Values);
                     }
                 }
+
+
                 /// <summary>Constructor.</summary>
                 /// <param name="Values">Variable whose size will be allocated in device memory.</param>
                 public Variable(int[] Values)
@@ -422,6 +424,35 @@ namespace OpenCLTemplate
                         VarPointer = new ComputeBuffer<int>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, Values);
                     }
                 }
+
+                /// <summary>Constructor.</summary>
+                /// <param name="Values">Variable whose size will be allocated in device memory.</param>
+                public Variable(short[] Values)
+                {
+                    //Aloca memoria no contexto especificado
+                    unsafe
+                    {
+                        OriginalVarLength = Values.Length;
+                        VarSize = Values.Length * sizeof(int);
+
+                        VarPointer = new ComputeBuffer<short>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, Values);
+                    }
+                }
+
+                /// <summary>Constructor.</summary>
+                /// <param name="Values">Variable whose size will be allocated in device memory.</param>
+                public Variable(uint[] Values)
+                {
+                    //Aloca memoria no contexto especificado
+                    unsafe
+                    {
+                        OriginalVarLength = Values.Length;
+                        VarSize = Values.Length * sizeof(uint);
+
+                        VarPointer = new ComputeBuffer<uint>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, Values);
+                    }
+                }
+
                 /// <summary>Constructor.</summary>
                 /// <param name="Values">Variable whose size will be allocated in device memory.</param>
                 public Variable(long[] Values)
@@ -483,7 +514,7 @@ namespace OpenCLTemplate
 
                 #endregion
 
-                #region Write to Device memory. int[], float[], long[], double[], byte[]
+                #region Write to Device memory. int[], uint[], float[], long[], double[], byte[], short[]
                 //private unsafe void WriteToDevice(void* p, ComputeCommandQueue CQ, bool BlockingWrite, ComputeEvent Event, CLEvent[] Event_Wait_List)
                 //{
                 //    uint n = 0;
@@ -549,6 +580,59 @@ namespace OpenCLTemplate
                     WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
                     //OpenCLDriver.clReleaseEvent(Event);
                 }
+
+
+                /// <summary>Writes variable to device</summary>
+                /// <param name="Values">Values to write to device</param>
+                /// <param name="CQ">Command queue to use</param>
+                /// <param name="BlockingWrite">TRUE to return only after completed writing.</param>
+                /// <param name="events">OpenCL Event associated to this operation</param>
+                public void WriteToDevice(short[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
+                {
+                    if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    unsafe
+                    {
+                        fixed (void* ponteiro = Values)
+                        {
+                            CQ.Write<short>((ComputeBuffer<short>)VarPointer, BlockingWrite, 0, Values.Length, (IntPtr)ponteiro, events);
+                        }
+                    }
+                }
+                /// <summary>Writes variable to device</summary>
+                /// <param name="Values">Values to write to device</param>
+                public void WriteToDevice(short[] Values)
+                {
+                    //CLEvent Event = new CLEvent();
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
+                    //OpenCLDriver.clReleaseEvent(Event);
+                }
+
+                /// <summary>Writes variable to device</summary>
+                /// <param name="Values">Values to write to device</param>
+                /// <param name="CQ">Command queue to use</param>
+                /// <param name="BlockingWrite">TRUE to return only after completed writing.</param>
+                /// <param name="events">OpenCL Event associated to this operation</param>
+                public void WriteToDevice(uint[] Values, ComputeCommandQueue CQ, bool BlockingWrite, ICollection<ComputeEventBase> events)
+                {
+                    if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    unsafe
+                    {
+                        fixed (void* ponteiro = Values)
+                        {
+                            CQ.Write<uint>((ComputeBuffer<uint>)VarPointer, BlockingWrite, 0, Values.Length, (IntPtr)ponteiro, events);
+                        }
+                    }
+                }
+
+                /// <summary>Writes variable to device</summary>
+                /// <param name="Values">Values to write to device</param>
+                public void WriteToDevice(uint[] Values)
+                {
+                    //CLEvent Event = new CLEvent();
+                    WriteToDevice(Values, CommQueues[DefaultCQ], true, null);
+                    //OpenCLDriver.clReleaseEvent(Event);
+                }
+
 
                 /// <summary>Writes variable to device</summary>
                 /// <param name="Values">Values to write to device</param>
@@ -662,7 +746,7 @@ namespace OpenCLTemplate
 
                 #endregion
 
-                #region Read from Device memory. int[], float[], long[], double[], byte[]
+                #region Read from Device memory. int[], uint[], float[], long[], double[], byte[], short[]
 
                 //private unsafe void ReadFromDeviceTo(void* p, CLCommandQueue CQ, CLBool BlockingRead, CLEvent Event, CLEvent[] Event_Wait_List)
                 //{
@@ -725,6 +809,62 @@ namespace OpenCLTemplate
                 /// <summary>Reads variable from device. Does not return until data has been copied.</summary>
                 /// <param name="Values">Values to store data coming from device</param>
                 public void ReadFromDeviceTo(int[] Values)
+                {
+                    //CLEvent Event = new CLEvent();
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
+
+                    //OpenCLDriver.clReleaseEvent(Event);
+                }
+
+                /// <summary>Reads variable from device.</summary>
+                /// <param name="Values">Values to store data coming from device</param>
+                /// <param name="CQ">Command queue to use</param>
+                /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                public void ReadFromDeviceTo(short[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
+                {
+                    if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
+                    unsafe
+                    {
+                        fixed (void* ponteiro = Values)
+                        {
+                            CQ.Read<short>((ComputeBuffer<short>)VarPointer, BlockingRead, 0, Values.Length, (IntPtr)ponteiro, events);
+                        }
+                    }
+                }
+
+                /// <summary>Reads variable from device. Does not return until data has been copied.</summary>
+                /// <param name="Values">Values to store data coming from device</param>
+                public void ReadFromDeviceTo(short[] Values)
+                {
+                    //CLEvent Event = new CLEvent();
+                    ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
+
+                    //OpenCLDriver.clReleaseEvent(Event);
+                }
+
+                /// <summary>Reads variable from device.</summary>
+                /// <param name="Values">Values to store data coming from device</param>
+                /// <param name="CQ">Command queue to use</param>
+                /// <param name="BlockingRead">TRUE to return only after completed reading.</param>
+                /// <param name="events">OpenCL Event associated with this operation</param>
+                public void ReadFromDeviceTo(uint[] Values, ComputeCommandQueue CQ, bool BlockingRead, ICollection<ComputeEventBase> events)
+                {
+                    if (Values.Length != OriginalVarLength) throw new Exception("Values length should be the same as allocated length");
+                    if (CreatedFromGLBuffer && (!AcquiredInOpenCL)) throw new Exception("Attempting to use a variable created from OpenGL buffer without acquiring. Should use CLGLInteropFunctions to properly acquire and release these variables");
+                    unsafe
+                    {
+                        fixed (void* ponteiro = Values)
+                        {
+                            CQ.Read<uint>((ComputeBuffer<uint>)VarPointer, BlockingRead, 0, Values.Length, (IntPtr)ponteiro, events);
+                        }
+                    }
+                }
+
+                /// <summary>Reads variable from device. Does not return until data has been copied.</summary>
+                /// <param name="Values">Values to store data coming from device</param>
+                public void ReadFromDeviceTo(uint[] Values)
                 {
                     //CLEvent Event = new CLEvent();
                     ReadFromDeviceTo(Values, CommQueues[DefaultCQ], true, null);
