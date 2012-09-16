@@ -129,8 +129,7 @@ namespace OpenCLTemplate
             HNMathFuncs.StringsColor = Color.DodgerBlue;
             HNMathFuncs.Strings = new List<string>() 
             { "native_cos", "native_divide", "native_exp", "native_exp2", "native_exp10", "native_log", "native_log2", "native_log10", "native_powr", "native_recip", "native_rsqrt", "native_sin", "native_sqrt", "native_tan",
-            "native_cos", "native_divide", "native_exp", "native_exp2", "native_exp10", "native_log", "native_log2", "native_log10", "native_powr", "native_recip", "native_rsqrt", "native_sin", "native_sqrt", "native_tan" };
-
+              "half_cos", "half_divide", "half_exp", "half_exp2", "half_exp10", "half_log", "half_log2", "half_log10", "half_powr", "half_recip", "half_rsqrt", "half_sin", "half_sqrt", "half_tan" };
 
             OpenCLStrings.Add(HNMathFuncs);
             #endregion
@@ -358,6 +357,13 @@ namespace OpenCLTemplate
                 rTB.Refresh();
             }
             #endregion
+
+            if (e.Control && e.KeyCode == Keys.A)
+            {
+                rTB.SelectAll();
+                e.SuppressKeyPress = true;
+                e.Handled = true;
+            }
         }
 
         /// <summary>Forces OpenCL RichTextBox to be updated</summary>

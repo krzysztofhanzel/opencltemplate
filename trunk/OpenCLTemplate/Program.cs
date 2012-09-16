@@ -15,8 +15,8 @@ namespace OpenCLTemplate
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmCLInfo());
-            //Application.Run(new frmCLEdit());
+            //Application.Run(new frmCLInfo());
+            Application.Run(new frmCLEdit());
         }
     }
 }
