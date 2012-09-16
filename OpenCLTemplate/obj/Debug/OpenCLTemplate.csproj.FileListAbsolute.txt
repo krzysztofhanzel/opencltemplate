@@ -34,8 +34,6 @@ D:\Documents and Settings\ut63\My Documents\Visual Studio 2008\Projects\CLTempla
 D:\Documents and Settings\ut63\My Documents\Visual Studio 2008\Projects\CLTemplate\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\pt\OpenCLTemplate.resources.dll
 D:\Documents and Settings\ut63\My Documents\Visual Studio 2008\Projects\CLTemplate\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.dll
 D:\Documents and Settings\ut63\My Documents\Visual Studio 2008\Projects\CLTemplate\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.pdb
-D:\OpenCLTemplate\opencltemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.dll
-D:\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.dll
 H:\Seagate Sync\VOL\VOL00\OpenCLTemplate\opencltemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.dll
 H:\Seagate Sync\VOL\VOL00\OpenCLTemplate\opencltemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.pdb
 H:\Seagate Sync\VOL\VOL00\OpenCLTemplate\opencltemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.xml
@@ -93,3 +91,5 @@ F:\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.csproj.
 F:\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\pt\OpenCLTemplate.resources.dll
 F:\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.dll
 F:\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.pdb
+D:\OpenCLTemplate\opencltemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.exe
+D:\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.exe

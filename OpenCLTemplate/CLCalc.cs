@@ -433,7 +433,7 @@ namespace OpenCLTemplate
                     unsafe
                     {
                         OriginalVarLength = Values.Length;
-                        VarSize = Values.Length * sizeof(int);
+                        VarSize = Values.Length * sizeof(short);
 
                         VarPointer = new ComputeBuffer<short>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, Values);
                     }
