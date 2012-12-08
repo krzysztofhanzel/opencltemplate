@@ -182,6 +182,35 @@ namespace OpenCLTemplate
                 }
             }
 
+
+
+            /// <summary>Loads a .CL program file and prepends the cPreamble to the code.</summary>
+            /// <summary>Throws FileNotFoundException.</summary>
+            /// <param name="FileName">Program filename</param>
+            /// <param name="Preamble">Code that is prepended to the loaded file</param>
+            public static string LoadSourceCode(string FileName, string Preamble)
+            {
+                //try{
+                System.IO.StreamReader sr = new System.IO.StreamReader(FileName);
+                String line = sr.ReadToEnd();
+                Preamble += line;
+                //}catch (Exception){}
+                return Preamble;
+            }
+
+            /// <summary>Loads a .CL program file</summary>
+            /// <summary>Throws FileNotFoundException.</summary>
+            /// <param name="FileName">Program filename</param>
+            public static string LoadSourceCode(string FileName)
+            {
+                //try{
+                System.IO.StreamReader sr = new System.IO.StreamReader(FileName);
+                String line = sr.ReadToEnd();
+                //}catch (Exception){}
+                return line;
+            }
+
+
             #region Compilation
             /// <summary>Compiles program contained in a single string.</summary>
             /// <param name="SourceCode">Source code to compile</param>
@@ -338,6 +367,29 @@ namespace OpenCLTemplate
             {
 
                 #region Constructor. int[], uint[], float[], long[], double[], byte[], short[]
+
+                /// <summary>Creates a variable in the device memory without copying.</summary>            
+                /// <param name="BufferType">Type of the buffer: typeof (int, float, double, long)</param>
+                /// <param name="Count">Number of elements</param>
+                public Variable(Type BufferType, int Count)
+                {
+                    OriginalVarLength = Count;
+                    VarSize = Count * Marshal.SizeOf(BufferType);
+                    if (BufferType == typeof(float))
+                        VarPointer = new ComputeBuffer<float>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.AllocateHostPointer, Count);
+                    else if (BufferType == typeof(int))
+                        VarPointer = new ComputeBuffer<int>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.AllocateHostPointer, Count);
+                    else if (BufferType == typeof(double))
+                        VarPointer = new ComputeBuffer<double>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.AllocateHostPointer, Count);
+                    else if (BufferType == typeof(long))
+                        VarPointer = new ComputeBuffer<long>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.AllocateHostPointer, Count);
+                    else if (BufferType == typeof(uint))
+                        VarPointer = new ComputeBuffer<uint>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.AllocateHostPointer, Count);
+                    else if (BufferType == typeof(byte))
+                        VarPointer = new ComputeBuffer<byte>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.AllocateHostPointer, Count);
+                    else if (BufferType == typeof(short))
+                        VarPointer = new ComputeBuffer<short>(Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.AllocateHostPointer, Count);
+                }
 
 
 
@@ -1025,7 +1077,34 @@ namespace OpenCLTemplate
                     VarPointer = new ComputeImage2D(Program.Context, ComputeMemoryFlags.ReadWrite | ComputeMemoryFlags.CopyHostPointer, format, width, height, 0, new IntPtr(p));
 
                 }
-                
+
+                /// <summary>Allocation of empty memory</summary>
+                /// <param name="DataType">Data type: float, uint8 (byte), int32, etc.</param>
+                private unsafe void CLMalloc(ComputeImageChannelType DataType)
+                {
+                    ComputeImageFormat format = new ComputeImageFormat(ComputeImageChannelOrder.Rgba, DataType);
+
+                    if (OriginalVarLength != 4 * width * height) throw new Exception("Vector length should be 4*width*height");
+
+                    VarPointer = new ComputeImage2D(Program.Context, ComputeMemoryFlags.ReadWrite, format, width, height, 0, IntPtr.Zero);
+                }
+
+
+                /// <summary>Constructor.</summary>
+                /// <param name="Type">Type that will be allocated in device memory. (Empty allocation)</param>
+                /// <param name="Width">Image width.</param>
+                /// <param name="Height">Image height.</param>
+                public Image2D(ComputeImageChannelType Type, int Width, int Height)
+                {
+                    //Aloca memoria no contexto especificado
+                    width = Width;
+                    height = Height;
+                    OriginalVarLength = width * height * 4;
+                    VarSize = OriginalVarLength;
+                    CLMalloc(Type);
+                }
+
+
                 /// <summary>Constructor.</summary>
                 /// <param name="Values">Variable whose size will be allocated in device memory.</param>
                 /// <param name="Width">Image width.</param>
