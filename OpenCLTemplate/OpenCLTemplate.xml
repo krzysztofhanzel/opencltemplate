@@ -206,6 +206,17 @@
         <member name="M:OpenCLTemplate.CLCalc.Program.Sync">
             <summary>Ends all commands being executed</summary>
         </member>
+        <member name="M:OpenCLTemplate.CLCalc.Program.LoadSourceCode(System.String,System.String)">
+            <summary>Loads a .CL program file and prepends the cPreamble to the code.</summary>
+            <summary>Throws FileNotFoundException.</summary>
+            <param name="FileName">Program filename</param>
+            <param name="Preamble">Code that is prepended to the loaded file</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLCalc.Program.LoadSourceCode(System.String)">
+            <summary>Loads a .CL program file</summary>
+            <summary>Throws FileNotFoundException.</summary>
+            <param name="FileName">Program filename</param>
+        </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Compile(System.String)">
             <summary>Compiles program contained in a single string.</summary>
             <param name="SourceCode">Source code to compile</param>
@@ -264,6 +275,11 @@
         </member>
         <member name="T:OpenCLTemplate.CLCalc.Program.Variable">
             <summary>Variables class</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLCalc.Program.Variable.#ctor(System.Type,System.Int32)">
+            <summary>Creates a variable in the device memory without copying.</summary>            
+            <param name="BufferType">Type of the buffer: typeof (int, float, double, long)</param>
+            <param name="Count">Number of elements</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Variable.#ctor(System.Int32,System.Type)">
             <summary>Creates variable from OpenGL buffer</summary>
@@ -497,6 +513,16 @@
             <summary>Unsafe allocation of memory</summary>
             <param name="p">Pointer to data</param>
             <param name="DataType">Data type: float, uint8 (byte), int32, etc.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.CLMalloc(Cloo.ComputeImageChannelType)">
+            <summary>Allocation of empty memory</summary>
+            <param name="DataType">Data type: float, uint8 (byte), int32, etc.</param>
+        </member>
+        <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.#ctor(Cloo.ComputeImageChannelType,System.Int32,System.Int32)">
+            <summary>Constructor.</summary>
+            <param name="Type">Type that will be allocated in device memory. (Empty allocation)</param>
+            <param name="Width">Image width.</param>
+            <param name="Height">Image height.</param>
         </member>
         <member name="M:OpenCLTemplate.CLCalc.Program.Image2D.#ctor(System.Single[],System.Int32,System.Int32)">
             <summary>Constructor.</summary>
