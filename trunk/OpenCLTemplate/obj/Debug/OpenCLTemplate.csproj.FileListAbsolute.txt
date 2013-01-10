@@ -93,7 +93,6 @@ F:\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.dll
 F:\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.pdb
 D:\OpenCLTemplate\opencltemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.exe
 D:\OpenCLTemplate\opencltemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.exe
-E:\Source Control\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.dll
 E:\Source Control\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.pdb
 E:\Source Control\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.xml
 E:\Source Control\OpenCLTemplate\OpenCLTemplate\bin\Debug\pt\OpenCLTemplate.resources.dll
@@ -110,5 +109,6 @@ E:\Source Control\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.Propert
 E:\Source Control\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.frmCLInfo.pt.resources
 E:\Source Control\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.csproj.GenerateResource.Cache
 E:\Source Control\OpenCLTemplate\OpenCLTemplate\obj\Debug\pt\OpenCLTemplate.resources.dll
-E:\Source Control\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.dll
 E:\Source Control\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.pdb
+E:\Source Control\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.dll
+E:\Source Control\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.dll

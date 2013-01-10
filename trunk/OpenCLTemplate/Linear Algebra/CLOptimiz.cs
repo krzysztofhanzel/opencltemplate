@@ -1738,7 +1738,7 @@ namespace OpenCLTemplate.LinearAlgebra
                     else
                     {
                         floatSymPosDefMatrix AtA = null;
-                        AtA = BLAS.MatrTranspMatrProd(CLA, CLlambda, ref AtA);
+                        AtA = BLAS.MatrTranspMatrProd(CLA, CLW, CLlambda, ref AtA);
 
                         CLv = BLAS.MatrTraspVecMult(CLA, CLW, CLr, ref CLv);
 
