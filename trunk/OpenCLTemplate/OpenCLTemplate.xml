@@ -1458,6 +1458,9 @@
             <summary>Encapsulates Linear Algebra functions, especially symmetric positive definite matrices.
             WARNING: Do not exceed linear systems of size 23000</summary>
         </member>
+        <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.UseOpenCLIfAvailable">
+            <summary>Use OpenCL?</summary>
+        </member>
         <member name="F:OpenCLTemplate.LinearAlgebra.floatLinalg.SUBMATRIXSIZE">
             <summary>Submatrix size, based on maximum amount of workitems per workgroup</summary>
         </member>

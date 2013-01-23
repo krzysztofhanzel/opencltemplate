@@ -11,7 +11,8 @@ namespace OpenCLTemplate.LinearAlgebra
     /// WARNING: Do not exceed linear systems of size 23000</summary>
     public partial class floatLinalg
     {
-
+        /// <summary>Use OpenCL?</summary>
+        public static bool UseOpenCLIfAvailable = true;
 
         #region Matrices and vector classes definitions and BLAS functions
 
@@ -27,7 +28,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (u.Length != v.Length) throw new Exception("Incompatible dimensions");
                 if (ans.Length != u.Length) throw new Exception("Ans dimension should be equal to vectors dimension");
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     u.CLCoef.WriteToDevice(new float[] { alpha });
                     v.CLCoef.WriteToDevice(new float[] { beta });
@@ -51,7 +52,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (u.Rows != v.Rows || u.Cols != v.Cols) throw new Exception("Incompatible dimensions");
                 if (ans.Rows != u.Rows || ans.Cols != u.Cols) throw new Exception("Ans dimension should be equal to vectors dimension");
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     u.CLCoef.WriteToDevice(new float[] { alpha });
                     v.CLCoef.WriteToDevice(new float[] { beta });
@@ -78,7 +79,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (temp == null) temp = new floatVector(new float[u.Length]);
                 if (u.Length != temp.Length) throw new Exception("Temp should have the same length as u and v");
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     kernelInnerProd.Execute(new CLCalc.Program.MemoryObject[] { u.CLValues, v.CLValues, temp.CLValues }, u.Length);
                 }
@@ -96,7 +97,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (ans == null) ans = new floatVector(new float[u.Length]);
                 if (ans.Length != u.Length) throw new Exception("ans and u should have same length");
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     kernelElemWiseProd.Execute(new CLCalc.Program.MemoryObject[] { u.CLValues, ans.CLValues }, u.Length);
                 }
@@ -116,7 +117,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (ans == null) ans = new floatVector(new float[u.Length]);
                 if (ans.Length != u.Length) throw new Exception("ans and u should have same length");
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     kernelElemWiseInv.Execute(new CLCalc.Program.MemoryObject[] { u.CLValues, ans.CLValues }, u.Length);
                 }
@@ -136,7 +137,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (ans == null) ans = new floatVector(new float[u.Length]);
                 if (ans.Length != u.Length) throw new Exception("ans and u should have same length");
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     kernelElemWiseInv2.Execute(new CLCalc.Program.MemoryObject[] { u.CLValues, ans.CLValues }, u.Length);
                 }
@@ -155,7 +156,7 @@ namespace OpenCLTemplate.LinearAlgebra
             public static float SumVectorElements(floatVector CLv)
             {
                 float resp = 0;
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     /*
                      The idea here is to create a reduction in which the access pattern to the vectors is coalesced.
@@ -214,7 +215,7 @@ namespace OpenCLTemplate.LinearAlgebra
             public static float SumMatrixElements(floatMatrix CLv)
             {
                 float resp = 0;
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     /*
                      The idea here is to create a reduction in which the access pattern to the vectors is coalesced.
@@ -271,7 +272,7 @@ namespace OpenCLTemplate.LinearAlgebra
             /// <summary>Copies src vector contents to dst</summary>
             public static void CopyVector(floatVector Src, floatVector Dst)
             {
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     kernelCopyBuffer.Execute(new CLCalc.Program.MemoryObject[] { Src.CLValues, Dst.CLValues }, Src.Length);
                 }
@@ -284,7 +285,7 @@ namespace OpenCLTemplate.LinearAlgebra
             /// <summary>Copies src vector contents to dst</summary>
             public static void CopyMatrix(floatMatrix Src, floatMatrix Dst)
             {
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     kernelCopyBuffer.Execute(new CLCalc.Program.MemoryObject[] { Src.CLValues, Dst.CLValues }, Src.CLValues.OriginalVarLength);
                 }
@@ -297,7 +298,7 @@ namespace OpenCLTemplate.LinearAlgebra
             /// <summary>Returns true if v has any positive entries</summary>
             public static bool HasPositiveEntries(floatVector v)
             {
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     float[] resp = new float[1];
                     v.CLCoef.WriteToDevice(resp);
@@ -324,7 +325,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (v.Length != M.Cols) throw new Exception("v length should match M cols");
                 if (ans == null) ans = new floatVector(new float[M.Rows]);
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     v.CLCoef.WriteToDevice(new float[] { alpha });
                     kernelMatrVecProd.Execute(new CLCalc.Program.MemoryObject[] { M.CLValues, M.CLDim, v.CLValues, v.CLCoef, ans.CLValues }, M.Rows);
@@ -353,7 +354,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (u.Length != M.Rows) throw new Exception("u length should match M rows");
                 if (ans == null) ans = new floatVector(new float[M.Rows]);
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     v.CLCoef.WriteToDevice(new float[] { alpha });
                     u.CLCoef.WriteToDevice(new float[] { beta });
@@ -382,7 +383,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (u.Length != D.Rows) throw new Exception("u length should match D dimension");
                 if (ans == null) ans = new floatVector(new float[D.Rows]);
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     u.CLCoef.WriteToDevice(new float[] { alpha });
                     kernelDiagVecProd.Execute(new CLCalc.Program.MemoryObject[] { D.CLValues, u.CLValues, u.CLCoef, ans.CLValues }, D.Rows);
@@ -405,7 +406,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (u.Cols != D.Rows) throw new Exception("u Cols should match D dimension");
                 if (ans == null) ans = new floatMatrix(new float[u.Cols, u.Rows]);
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     u.CLCoef.WriteToDevice(new float[] { alpha });
                     kernelDiagTranspMatProd.Execute(new CLCalc.Program.MemoryObject[] { D.CLValues, u.CLValues, u.CLCoef, ans.CLValues }, new int[] { u.Cols, u.Rows });
@@ -447,7 +448,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (ans.Length != v.Length) throw new Exception("ans and v should have the same length");
                 if (v.Length != M.getN) throw new Exception("Invalid vector length to multiply by this matrix");
 
-                if (CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL)
+                if (CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL || !floatLinalg.UseOpenCLIfAvailable)
                 {
                     MultiplyNoCL(M, v, ref ans);
                     return ans;
@@ -487,7 +488,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 H.LinearSolve(A, refine, ref temp);
 
                 //Go on to multiplying A*temp
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     kernelComputeAinvHAt.Execute(new CLCalc.Program.MemoryObject[] { A.CLValues, A.CLDim, temp.CLValues, ans.CLValues }, (m * (m + 1)) >> 1);
                     ans.IsCholeskyFactorized = false;
@@ -528,7 +529,7 @@ namespace OpenCLTemplate.LinearAlgebra
             {
                 if (ans == null) ans = new floatMatrix(new float[A.Cols, M.getN]);
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     if (!M.IsMatrixInClMemoryUpdated) M.CLValues.WriteToDevice(M.Values);
                     kernelSymMatrMatrMultiply.Execute(new CLCalc.Program.MemoryObject[] { M.CLValues, A.CLValues, ans.CLValues }, new int[] { A.Rows, A.Cols });
@@ -559,7 +560,7 @@ namespace OpenCLTemplate.LinearAlgebra
             /// <param name="AtA">Answer, A transpose times A</param>
             public static floatSymPosDefMatrix MatrTranspMatrProd(floatMatrix A, floatDiag W, floatVector lambda, ref floatSymPosDefMatrix AtA)
             {
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     return AuxLSAtACL(A, W, lambda, ref AtA);
                 }
@@ -579,7 +580,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (ans == null) ans = new floatMatrix(new float[A.Rows, B.Rows]);
                 if (ans.Rows != A.Rows || ans.Cols != B.Rows) throw new Exception("Invalid ans dimensions");
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     kernelRegularMatrTranspMatrProd.Execute(new CLCalc.Program.MemoryObject[] { A.CLValues, B.CLValues, ans.CLValues, A.CLDim }, new int[] { A.Rows, B.Rows });
                 }
@@ -706,7 +707,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (A.Cols != ans.Length) throw new Exception("Incompatible A and ans dimensions");
 
 
-                if (CLCalc.CLAccelerationType.UsingCL == CLCalc.CLAcceleration)
+                if (UseOpenCLIfAvailable && CLCalc.CLAccelerationType.UsingCL == CLCalc.CLAcceleration)
                 {
                     b.CLCoef.WriteToDevice(new float[] {alpha});
                     kernelTranspMatrVecProdW.Execute(new CLCalc.Program.MemoryObject[] { A.CLValues, A.CLDim, b.CLValues, b.CLCoef, W.CLValues, ans.CLValues }, A.Cols);
@@ -849,15 +850,15 @@ namespace OpenCLTemplate.LinearAlgebra
             /// <summary>Computes Cholesky factorization of a matrix</summary>
             public void ComputeCholesky()
             {
-                if (CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL/* || this.N < 120*/)
+                if (!UseOpenCLIfAvailable || CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL/* || this.N < 120*/)
                 {
                     NoCLCholesky();
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLcholDec.WriteToDevice(cholDec);
+                    if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLcholDec.WriteToDevice(cholDec);
                 }
                 else CLBlockCholesky();
 
                 //float last;
-                //if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                //if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 //{
                 //    CLcholDec.ReadFromDeviceTo(cholDec);
                 //    last = cholDec[((getN * (getN + 1)) >> 1) - 1];
@@ -977,7 +978,7 @@ namespace OpenCLTemplate.LinearAlgebra
             {
                 if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.Unknown) CLCalc.InitCL();
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     CLoffSet = new CLCalc.Program.Variable(new int[1]);
                     CLValues = new CLCalc.Program.Variable(this.Values);
@@ -1100,7 +1101,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 floatVector CLbb = new floatVector(b);
                 floatVector resp = null;
                 LinearSolve(CLbb, refine, ref resp);
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     resp.CLValues.ReadFromDeviceTo(resp.Values);
                 }
@@ -1115,7 +1116,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 floatMatrix CLbb = new floatMatrix(b);
                 floatMatrix resp = null;
                 LinearSolve(CLbb, true, ref resp);
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     resp.CLValues.ReadFromDeviceTo(resp.Values);
                 }
@@ -1146,13 +1147,13 @@ namespace OpenCLTemplate.LinearAlgebra
 
 
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     M.CLValues.ReadFromDeviceTo(M.Values);
                     this.CLcholDec.ReadFromDeviceTo(this.cholDec);
                 }
                 linsolveMatrix(M, ref invHAt);
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) invHAt.CLValues.WriteToDevice(invHAt.Values);
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) invHAt.CLValues.WriteToDevice(invHAt.Values);
 
 
                 ////TO DO: OpenCL fwd/bksubs
@@ -1182,7 +1183,7 @@ namespace OpenCLTemplate.LinearAlgebra
                     BLAS.LinearCombination(1, matMx, -1, M, ref matResidues);
 
 
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                    if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                         kernelElemWiseAbs.Execute(new CLCalc.Program.MemoryObject[] { matResidues.CLValues, matResiduesAbs.CLValues }, M.Values.Length);
                     else
                     {
@@ -1197,7 +1198,7 @@ namespace OpenCLTemplate.LinearAlgebra
                     {
                         LinsolveCLMatrix(matResidues, ref matDeltax);
 
-                        if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                        if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                             kernelInPlaceSubtract.Execute(new CLCalc.Program.MemoryObject[] { invHAt.CLValues, matDeltax.CLValues }, M.Values.Length);
                         else
                         {
@@ -1245,9 +1246,9 @@ namespace OpenCLTemplate.LinearAlgebra
 
 
                 CLbb.ReadFromDevice();
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) this.CLcholDec.ReadFromDeviceTo(this.cholDec);
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) this.CLcholDec.ReadFromDeviceTo(this.cholDec);
                 linsolve(CLbb.Values, ref resp);
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) resp.CLValues.WriteToDevice(resp.Values);
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) resp.CLValues.WriteToDevice(resp.Values);
 
                 ////A FAZER: Fwd/bksubs com OpenCL
                 //linsolveCL(CLbb, ref resp);
@@ -1263,7 +1264,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 {
                     //resp.ReadFromDevice();
                     //CLbb.ReadFromDevice();
-                    //if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                    //if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                     //{
                     //    this.CLValues.ReadFromDeviceTo(this.Values);
                     //    this.CLcholDec.ReadFromDeviceTo(this.cholDec);
@@ -1289,7 +1290,7 @@ namespace OpenCLTemplate.LinearAlgebra
 
                     BLAS.LinearCombination(1, vecMx, -1, CLbb, ref vecResidues);
 
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                    if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                         kernelElemWiseAbs.Execute(new CLCalc.Program.MemoryObject[] { vecResidues.CLValues, vecResiduesAbs.CLValues }, N);
                     else
                     {
@@ -1304,7 +1305,7 @@ namespace OpenCLTemplate.LinearAlgebra
                     {
                         linsolveCL(vecResidues, ref vecDeltax);
 
-                        if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                        if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                             kernelInPlaceSubtract.Execute(new CLCalc.Program.MemoryObject[] { resp.CLValues, vecDeltax.CLValues }, N);
                         else
                         {
@@ -1330,7 +1331,7 @@ namespace OpenCLTemplate.LinearAlgebra
 
             private void linsolveCL(floatVector CLbb, ref floatVector resp)
             {
-                if (CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL)
+                if (!UseOpenCLIfAvailable || CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL)
                 {
                     linsolve(CLbb.Values, ref resp);
                     return;
@@ -1471,7 +1472,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 int nRHSleftOver = M.Rows - SUBMATRIXSIZE*nRHSMult;
 
 
-                if (CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL)
+                if (!UseOpenCLIfAvailable || CLCalc.CLAcceleration != CLCalc.CLAccelerationType.UsingCL)
                 {
                     linsolveMatrix(M, ref resp);
                     return;
@@ -1609,7 +1610,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 {
                     if (!this.IsCholeskyFactorized) this.ComputeCholesky();
 
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLcholDec.ReadFromDeviceTo(cholDec);
+                    if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLcholDec.ReadFromDeviceTo(cholDec);
 
                     float det = 1;
                     for (int i = 0; i < N; i++)
@@ -1651,7 +1652,7 @@ namespace OpenCLTemplate.LinearAlgebra
             {
                 using (StreamWriter sw = new StreamWriter(file))
                 {
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLValues.ReadFromDeviceTo(Values);
+                    if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLValues.ReadFromDeviceTo(Values);
                     sw.WriteLine("# Created by OpenCLTemplate " + DateTime.Now.ToString());
                     sw.WriteLine("# name: P");
                     sw.WriteLine("# type: matrix");
@@ -1728,7 +1729,11 @@ namespace OpenCLTemplate.LinearAlgebra
                     //Computes residues and gradient
                     f(x, ref r, ref A, true);
                     CLA.SetValues(A);
-                    CLr.CLValues.WriteToDevice(r);
+                    if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLr.CLValues.WriteToDevice(r);
+                    else
+                    {
+                        for (int kk = 0; kk < r.Length; kk++) CLr.Values[kk] = r[kk];
+                    }
 
                     errAnt = err;
                     err = NormAtb(A, r, m, n);
@@ -1742,7 +1747,7 @@ namespace OpenCLTemplate.LinearAlgebra
 
                         CLv = BLAS.MatrTraspVecMult(CLA, CLW, CLr, ref CLv);
 
-                        if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLv.CLValues.ReadFromDeviceTo(CLv.Values);
+                        if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLv.CLValues.ReadFromDeviceTo(CLv.Values);
                         v = AtA.LinearSolve(CLv.Values);
 
                         for (int k = 0; k < v.Length; k++) v[k] = -v[k];
@@ -2034,7 +2039,7 @@ namespace OpenCLTemplate.LinearAlgebra
             public floatVector(float[] Vals)
             {
                 this.Values = (float[])Vals.Clone();
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     CLValues = new CLCalc.Program.Variable(Values);
                     CLCoef = new CLCalc.Program.Variable(new float[1]);
@@ -2052,7 +2057,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 //if I ever call a LinearSolve
                 symM.IsCholeskyFactorized = false;
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     CLCoef = new CLCalc.Program.Variable(new float[1]);
                 }
@@ -2099,7 +2104,7 @@ namespace OpenCLTemplate.LinearAlgebra
             /// <summary>Reads from OpenCL if using OpenCL</summary>
             public void ReadFromDevice()
             {
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLValues.ReadFromDeviceTo(Values);
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLValues.ReadFromDeviceTo(Values);
             }
             #endregion
 
@@ -2112,7 +2117,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 this.ReadFromDevice();
                 using (StreamWriter sw = new StreamWriter(file))
                 {
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLValues.ReadFromDeviceTo(Values);
+                    if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLValues.ReadFromDeviceTo(Values);
                     sw.WriteLine("# Created by OpenCLTemplate " + DateTime.Now.ToString());
                     sw.WriteLine("# name: q");
                     sw.WriteLine("# type: matrix");
@@ -2194,7 +2199,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 nCols = Vals.GetLength(1);
                 Values = new float[nRows * nCols];
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     CLValues = new CLCalc.Program.Variable(Values);
                     CLDim = new CLCalc.Program.Variable(new int[] { nRows, nCols });
@@ -2217,7 +2222,7 @@ namespace OpenCLTemplate.LinearAlgebra
                         Values[j + nCols * i] = Vals[i, j];
 
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                     CLValues.WriteToDevice(Values);
             }
 
@@ -2234,7 +2239,7 @@ namespace OpenCLTemplate.LinearAlgebra
             {
                 using (StreamWriter sw = new StreamWriter(file))
                 {
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLValues.ReadFromDeviceTo(Values);
+                    if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLValues.ReadFromDeviceTo(Values);
                     sw.WriteLine("# Created by OpenCLTemplate " + DateTime.Now.ToString());
                     sw.WriteLine("# name: A");
                     sw.WriteLine("# type: matrix");
@@ -2287,7 +2292,7 @@ namespace OpenCLTemplate.LinearAlgebra
             public floatDiag(float[] Vals)
             {
                 this.Values = (float[])Vals.Clone();
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     CLValues = new CLCalc.Program.Variable(Values);
                 }
@@ -2533,7 +2538,7 @@ namespace OpenCLTemplate.LinearAlgebra
 
 
                     ////////DEBUG
-                    //if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                    //if (UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                     //{
                     //    HessF.CLValues.ReadFromDeviceTo(HessF.Values);
                     //    HessF.CLcholDec.ReadFromDeviceTo(HessF.cholDec);
@@ -2550,7 +2555,7 @@ namespace OpenCLTemplate.LinearAlgebra
                     iters++;
                 }
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLx.CLValues.ReadFromDeviceTo(CLx.Values);
+                if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLx.CLValues.ReadFromDeviceTo(CLx.Values);
                 return CLx.Values;
             }
 
@@ -2642,7 +2647,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 floatLinalg.floatVector resp = null;
                 AtA.LinearSolve(Atb, true, ref resp);
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) resp.CLValues.ReadFromDeviceTo(resp.Values);
+                if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) resp.CLValues.ReadFromDeviceTo(resp.Values);
                 return resp.Values;
             }
 
@@ -2785,7 +2790,7 @@ namespace OpenCLTemplate.LinearAlgebra
                     floatLinalg.BLAS.CopyVector(Axmb, tempAxmb);
                     floatLinalg.BLAS.CopyVector(x, tempX);
 
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                    if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                     {
                         kernelpNorm.Execute(new CLCalc.Program.Variable[] { tempX.CLValues, CLq.CLValues, lambda.CLValues }, tempX.Length);
                         kernelpNorm.Execute(new CLCalc.Program.Variable[] { tempAxmb.CLValues, CLp.CLValues, w.CLValues }, tempAxmb.Length);
@@ -2807,7 +2812,7 @@ namespace OpenCLTemplate.LinearAlgebra
                     if (ComputeGradHess)
                     {
                         //Atz
-                        if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                        if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                             kerneldpNorm.Execute(new CLCalc.Program.Variable[] { Axmb.CLValues, CLp.CLValues, w.CLValues, dtempAtz.CLValues, d2tempAtz.CLValues }, tempAxmb.Length);
                         else
                         {
@@ -2823,7 +2828,7 @@ namespace OpenCLTemplate.LinearAlgebra
                         floatLinalg.BLAS.MatrTraspVecMult(A, Identity, dtempAtz, ref tempAtz);
 
                         //x
-                        if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                        if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                             kerneldpNorm.Execute(new CLCalc.Program.Variable[] { x.CLValues, CLq.CLValues, lambda.CLValues, tempdX.CLValues, tempd2x.CLValues }, x.Length);
                         else
                         {
@@ -3031,7 +3036,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (xF[xF.Length - 1] < 0) //feasible
                 {
                     for (int i = 0; i < x0.Length; i++) x0.Values[i] = xF[i];
-                    if (CLCalc.CLAccelerationType.UsingCL == CLCalc.CLAcceleration)
+                    if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAccelerationType.UsingCL == CLCalc.CLAcceleration)
                     {
                         x0.CLValues.WriteToDevice(x0.Values);
                     }
@@ -3049,7 +3054,7 @@ namespace OpenCLTemplate.LinearAlgebra
             static bool feasStopFunc(floatLinalg.floatVector x, floatLinalg.floatVector lambda, floatLinalg.floatVector nu)
             {
                 float[] lastElem = new float[1];
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     if (x.CLn == null) x.CLn = new CLCalc.Program.Variable(new int[] { x.Values.Length });
                     kernelgetLast.Execute(new CLCalc.Program.MemoryObject[] { x.CLValues, x.CLn, x.CLCoef }, 1);
@@ -3267,7 +3272,7 @@ namespace OpenCLTemplate.LinearAlgebra
                     xfeas = CheckFeasibility(x0, M, d, A, b);
                     feasible = (xfeas != null);
 
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLx.CLValues.WriteToDevice(xfeas);
+                    if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLx.CLValues.WriteToDevice(xfeas);
                     else for (int i = 0; i < xfeas.Length; i++) CLx.Values[i] = xfeas[i];
                 }
 
@@ -3294,7 +3299,7 @@ namespace OpenCLTemplate.LinearAlgebra
                         {
                             //DEBUG, taking too long to converge
                             for (int i = 0; i < CLlambda.Values.Length; i++) CLlambda.Values[i] = 0.1f;
-                            if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLlambda.CLValues.WriteToDevice(CLlambda.Values);
+                            if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLlambda.CLValues.WriteToDevice(CLlambda.Values);
                             t *= 0.1f;
                         }
 
@@ -3833,10 +3838,10 @@ namespace OpenCLTemplate.LinearAlgebra
                     {
                         y.Values[j] = _classifs[j] == Categories[i] ? 1 : 0;
                     }
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) y.CLValues.WriteToDevice(y.Values);
+                    if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) y.CLValues.WriteToDevice(y.Values);
 
                     int iters;
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLTheta.CLValues.WriteToDevice(x0);
+                    if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLTheta.CLValues.WriteToDevice(x0);
                     else for (int k = 0; k < CLTheta.Length; k++) CLTheta.Values[k] = x0[k];
                     float[] beta = floatOptimization.UnconstrainedMinimization.Solve(CLTheta, RegularizedLogistReg, out iters, Hess, CLGrad, temp, CLDeltaTheta);
 
@@ -3864,7 +3869,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 floatLinalg.BLAS.CopyVector(CLTheta, tempX);
 
                 //Computes cost and gradient/hessian terms
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                 {
                     kernelComputeLogistRegParams.Execute(new CLCalc.Program.Variable[] { XTheta.CLValues, y.CLValues, z1.CLValues, z2.CLValues, cost.CLValues }, XTheta.Length);
 
@@ -3894,7 +3899,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 if (ComputeGradHess)
                 {
                     //Regularization
-                    if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
+                    if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL)
                     {
                         kerneldpNorm.Execute(new CLCalc.Program.Variable[] { CLTheta.CLValues, CLq.CLValues, lambda.CLValues, tempdX.CLValues, tempd2X.CLValues }, CLTheta.Length);
                     }
@@ -3936,7 +3941,7 @@ namespace OpenCLTemplate.LinearAlgebra
                 CLTheta.Values[0] = 1;
                 for (int i = 0; i < Sample.Length; i++) CLTheta.Values[i + 1] = Sample[i];
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLTheta.CLValues.WriteToDevice(CLTheta.Values);
+                if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) CLTheta.CLValues.WriteToDevice(CLTheta.Values);
 
                 floatLinalg.BLAS.MatrVecProd(CLM, CLTheta, 1, ref CLv);
 
@@ -3969,7 +3974,7 @@ namespace OpenCLTemplate.LinearAlgebra
 
                 floatLinalg.BLAS.MatrTranspMatrProd(CLM, Samples, ref Values);
 
-                if (CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) Values.CLValues.ReadFromDeviceTo(Values.Values);
+                if (floatLinalg.UseOpenCLIfAvailable && CLCalc.CLAcceleration == CLCalc.CLAccelerationType.UsingCL) Values.CLValues.ReadFromDeviceTo(Values.Values);
 
                 //Values dimensions: nSamples x nCategories
                 maxVals = new float[n];
