@@ -155,7 +155,10 @@
         <member name="M:OpenCLTemplate.CLCalc.InitCL(Cloo.ComputeDeviceTypes)">
             <summary>Initializes OpenCL and reads devices</summary>
         </member>
-        <member name="M:OpenCLTemplate.CLCalc.InitCL(Cloo.ComputeDeviceTypes,Cloo.ComputeContext,Cloo.ComputeCommandQueue)">
+        <member name="M:OpenCLTemplate.CLCalc.InitCL(Cloo.ComputeDeviceTypes,System.Int32)">
+            <summary>Initializes OpenCL and reads devices</summary>
+        </member>
+        <member name="M:OpenCLTemplate.CLCalc.InitCL(Cloo.ComputeDeviceTypes,Cloo.ComputeContext,Cloo.ComputeCommandQueue,System.Int32)">
             <summary>Initializes OpenCL and reads devices. Uses previously created context and command queue if supplied. In that case DevicesToUse is ignored.</summary>
         </member>
         <member name="F:OpenCLTemplate.CLCalc.CLPlatforms">
