@@ -62,11 +62,17 @@ namespace OpenCLTemplate
         /// <summary>Initializes OpenCL and reads devices</summary>
         public static void InitCL(ComputeDeviceTypes DevicesToUse)
         {
-            InitCL(DevicesToUse, null, null);
+            InitCL(DevicesToUse, null, null, 0);
+        }
+
+        /// <summary>Initializes OpenCL and reads devices</summary>
+        public static void InitCL(ComputeDeviceTypes DevicesToUse, int PlatformToUse)
+        {
+            InitCL(DevicesToUse, null, null, PlatformToUse);
         }
 
         /// <summary>Initializes OpenCL and reads devices. Uses previously created context and command queue if supplied. In that case DevicesToUse is ignored.</summary>
-        public static void InitCL(ComputeDeviceTypes DevicesToUse, ComputeContext PrevCtx, ComputeCommandQueue PrevCQ)
+        public static void InitCL(ComputeDeviceTypes DevicesToUse, ComputeContext PrevCtx, ComputeCommandQueue PrevCQ, int PlatformToUse)
         {
             if (CLAcceleration != CLAccelerationType.UsingCL)
             {
@@ -80,7 +86,7 @@ namespace OpenCLTemplate
                     CLPlatforms = new List<ComputePlatform>();
                     foreach (ComputePlatform pp in ComputePlatform.Platforms) CLPlatforms.Add(pp);
 
-                    ComputeContextPropertyList Properties = new ComputeContextPropertyList(ComputePlatform.Platforms[0]);
+                    ComputeContextPropertyList Properties = new ComputeContextPropertyList(ComputePlatform.Platforms[PlatformToUse]);
 
                     if (PrevCtx == null)
                     {

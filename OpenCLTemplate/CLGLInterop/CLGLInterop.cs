@@ -113,7 +113,7 @@ namespace OpenCLTemplate.CLGLInterop
             if (CreateCLGLCtx)
             {
                 CreateCLGLContext(deviceNumber);
-                CLCalc.InitCL(ComputeDeviceTypes.Gpu, CLGLCtx, CQ);
+                CLCalc.InitCL(ComputeDeviceTypes.Gpu, CLGLCtx, CQ, Cloo.ComputePlatform.Platforms.IndexOf(CLGLCtx.Platform));
             }
 
 
