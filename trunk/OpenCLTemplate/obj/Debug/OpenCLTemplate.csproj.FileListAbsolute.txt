@@ -112,3 +112,22 @@ E:\Source Control\OpenCLTemplate\OpenCLTemplate\obj\Debug\pt\OpenCLTemplate.reso
 E:\Source Control\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.pdb
 E:\Source Control\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.dll
 E:\Source Control\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.dll
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.dll
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.pdb
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenCLTemplate.xml
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\bin\Debug\pt\OpenCLTemplate.resources.dll
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\bin\Debug\Cloo.dll
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenTK.dll
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenTK.GLControl.dll
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\bin\Debug\Cloo.xml
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenTK.xml
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\bin\Debug\OpenTK.GLControl.xml
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.csprojResolveAssemblyReference.cache
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.frmCLInfo.resources
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.frmCLEdit.resources
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.Properties.Resources.resources
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.frmCLInfo.pt.resources
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.csproj.GenerateResource.Cache
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\obj\Debug\pt\OpenCLTemplate.resources.dll
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.dll
+C:\Users\Douglas\SkyDrive\Desenvolvimento\OpenCLTemplate\OpenCLTemplate\obj\Debug\OpenCLTemplate.pdb
