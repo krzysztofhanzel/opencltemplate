@@ -56,7 +56,14 @@ namespace OpenCLTemplate
         /// <summary>Initializes OpenCL and reads devices</summary>
         public static void InitCL()
         {
-            InitCL(ComputeDeviceTypes.Gpu);
+            int n = Cloo.ComputePlatform.Platforms.Count, i = 0;
+            InitCL(ComputeDeviceTypes.Gpu, i);
+
+            while (i < n && (CLCalc.CLDevices == null || CLCalc.CLDevices.Count == 0))
+            {
+                i++;
+                InitCL(ComputeDeviceTypes.Gpu, i);
+            }
         }
 
         /// <summary>Initializes OpenCL and reads devices</summary>
