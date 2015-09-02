@@ -1,0 +1,1 @@
+OpenCLTemplate is a tool designed to allow programmers to quickly develop GPU accelerated software using C# and OpenCL technologies.
